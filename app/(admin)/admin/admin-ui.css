@@ -1,0 +1,97 @@
+/* ===================================================================
+   XeeTimes Admin — design tokens & shell styling (from "XeeTimes Admin.dc.html").
+   Dark/light via [data-adm] on <html>. Red (#c8102e) accent.
+   The shell (sidebar/topbar/dashboard) uses these tokens directly;
+   existing Tailwind pages are retoned for dark mode at the bottom.
+   =================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300..800;1,400..600&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&display=swap');
+
+:root,
+:root[data-adm="dark"] {
+  --bg: #0a0a0c; --panel: #101014; --panel2: #16161c; --rail: #0c0c10;
+  --line: rgba(255, 255, 255, .08); --line2: rgba(255, 255, 255, .05);
+  --ink: #f4f1ea; --ink2: #a7a59f; --ink3: #6b6a66;
+  --red: #c8102e; --red2: #a50d26; --blue: #4a8ced; --green: #39d98a; --amber: #f0b429; --violet: #9b7bf0;
+  --redbg: rgba(200, 16, 46, .30); --bluebg: rgba(74, 140, 237, .13); --greenbg: rgba(57, 217, 138, .13); --amberbg: rgba(240, 180, 41, .13); --violetbg: rgba(155, 123, 240, .13);
+  --active: rgba(200, 16, 46, .40); --hover: rgba(255, 255, 255, .04);
+  --shadow: 0 1px 3px rgba(0, 0, 0, .4);
+}
+:root[data-adm="light"] {
+  --bg: #F9FAFB; --panel: #ffffff; --panel2: #f3f4f6; --rail: #ffffff;
+  --line: rgba(17, 24, 39, .10); --line2: rgba(17, 24, 39, .06);
+  --ink: #111827; --ink2: #4b5563; --ink3: #9097a3;
+  --red: #c8102e; --red2: #a50d26; --blue: #2f6bd6; --green: #1b9e63; --amber: #bd860c; --violet: #7556d0;
+  --redbg: rgba(200, 16, 46, .10); --bluebg: rgba(47, 107, 214, .10); --greenbg: rgba(27, 158, 99, .10); --amberbg: rgba(240, 180, 41, .12); --violetbg: rgba(117, 86, 208, .10);
+  --active: rgba(200, 16, 46, .10); --hover: rgba(17, 24, 39, .04);
+  --shadow: 0 1px 3px rgba(20, 18, 12, .08);
+}
+
+.adm {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Hanken Grotesk', 'utheemu', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.adm .num { font-family: 'Newsreader', serif; }
+.adm ::selection { background: var(--red); color: #fff; }
+.adm ::-webkit-scrollbar { width: 10px; height: 10px; }
+.adm ::-webkit-scrollbar-track { background: transparent; }
+.adm ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 20px; border: 2px solid transparent; background-clip: padding-box; }
+:root[data-adm="light"] .adm .ic-sun, :root:not([data-adm="light"]) .adm .ic-moon { display: none; }
+
+/* Site logo in the admin shell — brighten the navy mark on dark backgrounds */
+[data-adm="dark"] .adm-logo-img { filter: brightness(1.95) saturate(1.1); }
+
+/* Dhivehi data still needs a Thaana face (Hanken has no Thaana glyphs) */
+.adm, .adm input, .adm textarea, .adm select, .adm button { font-family: 'Hanken Grotesk', 'utheemu', system-ui, sans-serif; }
+
+/* ---- Dark-mode retone for the existing Tailwind admin pages -------------- */
+[data-adm="dark"] .adm .bg-white { background: var(--panel) !important; }
+[data-adm="dark"] .adm .bg-gray-50 { background: var(--bg) !important; }
+[data-adm="dark"] .adm .bg-gray-100 { background: var(--panel2) !important; }
+[data-adm="dark"] .adm .text-gray-900,
+[data-adm="dark"] .adm .text-gray-800 { color: var(--ink) !important; }
+[data-adm="dark"] .adm .text-gray-700,
+[data-adm="dark"] .adm .text-gray-600 { color: var(--ink2) !important; }
+[data-adm="dark"] .adm .text-gray-500,
+[data-adm="dark"] .adm .text-gray-400 { color: var(--ink3) !important; }
+[data-adm="dark"] .adm .border-gray-100,
+[data-adm="dark"] .adm .border-gray-200,
+[data-adm="dark"] .adm .border-gray-300 { border-color: var(--line) !important; }
+[data-adm="dark"] .adm .divide-gray-100 > :not([hidden]) ~ :not([hidden]),
+[data-adm="dark"] .adm .divide-gray-200 > :not([hidden]) ~ :not([hidden]) { border-color: var(--line) !important; }
+[data-adm="dark"] .adm .shadow-sm,
+[data-adm="dark"] .adm .shadow { box-shadow: var(--shadow) !important; }
+[data-adm="dark"] .adm input,
+[data-adm="dark"] .adm textarea,
+[data-adm="dark"] .adm select { background: var(--bg) !important; color: var(--ink) !important; border-color: var(--line) !important; }
+[data-adm="dark"] .adm .hover\:bg-gray-50:hover,
+[data-adm="dark"] .adm .hover\:bg-gray-100:hover { background: var(--hover) !important; }
+[data-adm="dark"] .adm thead.bg-gray-50,
+[data-adm="dark"] .adm tr.bg-gray-50 { background: var(--panel2) !important; }
+
+/* ---- Responsive shell ---------------------------------------------------- */
+.adm-menu-btn { display: none; }
+.adm-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, .5); z-index: 45; }
+@media (max-width: 1023px) {
+  .adm-sidebar { position: fixed !important; z-index: 50; transform: translateX(-100%); transition: transform .25s ease; box-shadow: 0 0 40px rgba(0, 0, 0, .35); }
+  .adm-sidebar.open { transform: translateX(0); }
+  .adm-menu-btn { display: flex; }
+  .adm-topbar { padding-left: 70px !important; }
+}
+@media (max-width: 880px) {
+  .adm-dash-stats { grid-template-columns: repeat(2, 1fr) !important; }
+  .adm-dash-actions { grid-template-columns: repeat(2, 1fr) !important; }
+  .adm-dash-bottom { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 640px) {
+  .adm-search { display: none !important; }
+  .adm-user-meta { display: none !important; }
+  .adm main { padding: 16px !important; }
+  .adm-topbar { padding-left: 64px !important; padding-right: 16px !important; }
+  .adm-dash-stats { grid-template-columns: 1fr !important; }
+  .adm-dash-actions { grid-template-columns: 1fr !important; }
+}
+
+/* Clickable dashboard rows (recent comments) */
+.adm-hoverrow:hover { background: var(--line2); }

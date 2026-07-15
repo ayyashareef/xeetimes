@@ -1,0 +1,294 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ==================== AUTH ====================
+
+enum Role {
+  SUPER_ADMIN
+  EDITOR
+  JOURNALIST
+  MODERATOR
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  name_dv   String?
+  email     String   @unique
+  username  String?  @unique
+  password  String
+  role      Role     @default(JOURNALIST)
+  avatar    String?
+  bio_dv    String?
+  bio_en    String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  articles  Article[]
+  revisions Revision[]
+  media     Media[]
+  comments  Comment[]
+  auditLogs AuditLog[]
+}
+
+// ==================== CONTENT ====================
+
+enum ArticleStatus {
+  DRAFT
+  IN_REVIEW
+  PUBLISHED
+  SCHEDULED
+  ARCHIVED
+}
+
+model Article {
+  id                 String        @id @default(cuid())
+  slug               String        @unique
+  title_dv           String
+  title_en           String
+  shortTitle_dv      String?
+  shortTitle_en      String?
+  content_dv         String        @db.Text
+  content_en         String        @db.Text
+  excerpt_dv         String?       @db.VarChar(500)
+  excerpt_en         String?       @db.VarChar(500)
+  metaTitle_dv       String?
+  metaTitle_en       String?
+  metaDescription_dv String?
+  metaDescription_en String?
+  featuredImage      String?
+  galleryImages      Json?
+  featuredImageAlt_dv String?
+  featuredImageAlt_en String?
+  featuredImageCaption_dv String?
+  featuredImageCaption_en String?
+  status             ArticleStatus @default(DRAFT)
+  isFeatured         Boolean       @default(false)
+  isBreaking         Boolean       @default(false)
+  viewCount          Int           @default(0)
+  publishedAt        DateTime?
+  scheduledAt        DateTime?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id])
+
+  tags      Tag[]      @relation("ArticleTags")
+  revisions Revision[]
+  comments  Comment[]
+  reactions Reaction[]
+
+  @@index([status, publishedAt])
+  @@index([categoryId])
+  @@index([authorId])
+  @@index([slug])
+}
+
+model Category {
+  id             String     @id @default(cuid())
+  slug           String     @unique
+  name_dv        String
+  name_en        String
+  description_dv String?
+  description_en String?
+  parentId       String?
+  parent         Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children       Category[] @relation("CategoryHierarchy")
+  order          Int        @default(0)
+  isActive       Boolean    @default(true)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  articles Article[]
+}
+
+model Tag {
+  id      String @id @default(cuid())
+  slug    String @unique
+  name_dv String
+  name_en String
+
+  articles Article[] @relation("ArticleTags")
+}
+
+model Revision {
+  id         String   @id @default(cuid())
+  articleId  String
+  article    Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  editorId   String
+  editor     User     @relation(fields: [editorId], references: [id])
+  title_dv   String
+  title_en   String
+  content_dv String   @db.Text
+  content_en String   @db.Text
+  changeNote String?
+  createdAt  DateTime @default(now())
+
+  @@index([articleId])
+}
+
+// ==================== MEDIA ====================
+
+model Media {
+  id           String   @id @default(cuid())
+  url          String
+  filename     String
+  altText_dv   String?
+  altText_en   String?
+  caption_dv   String?
+  caption_en   String?
+  mimeType     String
+  size         Int
+  folder       String?
+  uploadedById String
+  uploadedBy   User     @relation(fields: [uploadedById], references: [id])
+  createdAt    DateTime @default(now())
+
+  @@index([folder])
+  @@index([createdAt])
+}
+
+// ==================== COMMENTS ====================
+
+model Comment {
+  id        String   @id @default(cuid())
+  articleId String
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  authorName String
+  content   String   @db.Text
+  isApproved Boolean @default(false)
+  parentId  String?
+  parent    Comment? @relation("CommentReplies", fields: [parentId], references: [id])
+  replies   Comment[] @relation("CommentReplies")
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([articleId, isApproved])
+}
+
+// ==================== REACTIONS ====================
+
+enum ReactionType {
+  LIKE
+  LOVE
+  HAHA
+  WOW
+  SAD
+  ANGRY
+}
+
+model Reaction {
+  id         String       @id @default(cuid())
+  articleId  String
+  article    Article      @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  type       ReactionType
+  sessionId  String
+  createdAt  DateTime     @default(now())
+
+  @@unique([articleId, sessionId])
+  @@index([articleId])
+}
+
+// ==================== ADS ====================
+
+// slot is a free-form key from lib/ad-slots.ts (each key defines a placement +
+// its correct size), so placements can change without a schema migration.
+model Advertisement {
+  id        String   @id @default(cuid())
+  title     String
+  imageUrl  String
+  linkUrl   String?
+  slot      String
+  isActive  Boolean  @default(true)
+  startDate DateTime?
+  endDate   DateTime?
+  clickCount Int     @default(0)
+  viewCount  Int     @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slot, isActive])
+}
+
+// ==================== SETTINGS ====================
+
+model SiteSettings {
+  id                  String  @id @default("default")
+  siteName_dv         String  @default("ޒީ ޓައިމްސް")
+  siteName_en         String  @default("XeeTimes")
+  siteDescription_dv  String?
+  siteDescription_en  String?
+  logo                String?
+  logoWhite           String?
+  favicon             String?
+  socialLinks         Json?
+  analyticsId         String?
+  registrationNo      String?
+  phone               String?
+  email               String?
+  copyright           String?
+  commentsEnabled     Boolean @default(true)
+  rolePermissions     Json?
+}
+
+// ==================== PAGES (Privacy, Terms, etc.) ====================
+
+model Page {
+  id         String   @id @default(cuid())
+  slug       String   @unique
+  title_en   String
+  title_dv   String
+  content_en String   @db.Text
+  content_dv String   @db.Text
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// ==================== CONTACT ====================
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String
+  message   String   @db.Text
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+// ==================== AUDIT ====================
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    String
+  entity    String
+  entityId  String?
+  details   Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}

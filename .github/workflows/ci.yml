@@ -1,0 +1,31 @@
+name: CI
+
+# Build-validate every push (except main, which the deploy workflow handles)
+# and every pull request, so broken code is caught before it reaches main/beta.
+on:
+  push:
+    branches-ignore: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      NEXT_TELEMETRY_DISABLED: '1'
+      # Dummy connection string — the build never connects (pages are dynamic),
+      # but Prisma needs the env var to be present.
+      DATABASE_URL: postgresql://user:pass@localhost:5432/db
+      DIRECT_URL: postgresql://user:pass@localhost:5432/db
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npx prisma generate
+      - run: npm run build

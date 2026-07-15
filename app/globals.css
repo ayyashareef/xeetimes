@@ -1,0 +1,410 @@
+@import url('https://fonts.googleapis.com/css?family=Special+Elite');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==================== DHIVEHI FONTS ==================== */
+@font-face {
+  font-family: 'mvwaheed';
+  src: url('/fonts/MVWaheed.woff2') format('woff2');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'utheemu';
+  src: url('/fonts/mvutheemuREGULAR.woff2') format('woff2');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'mvaahmufk';
+  src: url('/fonts/aammufkF.woff2') format('woff2');
+  font-display: swap;
+}
+
+/* ==================== BASE STYLES ==================== */
+@layer base {
+  * {
+    @apply border-gray-200;
+  }
+
+  .dark * {
+    @apply border-gray-700;
+  }
+}
+
+/* ==================== DHIVEHI TEXT ==================== */
+[dir="rtl"] {
+  font-family: 'utheemu', sans-serif;
+  line-height: 1.9;
+}
+
+[dir="rtl"] h1,
+[dir="rtl"] h2,
+[dir="rtl"] h3,
+[dir="rtl"] h4 {
+  font-family: 'mvwaheed', sans-serif;
+  line-height: 1.6;
+}
+
+[dir="rtl"] p,
+[dir="rtl"] span,
+[dir="rtl"] li,
+[dir="rtl"] td,
+[dir="rtl"] a {
+  font-family: 'utheemu', sans-serif;
+}
+
+/* Navigation menu items use mvwaheed */
+[dir="rtl"] nav a,
+[dir="rtl"] .nav-font {
+  font-family: 'mvwaheed', sans-serif;
+}
+
+/* ==================== ADMIN PANEL ==================== */
+/* Fonts + theme tokens for the admin live in app/(admin)/admin/admin-ui.css
+   (the `.adm` design system, Hanken Grotesk + Thaana fallback). */
+
+/* Admin: keep wide data tables from overflowing the viewport on mobile —
+   each table becomes its own horizontal scroll area. */
+@media (max-width: 768px) {
+  .admin-root table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Search bar elements use mvwaheed */
+[dir="rtl"] .search-font,
+[dir="rtl"] .search-font input,
+[dir="rtl"] .search-font button {
+  font-family: 'mvwaheed', sans-serif;
+}
+
+/* ==================== CARD HOVER ANIMATIONS ==================== */
+.article-card {
+  @apply transition-all duration-300 ease-out;
+}
+
+.article-card:hover {
+  @apply -translate-y-1;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+
+/* ==================== RICH TEXT CONTENT ==================== */
+.prose-content h1,
+.prose-content h2,
+.prose-content h3 {
+  @apply font-bold mb-4 mt-8;
+}
+
+.prose-content h1 { @apply text-3xl; }
+.prose-content h2 { @apply text-2xl; }
+.prose-content h3 { @apply text-xl; }
+
+.prose-content p {
+  @apply mb-4 leading-relaxed text-[17px];
+}
+
+.prose-content img {
+  @apply rounded-lg my-6 max-w-full h-auto;
+}
+
+.prose-content figure.image-caption-figure {
+  @apply my-6 text-center;
+}
+
+.prose-content figure.image-caption-figure img {
+  @apply rounded-lg max-w-full h-auto my-0 mx-auto;
+}
+
+.prose-content figure.image-caption-figure figcaption {
+  @apply mt-2 text-sm text-gray-500 dark:text-gray-400 italic;
+}
+
+/* Gallery */
+.prose-content .article-gallery {
+  @apply my-6 grid grid-cols-2 md:grid-cols-3 gap-2;
+}
+
+.prose-content .article-gallery figure {
+  @apply m-0;
+}
+
+.prose-content .article-gallery figure img {
+  @apply w-full h-48 object-cover rounded-lg my-0 cursor-pointer hover:opacity-90 transition;
+}
+
+.prose-content .article-gallery figure figcaption {
+  @apply mt-1 text-xs text-gray-500 dark:text-gray-400 italic text-center;
+}
+
+.prose-content a {
+  @apply text-primary underline;
+}
+
+.prose-content ul,
+.prose-content ol {
+  @apply mb-4 ps-6;
+}
+
+.prose-content ul { @apply list-disc; }
+.prose-content ol { @apply list-decimal; }
+
+.prose-content li {
+  @apply mb-2;
+}
+
+.prose-content blockquote {
+  font-family: 'Special Elite', cursive;
+  font-weight: 100;
+  font-size: 1.5rem;
+  max-width: 600px;
+  line-height: 1.4;
+  position: relative;
+  margin: 1.5rem auto;
+  padding: 0.5rem 1rem;
+  color: #1a1a2e;
+  border: none;
+  text-align: center;
+}
+
+.prose-content blockquote::before,
+.prose-content blockquote::after {
+  position: absolute;
+  font-family: Georgia, 'Times New Roman', serif;
+  color: #e8e6dc;
+  font-size: 6rem;
+  line-height: 1;
+}
+
+.prose-content blockquote::before {
+  content: '\201C';
+  left: -3.5rem;
+  top: -1.5rem;
+}
+
+.prose-content blockquote::after {
+  content: '\201D';
+  right: -3.5rem;
+  bottom: 0;
+}
+
+.prose-content blockquote p {
+  margin: 0;
+}
+
+.prose-content blockquote p:last-child em:only-child {
+  display: block;
+  font-family: inherit;
+  font-style: normal;
+  font-size: 0.875rem;
+  color: #9ca3af;
+  margin-top: 0.75rem;
+}
+
+.prose-content blockquote p:last-child em:only-child::before {
+  content: '\2014\00a0';
+}
+
+@media (prefers-color-scheme: dark) {
+  .prose-content blockquote {
+    color: #d1d5db;
+  }
+  .prose-content blockquote::before,
+  .prose-content blockquote::after {
+    color: #374151;
+  }
+  .prose-content blockquote p:last-child em:only-child {
+    color: #6b7280;
+  }
+}
+
+/* RTL prose adjustments */
+[dir="rtl"] .prose-content {
+  line-height: 2;
+  font-size: 1.05rem;
+}
+
+/* ==================== TIPTAP EDITOR ==================== */
+.ProseMirror blockquote {
+  font-family: 'Special Elite', cursive;
+  font-weight: 100;
+  font-size: 1.25rem;
+  max-width: 600px;
+  line-height: 1.4;
+  position: relative;
+  margin: 1rem auto;
+  padding: 0.5rem 1rem;
+  color: #1a1a2e;
+  border: none;
+  text-align: center;
+}
+
+.ProseMirror blockquote::before,
+.ProseMirror blockquote::after {
+  position: absolute;
+  font-family: Georgia, 'Times New Roman', serif;
+  color: #e8e6dc;
+  font-size: 5rem;
+  line-height: 1;
+}
+
+.ProseMirror blockquote::before {
+  content: '\201C';
+  left: -3rem;
+  top: -1rem;
+}
+
+.ProseMirror blockquote::after {
+  content: '\201D';
+  right: -3rem;
+  bottom: -0.5rem;
+}
+
+.ProseMirror blockquote p:last-child em:only-child {
+  display: block;
+  font-style: normal;
+  font-size: 0.8rem;
+  color: #9ca3af;
+  margin-top: 0.5rem;
+}
+
+.ProseMirror blockquote p:last-child em:only-child::before {
+  content: '\2014\00a0';
+}
+
+.ProseMirror h1 { @apply text-3xl font-bold mb-4 mt-6; }
+.ProseMirror h2 { @apply text-2xl font-bold mb-3 mt-5; }
+.ProseMirror h3 { @apply text-xl font-bold mb-2 mt-4; }
+
+.ProseMirror ul { @apply list-disc ps-6 mb-4; }
+.ProseMirror ol { @apply list-decimal ps-6 mb-4; }
+.ProseMirror li { @apply mb-1; }
+
+.ProseMirror hr { @apply my-6 border-gray-200; }
+
+.ProseMirror a { @apply text-primary underline; }
+
+.ProseMirror img { @apply rounded-lg my-4 max-w-full h-auto; }
+
+.ProseMirror code {
+  @apply bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-sm;
+}
+
+.ProseMirror pre {
+  @apply bg-gray-900 text-gray-100 rounded-lg p-4 my-4 overflow-x-auto;
+}
+
+.ProseMirror pre code {
+  @apply bg-transparent text-inherit p-0;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  @apply text-gray-400;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* ==================== AD LABEL ==================== */
+.ad-label {
+  @apply text-[10px] uppercase tracking-wider text-gray-400;
+}
+
+/* ==================== SCROLLBAR ==================== */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #1a1a2e;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400;
+}
+
+/* Hide scrollbar for horizontal scroll sections */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* ==================== SOCIAL EMBEDS ==================== */
+.twitter-tweet,
+.fb-post {
+  @apply mx-auto my-6;
+}
+
+/* Styled embed card on public article page */
+.social-embed-card {
+  @apply my-8 max-w-lg mx-auto;
+}
+
+.social-embed-card-inner {
+  @apply rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden shadow-sm;
+}
+
+.social-embed-card-header {
+  @apply flex items-center gap-2.5 px-5 pt-4 pb-3;
+}
+
+.social-embed-card-icon {
+  @apply flex items-center;
+}
+
+.social-embed-card-platform {
+  @apply text-sm font-semibold text-gray-900 dark:text-white;
+}
+
+.social-embed-card-username {
+  @apply text-sm text-gray-500 dark:text-gray-400;
+}
+
+.social-embed-card-body {
+  @apply px-2 min-h-[80px];
+}
+
+.social-embed-card-loading {
+  @apply flex items-center justify-center gap-3 py-8 text-sm text-gray-400 dark:text-gray-500;
+}
+
+.social-embed-card-spinner {
+  @apply w-5 h-5 border-2 border-gray-200 dark:border-gray-600 border-t-gray-500 dark:border-t-gray-300 rounded-full animate-spin;
+}
+
+.social-embed-card-link {
+  @apply block text-center text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white px-5 py-3 border-t border-gray-100 dark:border-gray-700 transition-colors no-underline;
+}
+
+/* Fallback plain node (before JS processes it) */
+.social-embed-node {
+  @apply my-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 text-center;
+}
+
+.social-embed-node a {
+  @apply text-primary text-sm hover:underline;
+}
+
+/* Editor preview for social embeds */
+.social-embed-preview {
+  user-select: none;
+}

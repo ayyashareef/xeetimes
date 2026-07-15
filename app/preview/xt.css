@@ -1,0 +1,309 @@
+/* ===================================================================
+   XeeTimes — public design styles
+   Faithful port of the "XeeTimes.dc.html" Claude Design.
+   Light-only. Per-element layout stays inline in the markup builders;
+   this file covers fonts, tokens, hover-independent rules and keyframes.
+   Thaana text is always covered by a loaded webfont (Ammu / MVTypewriter /
+   Faruma) — never the OS default (MV Boli). No 'MV Boli' anywhere.
+   =================================================================== */
+
+/* Ammu — headings + nav (MV A. Waheed display face) */
+@font-face {
+  font-family: 'Ammu';
+  src: url('/fonts/MVAWaheed.ttf') format('truetype');
+  font-weight: 400 900;
+  font-display: swap;
+}
+/* MVTypewriter — reading body (MV Faseyha) */
+@font-face {
+  font-family: 'MVTypewriter';
+  src: url('/fonts/Mv_Faseyha.ttf') format('truetype');
+  font-weight: 400 700;
+  font-display: swap;
+}
+/* Faruma — bundled Thaana fallback so nothing ever falls back to MV Boli */
+@font-face {
+  font-family: 'Faruma';
+  src: url('/fonts/Faruma.woff2') format('woff2');
+  font-weight: 400 700;
+  font-display: swap;
+}
+
+/* Single light palette (XeeTimes design tokens). */
+:root,
+:root[data-xt-theme="light"] {
+  --page: #ece8e1;     /* outer body behind the centred card */
+  --bg: #fbfaf7;       /* the root card */
+  --bg0: #f5f2eb;      /* cream panels / utility bands */
+  --bg2: #ffffff;      /* cards */
+  --bg3: #e5e0d5;
+  --line: #e7e3da;
+  --line2: #ece8df;
+  --ink: #16161a;
+  --ink2: #6f6b62;
+  --ink3: #a09b91;
+  --red: #c8102e;
+  --red2: #a50d26;
+  --blue: #c8102e;     /* design is single-accent; alias blue -> red */
+  --nav: #16161a;
+  --footer: #060606;
+  --ph1: #efece4;
+  --ph2: #ddd8cd;
+  --phink: rgba(20, 18, 12, .16);
+  --chip: rgba(0, 0, 0, .5);
+  --en: var(--font-archivo), 'Archivo', sans-serif;
+}
+
+/* The centred card sits on a warm grey page. */
+body:has(#xt-root) { background: var(--page); }
+
+#xt-root {
+  max-width: none;      /* full-width header/footer; content is contained via .xt-wrap */
+  margin: 0 auto;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+/* Centered content container (main body, header content, footer content).
+   ~1240px like hirinews.com — narrower middle, full-width header/footer bars. */
+#xt-root .xt-wrap { max-width: 1240px; margin: 0 auto; }
+#xt-root ::selection { background: var(--red); color: #fff; }
+#xt-root, #xt-root * { box-sizing: border-box; }
+#xt-root a { color: inherit; text-decoration: none; }
+
+/* Type. Body = MVTypewriter, headings/nav = Ammu, Latin = Archivo.
+   Every stack ends in a bundled Thaana face then sans-serif — never Boli. */
+#xt-root {
+  font-family: 'MVTypewriter', 'Faruma', sans-serif;
+}
+#xt-root h1, #xt-root h2, #xt-root h3, #xt-root h4,
+#xt-root .xt-hl, #xt-root .xt-lead-hl, #xt-root .xt-secname {
+  font-family: 'Ammu', 'Faruma', sans-serif;
+  font-weight: 700;
+}
+#xt-root header nav a { font-family: 'Ammu', 'Faruma', sans-serif; }
+#xt-root .xt-en { font-family: var(--en); }
+
+/* Sharp corners are core to the look — but images/badges keep their inline radii,
+   so we DON'T globally zero radius (the design's `.xt-root *{border-radius:0}` is
+   dropped intentionally; inline rounding on thumbs reads better here). */
+
+/* ---- hover transitions (ported from the design) ---- */
+#xt-root .xt-card:hover .xt-thumb img { transform: scale(1.06); }
+#xt-root .xt-card:hover .xt-hl { color: var(--red); }
+#xt-root .xt-gcard { transition: transform .2s ease, box-shadow .2s ease; }
+#xt-root .xt-gcard:hover { transform: translateY(-4px); box-shadow: 0 14px 30px rgba(0,0,0,.1); }
+#xt-root .xt-gcard:hover .xt-hl { color: var(--red); }
+#xt-root .xt-gcard:hover .xt-thumb img { transform: scale(1.06); }
+#xt-root .xt-lead:hover img { transform: scale(1.04); }
+#xt-root .xt-lead:hover .xt-lead-hl { color: var(--red); }
+#xt-root .xt-thumb img { transition: transform .5s ease; }
+#xt-root .xt-navdark { transition: background .18s, color .18s; }
+#xt-root .xt-navdark:hover { background: var(--red); color: #fff !important; }
+#xt-root .xt-nav-item { position: relative; }
+#xt-root .xt-nav-item::after { content: ""; position: absolute; right: 0; bottom: -2px; height: 3px; width: 0; background: var(--red); transition: width .22s ease; }
+#xt-root .xt-nav-item:hover::after { width: 100%; }
+/* Dropdown submenu (e.g. Others → Talent/Recipes/…), dark like the design nav. */
+#xt-root .xt-hasmenu { position: relative; display: inline-flex; }
+#xt-root .xt-submenu { display: none; position: absolute; top: 100%; inset-inline-start: 0; background: var(--nav); min-width: 172px; z-index: 60; box-shadow: 0 16px 36px rgba(0,0,0,.34); }
+#xt-root .xt-hasmenu:hover .xt-submenu, #xt-root .xt-submenu:hover { display: block; }
+#xt-root .xt-submenu a { display: block; padding: 12px 18px; color: #e6e3dc; font-family: 'Ammu','Faruma',sans-serif; font-size: 15px; transition: background .15s, color .15s; }
+#xt-root .xt-submenu a:hover { background: var(--red); color: #fff; }
+#xt-root .xt-share { transition: transform .15s ease, filter .15s ease; }
+#xt-root .xt-share:hover { transform: translateY(-2px); filter: brightness(1.08); }
+#xt-root .xt-react { transition: transform .15s ease, background .15s ease; }
+#xt-root .xt-react:hover { transform: scale(1.06); background: #f3efe7; }
+#xt-root .xt-page { transition: background .15s, color .15s; }
+#xt-root .xt-page:hover { background: var(--red); color: #fff; }
+#xt-root .xt-social { transition: transform .15s ease, opacity .15s ease; opacity: .92; }
+#xt-root .xt-social:hover { transform: translateY(-3px); opacity: 1; color: var(--red) !important; }
+#xt-root .xt-more:hover { gap: 12px; }
+#xt-root .xt-seeall:hover { color: var(--red); }
+
+@keyframes hlRise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+
+/* image-slot placeholder */
+#xt-root .xt-img {
+  background:
+    radial-gradient(130% 110% at 28% 18%, rgba(200,16,46,.14), transparent 58%),
+    linear-gradient(165deg, var(--ph1) 0%, var(--ph2) 100%);
+  display: flex; align-items: center; justify-content: center;
+}
+#xt-root .xt-img > span { font-family: var(--en); color: var(--phink); font-size: 15px; text-align: center; padding: 0 24px; }
+
+/* Logo — centred, from assets/xt-logo.png (design shows ~78px tall). */
+#xt-root .xt-logo-img { height: 78px; width: auto; display: block; image-rendering: -webkit-optimize-contrast; }
+
+/* ---- Advertisement slots ---- filled ad shows its image; empty shows the
+   design's dashed cream box with the Dhivehi "އިޝްތިހާރު" label. */
+#xt-root .xt-ad { position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+#xt-root .xt-ad:not(:has(img)) {
+  border: 1px dashed #d6d0c4; background: #fff; color: #b0aa9f;
+}
+#xt-root .xt-ad:not(:has(img))::before {
+  content: "އިޝްތިހާރު"; font-family: 'MVTypewriter', 'Faruma', sans-serif;
+  font-size: 15px; color: #b0aa9f; pointer-events: none;
+}
+#xt-root .xt-ad img { width: 100%; height: 100%; object-fit: contain; object-position: top; display: block; }
+#xt-root .xt-ad a { display: block; width: 100%; height: 100%; }
+#xt-root .xt-ad-label {
+  display: block; margin-top: 6px; text-align: center; line-height: 1;
+  font-family: var(--en); font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: #a49f96;
+}
+#xt-root .xt-adband { text-align: center; }
+#xt-root .xt-adband > .xt-adband-label {
+  font-family: var(--en); font-size: 10px; letter-spacing: .22em; color: #a49f96; margin-top: 8px; text-transform: uppercase;
+}
+
+/* ---- Vertical share rail (article) ---- */
+#xt-root .xt-share-rail { display: flex; flex-direction: column; gap: 8px; width: 44px; flex: none; position: sticky; top: 20px; }
+#xt-root .xt-share { width: 44px; height: 44px; display: grid; place-items: center; color: #fff; cursor: pointer; }
+#xt-root .xt-ad-rail { display: flex; flex-direction: column; gap: 28px; }
+
+/* ---- Comments ---- */
+#xt-root .xt-comment { display: flex; gap: 14px; padding: 18px 0; border-bottom: 1px solid var(--line2); }
+#xt-root .xt-comment .av {
+  flex: none; width: 42px; height: 42px; border-radius: 50%;
+  background: var(--ink); display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 16px;
+}
+
+/* ---- Section head skew marks (design "//") ---- */
+#xt-root .xt-skew { display: inline-flex; gap: 4px; }
+#xt-root .xt-skew span { width: 5px; height: 22px; background: var(--red); transform: skewX(-14deg); display: block; }
+
+/* ---- Article reading body ---- MVTypewriter reading face. */
+#xt-root .xt-article-body,
+#xt-root .xt-article-body p, #xt-root .xt-article-body li,
+#xt-root .xt-article-body h2, #xt-root .xt-article-body h3,
+#xt-root .xt-article-body blockquote, #xt-root .xt-article-body span,
+#xt-root .xt-article-body div, #xt-root .xt-article-body strong, #xt-root .xt-article-body b {
+  font-family: 'MVTypewriter', 'Faruma', sans-serif;
+}
+#xt-root .xt-article-body p { margin: 0 0 20px; font-size: 17px; line-height: 2.1; color: #26262b; text-align: justify; }
+#xt-root .xt-article-body h2 { margin: 34px 0 18px; font-size: 25px; font-weight: 700; line-height: 1.6; font-family: 'Ammu','Faruma',sans-serif; }
+#xt-root .xt-article-body h3 { margin: 28px 0 14px; font-size: 21px; font-weight: 700; line-height: 1.6; font-family: 'Ammu','Faruma',sans-serif; }
+#xt-root .xt-article-body img { max-width: 100%; height: auto; margin: 12px 0 22px; display: block; }
+#xt-root .xt-article-body figure { margin: 12px 0 22px; }
+#xt-root .xt-article-body figcaption { font-family: var(--en); font-size: 13px; color: var(--ink3); text-align: center; margin-top: 8px; }
+#xt-root .xt-article-body a { color: var(--red); text-decoration: underline; }
+#xt-root .xt-article-body ul, #xt-root .xt-article-body ol { margin: 0 0 22px; padding-right: 26px; }
+#xt-root .xt-article-body li { margin: 0 0 10px; font-size: 17px; line-height: 2; }
+/* Note callout — the design's right-red-border cream box. */
+#xt-root .xt-article-body blockquote {
+  border-right: 4px solid var(--red); background: #f7f4ee; padding: 16px 18px;
+  margin: 26px 0; font-size: 15px; line-height: 1.9; color: #4a4842;
+}
+#xt-root .xt-article-body blockquote p { margin: 0; font-size: 15px; line-height: 1.9; color: #4a4842; text-align: right; }
+#xt-root .xt-article-body blockquote .xt-quote-body { margin: 0; }
+#xt-root .xt-article-body blockquote .xt-quote-author { display: block; margin-top: 12px; font-style: normal; font-weight: 700; font-size: 14px; color: var(--red); font-family: 'Ammu','Faruma',sans-serif; }
+
+/* ---- "More news" / load-more + pagination buttons ---- */
+#xt-root .xt-loadmore {
+  font-family: 'Ammu','Faruma',sans-serif; font-size: 16px; font-weight: 700; color: #fff;
+  background: var(--ink); border: none; padding: 12px 40px; cursor: pointer; transition: background .18s;
+}
+#xt-root .xt-loadmore:hover { background: var(--red); }
+#xt-root .xt-loadmore:disabled { opacity: .7; cursor: default; }
+
+/* ---- Featured-image caption overlay ---- */
+#xt-root .xt-photo-credit {
+  position: absolute; bottom: 0; left: 0; right: 0; direction: rtl;
+  display: flex; align-items: center; gap: 12px; padding: 9px 18px;
+  background: rgba(0,0,0,.5); color: #fff;
+  font-family: 'MVTypewriter','Faruma',sans-serif; font-size: 13.5px; line-height: 1.5;
+}
+#xt-root .xt-photo-credit svg { flex: none; opacity: .9; }
+
+/* ---- Gallery + lightbox ---- */
+#xt-root .xt-gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+#xt-root .xt-gallery figure { margin: 0; aspect-ratio: 4/3; overflow: hidden; }
+#xt-root .xt-gallery figure.xt-gal-hidden { display: none; }
+#xt-root .xt-gallery img { width: 100%; height: 100%; object-fit: cover; display: block; cursor: zoom-in; }
+#xt-root .xt-lb { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; background: rgba(4,6,12,.92); padding: 40px; animation: xt-lb-in .18s ease; }
+@keyframes xt-lb-in { from { opacity: 0; } to { opacity: 1; } }
+#xt-root .xt-lb .xt-lb-img { max-width: 92vw; max-height: 88vh; width: auto; height: auto; box-shadow: 0 20px 60px rgba(0,0,0,.5); object-fit: contain; }
+#xt-root .xt-lb .xt-lb-btn { position: absolute; background: rgba(255,255,255,.1); color: #fff; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .15s; }
+#xt-root .xt-lb .xt-lb-btn:hover { background: rgba(255,255,255,.22); }
+#xt-root .xt-lb .xt-lb-close { top: 22px; right: 26px; width: 46px; height: 46px; font-size: 30px; line-height: 1; }
+#xt-root .xt-lb .xt-lb-prev, #xt-root .xt-lb .xt-lb-next { top: 50%; transform: translateY(-50%); width: 54px; height: 54px; font-size: 34px; line-height: 1; }
+#xt-root .xt-lb .xt-lb-prev { left: 24px; }
+#xt-root .xt-lb .xt-lb-next { right: 24px; }
+
+/* ---- Inline article-card embed (TipTap) ---- */
+#xt-root .xt-article-body .xt-embed-card { display: flex; gap: 16px; align-items: center; border: 1px solid var(--line); padding: 15px 18px; margin: 24px 0; background: var(--bg0); text-decoration: none; transition: box-shadow .2s, transform .2s; }
+#xt-root .xt-article-body .xt-embed-card:hover { box-shadow: 0 10px 24px rgba(15,23,42,.12); transform: translateY(-2px); }
+#xt-root .xt-article-body .xt-embed-card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+#xt-root .xt-article-body .xt-embed-card-cat { color: var(--red); font-weight: 700; font-size: 13px; }
+#xt-root .xt-article-body .xt-embed-card-title { font-size: 18px; font-weight: 600; line-height: 1.7; color: var(--ink); }
+#xt-root .xt-article-body .xt-embed-card:hover .xt-embed-card-title { color: var(--red); }
+#xt-root .xt-article-body .xt-embed-card-meta { font-size: 12.5px; color: var(--ink3); font-family: var(--en); }
+#xt-root .xt-article-body .xt-embed-card-thumb { flex: none; width: 116px; height: 84px; overflow: hidden; background: var(--bg2); }
+#xt-root .xt-article-body .xt-embed-card-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* ---- Social embeds (SocialEmbedRenderer) ---- */
+#xt-root .xt-article-body .social-embed-card { direction: ltr; margin: 22px auto 30px; max-width: 550px; }
+#xt-root .xt-article-body .social-embed-card-inner { border: 1px solid var(--line); overflow: hidden; background: var(--bg0); }
+#xt-root .xt-article-body .social-embed-card-header { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--line2); }
+#xt-root .xt-article-body .social-embed-card-platform { font-weight: 700; font-size: 15px; color: var(--ink); }
+#xt-root .xt-article-body .social-embed-card-username { font-size: 13px; color: var(--ink3); }
+#xt-root .xt-article-body .social-embed-card-body { padding: 10px 12px; min-height: 60px; }
+#xt-root .xt-article-body .social-embed-card-loading { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 22px; color: var(--ink3); font-size: 14px; }
+#xt-root .xt-article-body .social-embed-card-spinner { width: 18px; height: 18px; border: 2px solid var(--line); border-top-color: var(--red); border-radius: 50%; animation: xt-spin .7s linear infinite; }
+#xt-root .xt-article-body .social-embed-card-link { display: block; padding: 10px 16px; border-top: 1px solid var(--line2); font-size: 13px; color: var(--red); text-decoration: none; text-align: center; }
+@keyframes xt-spin { to { transform: rotate(360deg); } }
+#xt-root .xt-article-body div[data-youtube-video] { margin: 18px 0 30px; }
+#xt-root .xt-article-body div[data-youtube-video] iframe { width: 100%; height: auto; aspect-ratio: 16/9; max-width: 720px; display: block; margin: 0 auto; }
+#xt-root .xt-article-body iframe { max-width: 100%; margin: 12px 0 22px; }
+
+/* ==================== MOBILE MENU (hamburger + drawer) ==================== */
+#xt-root .xt-mobonly { display: none; }
+#xt-root .xt-burger { flex-direction: column; gap: 5px; width: 40px; height: 40px; align-items: center; justify-content: center; cursor: pointer; background: transparent; border: none; flex: none; padding: 0; }
+#xt-root .xt-burger span { display: block; width: 19px; height: 2px; background: #fff; transition: transform .32s cubic-bezier(.4,0,.1,1), opacity .2s ease; }
+#xt-root .xt-backdrop { display: none; position: fixed; inset: 0; z-index: 60; background: rgba(0,0,0,.5); border: none; padding: 0; opacity: 0; pointer-events: none; transition: opacity .38s ease; }
+#xt-root .xt-drawer { display: none; position: fixed; top: 0; bottom: 0; right: 0; z-index: 61; width: 300px; max-width: 85vw; flex-direction: column; background: var(--bg); box-shadow: -24px 0 70px rgba(0,0,0,.35); transform: translateX(106%); transition: transform .44s cubic-bezier(.4,0,.1,1); }
+#xt-root .xt-drawer-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--line); flex: none; }
+#xt-root .xt-dlogo-img { height: 42px; width: auto; display: block; }
+#xt-root .xt-drawer-close { background: transparent; width: 40px; height: 40px; border: 1px solid var(--line); display: grid; place-items: center; cursor: pointer; color: var(--ink); flex: none; }
+#xt-root .xt-drawer-nav { display: flex; flex-direction: column; padding: 12px; gap: 2px; flex: 1; overflow-y: auto; }
+#xt-root .xt-dlink { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; font-size: 18px; font-weight: 500; text-decoration: none; font-family: 'Ammu','Faruma',sans-serif; transition: background .15s; }
+#xt-root .xt-dlink:hover { background: var(--bg0); }
+:root[data-xt-menu="open"] #xt-root .xt-backdrop { opacity: 1; pointer-events: auto; }
+:root[data-xt-menu="open"] #xt-root .xt-drawer { transform: none; }
+:root[data-xt-menu="open"] #xt-root .xt-burger span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+:root[data-xt-menu="open"] #xt-root .xt-burger span:nth-child(2) { opacity: 0; }
+:root[data-xt-menu="open"] #xt-root .xt-burger span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 1100px) {
+  #xt-root .xt-article-grid { grid-template-columns: 1fr !important; }
+  #xt-root .xt-share-rail { position: static; flex-direction: row; flex-wrap: wrap; width: auto; }
+  #xt-root .xt-ad-rail { position: static; flex-direction: row; flex-wrap: wrap; }
+}
+@media (max-width: 1000px) {
+  #xt-root .xt-g-4 { grid-template-columns: repeat(2, 1fr) !important; }
+  #xt-root .xt-g-hero { grid-template-columns: 1fr !important; }
+  #xt-root .xt-g-hero .xt-hero-ad { display: none !important; }
+  #xt-root .xt-g-seclead { grid-template-columns: 1fr !important; }
+  #xt-root .xt-g-seclead .xt-seclead-ad { display: none !important; }
+  #xt-root .xt-art-toprow { grid-template-columns: 1fr !important; }
+  #xt-root .xt-art-topad { display: none !important; }
+}
+@media (max-width: 860px) {
+  #xt-root .xt-desknav { display: none !important; }
+  #xt-root .xt-mobonly { display: flex !important; }
+  #xt-root .xt-backdrop { display: block; }
+  #xt-root .xt-drawer { display: flex; }
+  #xt-root .xt-ad-rail { display: none !important; }
+}
+@media (max-width: 760px) {
+  #xt-root .xt-g-3 { grid-template-columns: repeat(2, 1fr) !important; }
+  #xt-root .xt-g-side { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 600px) {
+  #xt-root .xt-g-4, #xt-root .xt-g-3 { grid-template-columns: 1fr !important; }
+  #xt-root .xt-gallery { grid-template-columns: 1fr !important; }
+  #xt-root section, #xt-root main, #xt-root header > div, #xt-root .xt-article-grid { padding-left: 16px !important; padding-right: 16px !important; }
+}
