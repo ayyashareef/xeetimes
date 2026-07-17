@@ -20,6 +20,10 @@ const nextConfig = {
         hostname: '**',
       },
     ],
+    // Serve optimized WebP and cache the resized results on disk for 30 days so
+    // the multi-MB WordPress originals are only ever processed once.
+    formats: ['image/webp'],
+    minimumCacheTTL: 2592000,
   },
   // Every WordPress-era feed URL variant still lands on the real feed —
   // aggregators (Adafi etc.) were configured against the old WP endpoints.

@@ -14,15 +14,15 @@ export type AdSlotDef = {
   kind: AdKind;
 };
 
-// Sizes mirror the live xeetimes.com placements: a wide top banner (~5:1, the
-// real site uses a 4000×800 header GIF) and wide in-content banners between
-// sections (~8:1, e.g. the real 2048×256 creatives), plus the article sidebar.
+// Sizes mirror the live xeetimes.com placements: a 1120×224 top banner (5:1),
+// a 436×349 homepage hero side box, a 380×320 article hero side box, wide
+// in-content banners (~8:1, the real 2048×256 creatives), and the sidebar box.
 export const AD_SLOTS: AdSlotDef[] = [
-  { key: 'HOMEPAGE_BANNER', label: 'Site — top banner (all pages)', w: 2000, h: 400, kind: 'banner' },
-  { key: 'HOME_BOX_1', label: 'Homepage — hero side box', w: 300, h: 250, kind: 'box' },
+  { key: 'HOMEPAGE_BANNER', label: 'Site — top banner (all pages)', w: 1120, h: 224, kind: 'banner' },
+  { key: 'HOME_BOX_1', label: 'Homepage — hero side box', w: 436, h: 349, kind: 'box' },
   { key: 'HOMEPAGE_MID', label: 'Homepage — in-content banner (upper)', w: 2048, h: 256, kind: 'banner' },
   { key: 'HOMEPAGE_MID_2', label: 'Homepage — in-content banner (lower)', w: 2048, h: 256, kind: 'banner' },
-  { key: 'ARTICLE_SIDEBAR_1', label: 'Article — sidebar (top)', w: 300, h: 600, kind: 'tall' },
+  { key: 'ARTICLE_SIDEBAR_1', label: 'Article — hero side box', w: 380, h: 320, kind: 'box' },
   { key: 'ARTICLE_SIDEBAR_2', label: 'Article — sidebar (bottom)', w: 300, h: 250, kind: 'box' },
 ];
 

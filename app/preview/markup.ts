@@ -176,15 +176,23 @@ const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://xeetimes.com').re
 function ph(): string {
   return 'background:linear-gradient(165deg,var(--ph1),var(--ph2));display:flex;align-items:center;justify-content:center;';
 }
+// Widths the Next image optimizer accepts (subset of the default device/image
+// sizes). Requested widths are rounded UP to the nearest allowed size.
+const IMG_SIZES = [384, 640, 750, 828, 1080, 1200, 1920];
+const allowW = (w: number) => IMG_SIZES.find((s) => s >= w) || 1920;
 function optSrc(src: string, w: number): string {
-  // WordPress media: use the stored URL verbatim (no Next optimizer). An absolute
-  // URL loads from its origin; a relative /wp-content/uploads/... path loads from
-  // THIS server (nginx serves it) — so self-hosting is just a DB URL rewrite.
-  if (/wp-content\/uploads/i.test(src)) return src;
+  // WordPress media -> Next image optimizer (resize + WebP + on-disk cache),
+  // read from the relative path (public/wp-content -> the uploads dir). This
+  // turns multi-MB originals into right-sized WebP. gif/svg pass through.
+  const rel = src.replace(/^https?:\/\/[^/]+/i, '');
+  if (/\/wp-content\/uploads\//i.test(rel)) {
+    if (/\.(gif|svg)(\?|$)/i.test(rel)) return rel;
+    return `/_next/image?url=${encodeURIComponent(rel)}&w=${allowW(w)}&q=75`;
+  }
   const p = src.replace(/^https?:\/\/(www\.)?xeetimes\.com/i, '');
   if (!p.startsWith('/') || /\.gif(\?|$)/i.test(p)) return src;
   const url = p.startsWith('/uploads/') ? `${SITE_URL}${p}` : p;
-  return `/_next/image?url=${encodeURIComponent(url)}&w=${w}&q=75`;
+  return `/_next/image?url=${encodeURIComponent(url)}&w=${allowW(w)}&q=75`;
 }
 // eager: for the LCP hero image.
 export function imgFill(a: Art, lang: Lang, w = 750, eager = false): string {
@@ -229,16 +237,20 @@ function adBand(slot: string, ads: AdsMap): string {
   if (!AD_SLOT_MAP[slot]) return '';
   return `<div class="xt-adband">${adSlot(slot, ads)}<div class="xt-adband-label">Advertisement</div></div>`;
 }
-// An ad box that fills its flex parent's height (used beside a fixed-height photo
-// so the ad ends up exactly the same height as the image).
+// An ad box beside the hero photo, rendered at the slot's exact aspect ratio
+// (e.g. 436×349 home, 380×320 article) so the creative size is authoritative.
+// The column width comes from the grid; height follows the aspect — which lands
+// very close to the neighbouring 16:9 photo's height.
 function fillAdBox(slot: string, ads: AdsMap): string {
+  const def = AD_SLOT_MAP[slot];
+  const ar = def ? `aspect-ratio:${def.w}/${def.h};` : 'flex:1;min-height:0;';
   const ad = ads[slot];
   if (ad) {
     const img = `<img src="${esc(ad.imageUrl)}" alt="${esc(ad.title || 'Advertisement')}" loading="lazy">`;
     const inner = ad.linkUrl ? `<a href="${esc(ad.linkUrl)}" target="_blank" rel="noopener" data-ad="${esc(ad.id)}">${img}</a>` : img;
-    return `<div class="xt-ad xt-ad-filled" data-ad-view="${esc(ad.id)}" style="flex:1;min-height:0;">${inner}</div>`;
+    return `<div class="xt-ad xt-ad-filled" data-ad-view="${esc(ad.id)}" style="width:100%;${ar}">${inner}</div>`;
   }
-  return `<div class="xt-ad" style="flex:1;min-height:0;"></div>`;
+  return `<div class="xt-ad" style="width:100%;${ar}"></div>`;
 }
 // A flex column: "Advertisement" eyebrow + a fill-height ad box. Placed in a grid
 // cell that stretches to the neighbouring photo's height.
@@ -289,7 +301,9 @@ export function header(lang: Lang, sm = false, active = '', ads: AdsMap = {}, hi
   </aside>`;
 
   return `
-  <div class="xt-wrap" style="padding:16px 26px 8px;text-align:center;">${adBand('HOMEPAGE_BANNER', ads)}</div>
+  <div class="xt-wrap" style="padding:16px 26px 8px;">
+    <div style="max-width:1120px;margin:0 auto;text-align:center;">${adBand('HOMEPAGE_BANNER', ads)}</div>
+  </div>
   <header>
     <div class="xt-wrap" style="display:flex;align-items:center;justify-content:center;padding:8px 26px 20px;">
       <a href="/${lang}"><img class="xt-logo-img" src="${esc(logoSrc)}" alt="XeeTimes"></a>
@@ -298,7 +312,7 @@ export function header(lang: Lang, sm = false, active = '', ads: AdsMap = {}, hi
       <div class="xt-wrap" style="display:flex;align-items:center;justify-content:center;gap:4px;padding:0 22px;font-size:16px;position:relative;">
         <a href="/${lang}" class="xt-navdark" style="color:#fff;padding:13px 16px;display:flex;align-items:center;" aria-label="Home">${ICON.home}</a>
         <span class="xt-desknav" style="display:flex;align-items:center;gap:4px;">${navLinks}</span>
-        <a href="/${lang}/search" class="xt-navdark xt-mobonly" style="color:#fff;padding:11px 14px;display:flex;align-items:center;" aria-label="Search">${ICON.search}</a>
+        <a href="/${lang}/search" class="xt-navdark xt-mobonly" style="color:#fff;padding:11px 14px;align-items:center;" aria-label="Search">${ICON.search}</a>
         <button class="xt-burger xt-mobonly" data-act="menu" aria-label="Menu"><span></span><span></span><span></span></button>
         <span class="xt-desknav" style="position:absolute;${lang === 'dv' ? 'left' : 'right'}:20px;top:50%;transform:translateY(-50%);display:flex;align-items:center;color:#fff;">
           <a href="/${lang}/search" style="padding:8px 10px;display:flex;align-items:center;color:#fff;" aria-label="Search">${ICON.search}</a>
@@ -565,7 +579,7 @@ export function articleHtml(a: Art, related: Art[], comments: Cmt[], lang: Lang,
       ${fillAdColumn('ARTICLE_SIDEBAR_1', ads, 'xt-art-topad')}
     </div>
     <div class="xt-article-grid" style="display:grid;grid-template-columns:minmax(0,1.5fr) 1fr;gap:40px;align-items:start;">
-      <article style="display:flex;gap:22px;align-items:flex-start;">
+      <article class="xt-art-flex" style="display:flex;gap:22px;align-items:flex-start;">
         ${shareRail(a, lang)}
         <div style="flex:1;min-width:0;">
           <div style="display:flex;align-items:center;gap:16px;margin:0 0 22px;padding:0 0 14px;border-bottom:1px solid var(--line2);">

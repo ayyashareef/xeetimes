@@ -28,6 +28,19 @@
   font-weight: 400 700;
   font-display: swap;
 }
+/* MV Utheemu — article reading body (regular + bold faces) */
+@font-face {
+  font-family: 'MV Utheemu';
+  src: url('/fonts/mvutheemuREGULAR.woff2') format('woff2');
+  font-weight: 400 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'MV Utheemu';
+  src: url('/fonts/mvutheemuBOLD-B7tZquwO.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+}
 
 /* Single light palette (XeeTimes design tokens). */
 :root,
@@ -180,17 +193,17 @@ body:has(#xt-root) { background: var(--page); }
 #xt-root .xt-article-body h2, #xt-root .xt-article-body h3,
 #xt-root .xt-article-body blockquote, #xt-root .xt-article-body span,
 #xt-root .xt-article-body div, #xt-root .xt-article-body strong, #xt-root .xt-article-body b {
-  font-family: 'MVTypewriter', 'Faruma', sans-serif;
+  font-family: 'MV Utheemu', 'Faruma', sans-serif;
 }
-#xt-root .xt-article-body p { margin: 0 0 20px; font-size: 17px; line-height: 2.1; color: #26262b; text-align: justify; }
-#xt-root .xt-article-body h2 { margin: 34px 0 18px; font-size: 25px; font-weight: 700; line-height: 1.6; font-family: 'Ammu','Faruma',sans-serif; }
-#xt-root .xt-article-body h3 { margin: 28px 0 14px; font-size: 21px; font-weight: 700; line-height: 1.6; font-family: 'Ammu','Faruma',sans-serif; }
+#xt-root .xt-article-body p { margin: 0 0 26px; font-size: 30px; line-height: 1.85; color: #26262b; text-align: justify; }
+#xt-root .xt-article-body h2 { margin: 40px 0 20px; font-size: 36px; font-weight: 700; line-height: 1.5; font-family: 'Ammu','Faruma',sans-serif; }
+#xt-root .xt-article-body h3 { margin: 32px 0 16px; font-size: 32px; font-weight: 700; line-height: 1.5; font-family: 'Ammu','Faruma',sans-serif; }
 #xt-root .xt-article-body img { max-width: 100%; height: auto; margin: 12px 0 22px; display: block; }
 #xt-root .xt-article-body figure { margin: 12px 0 22px; }
 #xt-root .xt-article-body figcaption { font-family: var(--en); font-size: 13px; color: var(--ink3); text-align: center; margin-top: 8px; }
 #xt-root .xt-article-body a { color: var(--red); text-decoration: underline; }
 #xt-root .xt-article-body ul, #xt-root .xt-article-body ol { margin: 0 0 22px; padding-right: 26px; }
-#xt-root .xt-article-body li { margin: 0 0 10px; font-size: 17px; line-height: 2; }
+#xt-root .xt-article-body li { margin: 0 0 14px; font-size: 30px; line-height: 1.85; }
 /* Note callout — the design's right-red-border cream box. */
 #xt-root .xt-article-body blockquote {
   border-right: 4px solid var(--red); background: #f7f4ee; padding: 16px 18px;
@@ -279,6 +292,12 @@ body:has(#xt-root) { background: var(--page); }
 /* ==================== RESPONSIVE ==================== */
 @media (max-width: 1100px) {
   #xt-root .xt-article-grid { grid-template-columns: 1fr !important; }
+  /* Stack the article so the share icons become a full-width horizontal row on top
+     and the body reads full-width below. The article carries an inline
+     `align-items:flex-start`, so force `stretch` (!important) or the body div
+     shrinks to its content width. */
+  #xt-root .xt-art-flex { flex-direction: column !important; align-items: stretch !important; }
+  #xt-root .xt-art-flex > div { width: 100%; }
   #xt-root .xt-share-rail { position: static; flex-direction: row; flex-wrap: wrap; width: auto; }
   #xt-root .xt-ad-rail { position: static; flex-direction: row; flex-wrap: wrap; }
 }
@@ -306,4 +325,8 @@ body:has(#xt-root) { background: var(--page); }
   #xt-root .xt-g-4, #xt-root .xt-g-3 { grid-template-columns: 1fr !important; }
   #xt-root .xt-gallery { grid-template-columns: 1fr !important; }
   #xt-root section, #xt-root main, #xt-root header > div, #xt-root .xt-article-grid { padding-left: 16px !important; padding-right: 16px !important; }
+  /* The 30px headline overlaid on the hero image overflows a phone-width image —
+     shrink it and let long Thaana words wrap instead of spilling out. */
+  #xt-root .xt-lead-hl { font-size: 21px !important; line-height: 1.5 !important; overflow-wrap: anywhere; }
+  #xt-root .xt-article-body p, #xt-root .xt-article-body li { font-size: 24px; line-height: 1.85; }
 }
