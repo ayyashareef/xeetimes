@@ -339,10 +339,10 @@ body:has(#xt-root) { background: var(--page); }
   /* minmax(0,1fr) — a bare 1fr grows to the content's min-content and blows the
      column out past the viewport (the image overflowed, leaving a clipped strip). */
   #xt-root .xt-g-4 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  /* Hero / category-lead stack to one column; the side ad shows BELOW the image
+     (full width) rather than being hidden. */
   #xt-root .xt-g-hero { grid-template-columns: minmax(0, 1fr) !important; }
-  #xt-root .xt-g-hero .xt-hero-ad { display: none !important; }
   #xt-root .xt-g-seclead { grid-template-columns: minmax(0, 1fr) !important; }
-  #xt-root .xt-g-seclead .xt-seclead-ad { display: none !important; }
   #xt-root .xt-art-toprow { grid-template-columns: minmax(0, 1fr) !important; }
   #xt-root .xt-art-topad { display: none !important; }
 }
