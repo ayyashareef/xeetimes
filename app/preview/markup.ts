@@ -71,7 +71,7 @@ const STR = {
     latest: 'އެންމެ ފަހުގެ', latestNews: 'އެންމެ ފަހުގެ ޚަބަރު', report: 'ރިޕޯޓް',
     related: 'ގުޅުންހުރި ލިޔުންތައް', comments: 'ކޮމެންޓް', search: 'ހޯދުން', results: 'ނަތީޖާ',
     searchPlaceholder: 'ހޯދާ...', desk: 'ޒީ ޓައިމްސް ޑެސްކް',
-    home: 'ފުރަތަމަ ޞަފްޙާ', allNews: 'ހުރިހާ ޚަބަރެއް',
+    home: 'ފުރަތަމަ ޞަފްޙާ', allNews: 'އިތުރަށް',
     commentPh: 'ކޮމެންޓް ލިޔުއްވާ...', namePh: 'ނަން', postComment: 'ފޮނުވާ',
     noComments: 'މި ޚަބަރަށް ކޮމެންޓެއް ނެތް. ފުރަތަމަ ކޮމެންޓް ކޮށްލައްވާ.',
     noResults: (q: string) => `"${q}" އާ ގުޅޭ ޚަބަރެއް ނުފެނުނު.`,
