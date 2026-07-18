@@ -100,7 +100,7 @@ export default function UsersPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Avatar</label>
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center text-gray-400 text-xl font-semibold shrink-0">
+                <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center text-gray-400 text-xl font-semibold shrink-0">
                   {form.avatar ? <img src={form.avatar} alt="" className="w-full h-full object-cover" /> : (form.name || '?').charAt(0).toUpperCase()}
                 </div>
                 <div className="flex flex-col gap-1.5">
@@ -198,7 +198,7 @@ export default function UsersPage() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-1">
-                      <button onClick={() => { setEditing(user); setForm({ name: user.name, name_dv: user.name_dv || '', email: user.email, username: user.username || '', password: '', role: user.role, isActive: user.isActive, avatar: user.avatar || '' }); setShowForm(true); }}
+                      <button onClick={() => { setEditing(user); setForm({ name: user.name, name_dv: user.name_dv || '', email: user.email, username: user.username || '', password: '', role: user.role, isActive: user.isActive, avatar: user.avatar || '' }); setShowForm(true); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                         className="p-1.5 text-gray-400 hover:text-primary rounded"><Edit2 className="w-4 h-4" /></button>
                       <button onClick={() => handleDelete(user.id)} className="p-1.5 text-gray-400 hover:text-red-600 rounded"><Trash2 className="w-4 h-4" /></button>
                     </div>
