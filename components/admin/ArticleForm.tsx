@@ -86,7 +86,6 @@ export default function ArticleForm({ article, role }: ArticleFormProps) {
   const [creatingTag, setCreatingTag] = useState(false);
   const [authors, setAuthors] = useState<Author[]>([]);
   const [activeTab, setActiveTab] = useState<'content' | 'seo'>('content');
-  const [activeLang, setActiveLang] = useState<'dv' | 'en'>('dv');
   const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
   const [galleryPickerOpen, setGalleryPickerOpen] = useState(false);
 
@@ -185,8 +184,8 @@ export default function ArticleForm({ article, role }: ArticleFormProps) {
       toast.error('Please select a category');
       return;
     }
-    if (!form.title_dv && !form.title_en) {
-      toast.error('Please enter a title in at least one language');
+    if (!form.title_dv) {
+      toast.error('Please enter a title');
       return;
     }
 
@@ -200,6 +199,16 @@ export default function ArticleForm({ article, role }: ArticleFormProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...form,
+          // Dhivehi-only site: mirror the *_en fields from *_dv so the DB (which
+          // still has both columns) stays valid and public en-fallbacks work.
+          title_en: form.title_dv,
+          shortTitle_en: form.shortTitle_dv,
+          content_en: form.content_dv,
+          excerpt_en: form.excerpt_dv,
+          metaTitle_en: form.metaTitle_dv,
+          metaDescription_en: form.metaDescription_dv,
+          featuredImageAlt_en: form.featuredImageAlt_dv,
+          featuredImageCaption_en: form.featuredImageCaption_dv,
           status,
           tags: form.selectedTags,
         }),
@@ -244,69 +253,29 @@ export default function ArticleForm({ article, role }: ArticleFormProps) {
 
         {activeTab === 'content' && (
           <>
-            {/* Language toggle */}
-            <div className="flex gap-2 bg-white rounded-xl p-1 shadow-sm border border-gray-100">
-              <button
-                onClick={() => setActiveLang('dv')}
-                className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition ${activeLang === 'dv' ? 'bg-secondary text-white' : 'text-gray-600 hover:bg-gray-50'}`}
-              >
-                ދިވެހި (Dhivehi)
-              </button>
-              <button
-                onClick={() => setActiveLang('en')}
-                className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition ${activeLang === 'en' ? 'bg-secondary text-white' : 'text-gray-600 hover:bg-gray-50'}`}
-              >
-                English
-              </button>
-            </div>
-
             {/* Title */}
             <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {activeLang === 'dv' ? 'ސުރުޚީ (Title - Dhivehi)' : 'Title (English)'}
-              </label>
-              {activeLang === 'dv' ? (
-                <input
-                  type="text"
-                  value={form.title_dv}
-                  onChange={(e) => setForm(f => ({ ...f, title_dv: e.target.value }))}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg text-lg outline-none focus:ring-2 focus:ring-primary/20 font-dv-heading"
-                  dir="rtl"
-                  placeholder="ސުރުޚީ ލިޔޭ..."
-                />
-              ) : (
-                <input
-                  type="text"
-                  value={form.title_en}
-                  onChange={(e) => setForm(f => ({ ...f, title_en: e.target.value }))}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg text-lg outline-none focus:ring-2 focus:ring-primary/20"
-                  placeholder="Enter title..."
-                />
-              )}
+              <label className="block text-sm font-medium text-gray-700 mb-2">ސުރުޚީ (Title)</label>
+              <input
+                type="text"
+                value={form.title_dv}
+                onChange={(e) => setForm(f => ({ ...f, title_dv: e.target.value }))}
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg text-lg outline-none focus:ring-2 focus:ring-primary/20 font-dv-heading"
+                dir="rtl"
+                placeholder="ސުރުޚީ ލިޔޭ..."
+              />
 
               {/* Short title — shown on home cards + the share/OG preview. Falls
                   back to the full title when left blank. */}
-              <label className="block text-sm font-medium text-gray-700 mt-4 mb-2">
-                {activeLang === 'dv' ? 'ކުރު ސުރުޚީ (Short title — home & share)' : 'Short title (home & share)'}
-              </label>
-              {activeLang === 'dv' ? (
-                <input
-                  type="text"
-                  value={form.shortTitle_dv}
-                  onChange={(e) => setForm(f => ({ ...f, shortTitle_dv: e.target.value }))}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-primary/20 font-dv-heading"
-                  dir="rtl"
-                  placeholder="ކުރު ސުރުޚީ (ހުސްކޮށް ބާއްވައިފިނަމަ ސުރުޚީ ބޭނުންކުރެވޭނެ)"
-                />
-              ) : (
-                <input
-                  type="text"
-                  value={form.shortTitle_en}
-                  onChange={(e) => setForm(f => ({ ...f, shortTitle_en: e.target.value }))}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-primary/20"
-                  placeholder="Short title (falls back to the full title if blank)"
-                />
-              )}
+              <label className="block text-sm font-medium text-gray-700 mt-4 mb-2">ކުރު ސުރުޚީ (Short title — home & share)</label>
+              <input
+                type="text"
+                value={form.shortTitle_dv}
+                onChange={(e) => setForm(f => ({ ...f, shortTitle_dv: e.target.value }))}
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-primary/20 font-dv-heading"
+                dir="rtl"
+                placeholder="ކުރު ސުރުޚީ (ހުސްކޮށް ބާއްވައިފިނަމަ ސުރުޚީ ބޭނުންކުރެވޭނެ)"
+              />
               <p className="mt-2 text-xs text-gray-400">
                 Appears on the home page and in the shared link preview. The full title shows on the article page.
               </p>
@@ -314,53 +283,28 @@ export default function ArticleForm({ article, role }: ArticleFormProps) {
 
             {/* Content */}
             <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {activeLang === 'dv' ? 'ލިޔުން (Content - Dhivehi)' : 'Content (English)'}
-              </label>
-              {activeLang === 'dv' ? (
-                <RichTextEditor
-                  key="editor-dv"
-                  content={form.content_dv}
-                  onChange={(html) => setForm(f => ({ ...f, content_dv: html }))}
-                  dir="rtl"
-                  placeholder="ލިޔުން ލިޔޭ..."
-                />
-              ) : (
-                <RichTextEditor
-                  key="editor-en"
-                  content={form.content_en}
-                  onChange={(html) => setForm(f => ({ ...f, content_en: html }))}
-                  dir="ltr"
-                  placeholder="Start writing..."
-                />
-              )}
+              <label className="block text-sm font-medium text-gray-700 mb-2">ލިޔުން (Content)</label>
+              <RichTextEditor
+                key="editor-dv"
+                content={form.content_dv}
+                onChange={(html) => setForm(f => ({ ...f, content_dv: html }))}
+                dir="rtl"
+                placeholder="ލިޔުން ލިޔޭ..."
+              />
             </div>
 
             {/* Excerpt */}
             <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {activeLang === 'dv' ? 'ޚުލާޞާ (Excerpt - Dhivehi)' : 'Excerpt (English)'}
-              </label>
-              {activeLang === 'dv' ? (
-                <textarea
-                  value={form.excerpt_dv}
-                  onChange={(e) => setForm(f => ({ ...f, excerpt_dv: e.target.value }))}
-                  rows={3}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-primary/20 font-dv-body"
-                  dir="rtl"
-                  placeholder="ކުރު ޚުލާޞާއެއް..."
-                  maxLength={500}
-                />
-              ) : (
-                <textarea
-                  value={form.excerpt_en}
-                  onChange={(e) => setForm(f => ({ ...f, excerpt_en: e.target.value }))}
-                  rows={3}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-primary/20"
-                  placeholder="Brief summary..."
-                  maxLength={500}
-                />
-              )}
+              <label className="block text-sm font-medium text-gray-700 mb-2">ޚުލާޞާ (Excerpt)</label>
+              <textarea
+                value={form.excerpt_dv}
+                onChange={(e) => setForm(f => ({ ...f, excerpt_dv: e.target.value }))}
+                rows={3}
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-primary/20 font-dv-body"
+                dir="rtl"
+                placeholder="ކުރު ޚުލާޞާއެއް..."
+                maxLength={500}
+              />
             </div>
           </>
         )}
@@ -368,31 +312,7 @@ export default function ArticleForm({ article, role }: ArticleFormProps) {
         {activeTab === 'seo' && (
           <div className="space-y-4">
             <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 space-y-4">
-              <h3 className="font-medium text-gray-900">SEO - English</h3>
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">Meta Title</label>
-                <input
-                  type="text"
-                  value={form.metaTitle_en}
-                  onChange={(e) => setForm(f => ({ ...f, metaTitle_en: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20"
-                  placeholder="SEO title (leave blank to use article title)"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">Meta Description</label>
-                <textarea
-                  value={form.metaDescription_en}
-                  onChange={(e) => setForm(f => ({ ...f, metaDescription_en: e.target.value }))}
-                  rows={2}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20"
-                  placeholder="SEO description (leave blank to use excerpt)"
-                />
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 space-y-4">
-              <h3 className="font-medium text-gray-900">SEO - ދިވެހި</h3>
+              <h3 className="font-medium text-gray-900">SEO</h3>
               <div>
                 <label className="block text-sm text-gray-600 mb-1">English / Latin title (Google &amp; share text)</label>
                 <input
@@ -483,13 +403,6 @@ export default function ArticleForm({ article, role }: ArticleFormProps) {
                   <X className="w-3 h-3" />
                 </button>
               </div>
-              <input
-                type="text"
-                value={form.featuredImageCaption_en}
-                onChange={(e) => setForm(f => ({ ...f, featuredImageCaption_en: e.target.value }))}
-                className="w-full px-3 py-1.5 border border-gray-200 rounded-lg text-xs outline-none focus:ring-2 focus:ring-primary/20"
-                placeholder="Caption / Photo credit (English)"
-              />
               <input
                 type="text"
                 value={form.featuredImageCaption_dv}
