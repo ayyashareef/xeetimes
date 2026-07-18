@@ -220,7 +220,7 @@ body:has(#xt-root) { background: var(--page); }
 /* Most WP articles store the body as bare text (no <p> wrapper), so the size
    must live on the container — not only on <p> — or it never applies. */
 #xt-root .xt-article-body { font-size: 20px; line-height: 1.9; color: #26262b; }
-#xt-root .xt-article-body p { margin: 0 0 22px; font-size: 20px; line-height: 1.9; color: #26262b; text-align: justify; }
+#xt-root .xt-article-body p { margin: 0 0 22px; font-size: 20px; line-height: 1.9; color: #26262b; text-align: start; }
 #xt-root .xt-article-body h2 { margin: 34px 0 18px; font-size: 35px; font-weight: 700; line-height: 1.5; font-family: 'Waheed','AmmuFK','Ammu','Faruma',sans-serif; }
 #xt-root .xt-article-body h3 { margin: 28px 0 14px; font-size: 32px; font-weight: 700; line-height: 1.5; font-family: 'Waheed','AmmuFK','Ammu','Faruma',sans-serif; }
 #xt-root .xt-article-body img { max-width: 100%; height: auto; margin: 12px 0 22px; display: block; }
@@ -324,23 +324,26 @@ body:has(#xt-root) { background: var(--page); }
 
 /* ==================== RESPONSIVE ==================== */
 @media (max-width: 1100px) {
-  #xt-root .xt-article-grid { grid-template-columns: 1fr !important; }
+  #xt-root .xt-article-grid { grid-template-columns: minmax(0, 1fr) !important; }
   /* Stack the article so the share icons become a full-width horizontal row on top
      and the body reads full-width below. The article carries an inline
      `align-items:flex-start`, so force `stretch` (!important) or the body div
      shrinks to its content width. */
   #xt-root .xt-art-flex { flex-direction: column !important; align-items: stretch !important; }
   #xt-root .xt-art-flex > div { width: 100%; }
-  #xt-root .xt-share-rail { position: static; flex-direction: row; flex-wrap: wrap; width: auto; }
+  /* Share icons: full-width row, spread edge-to-edge (no white gap on the right). */
+  #xt-root .xt-share-rail { position: static; flex-direction: row; flex-wrap: wrap; width: 100%; justify-content: space-between; }
   #xt-root .xt-ad-rail { position: static; flex-direction: row; flex-wrap: wrap; }
 }
 @media (max-width: 1000px) {
-  #xt-root .xt-g-4 { grid-template-columns: repeat(2, 1fr) !important; }
-  #xt-root .xt-g-hero { grid-template-columns: 1fr !important; }
+  /* minmax(0,1fr) — a bare 1fr grows to the content's min-content and blows the
+     column out past the viewport (the image overflowed, leaving a clipped strip). */
+  #xt-root .xt-g-4 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  #xt-root .xt-g-hero { grid-template-columns: minmax(0, 1fr) !important; }
   #xt-root .xt-g-hero .xt-hero-ad { display: none !important; }
-  #xt-root .xt-g-seclead { grid-template-columns: 1fr !important; }
+  #xt-root .xt-g-seclead { grid-template-columns: minmax(0, 1fr) !important; }
   #xt-root .xt-g-seclead .xt-seclead-ad { display: none !important; }
-  #xt-root .xt-art-toprow { grid-template-columns: 1fr !important; }
+  #xt-root .xt-art-toprow { grid-template-columns: minmax(0, 1fr) !important; }
   #xt-root .xt-art-topad { display: none !important; }
 }
 @media (max-width: 860px) {
@@ -349,19 +352,28 @@ body:has(#xt-root) { background: var(--page); }
   #xt-root .xt-backdrop { display: block; }
   #xt-root .xt-drawer { display: flex; }
   #xt-root .xt-ad-rail { display: none !important; }
+  /* Spread the three mobile icons across the bar: search | menu | home. */
+  #xt-root .xt-navrow { justify-content: space-between !important; gap: 0 !important; }
 }
 @media (max-width: 760px) {
   #xt-root .xt-g-3 { grid-template-columns: repeat(2, 1fr) !important; }
   #xt-root .xt-g-side { grid-template-columns: 1fr !important; }
 }
 @media (max-width: 600px) {
-  #xt-root .xt-g-4, #xt-root .xt-g-3 { grid-template-columns: 1fr !important; }
-  #xt-root .xt-gallery { grid-template-columns: 1fr !important; }
+  /* News cards stay 2-up on phones (not a single column). */
+  #xt-root .xt-g-4, #xt-root .xt-g-3 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  #xt-root .xt-gallery { grid-template-columns: minmax(0, 1fr) !important; }
   #xt-root section, #xt-root main, #xt-root header > div, #xt-root .xt-article-grid { padding-left: 16px !important; padding-right: 16px !important; }
   /* The 30px headline overlaid on the hero image overflows a phone-width image —
      shrink it and let long Thaana words wrap instead of spilling out. */
   #xt-root .xt-lead-hl { font-size: 21px !important; line-height: 1.5 !important; overflow-wrap: anywhere; }
   /* Article title sits below the photo (not overlaid), so it can be bigger on phones. */
   #xt-root h1.xt-arttitle { font-size: 28px !important; line-height: 1.45 !important; }
-  #xt-root .xt-article-body p, #xt-root .xt-article-body li { font-size: 25px; line-height: 1.9; }
+  /* Article body: 5px smaller than desktop on phones. Size lives on the container
+     too, since most WP bodies are bare text with no <p>. */
+  #xt-root .xt-article-body { font-size: 15px !important; }
+  #xt-root .xt-article-body p, #xt-root .xt-article-body li { font-size: 15px !important; line-height: 1.9; }
+  /* Emoji reactions: all six on a single line. */
+  #xt-root [data-react-bar] { flex-wrap: nowrap !important; gap: 5px !important; }
+  #xt-root [data-react-bar] .xt-react { flex: 1 1 0; min-width: 0; padding: 9px 2px !important; gap: 4px !important; justify-content: center; }
 }

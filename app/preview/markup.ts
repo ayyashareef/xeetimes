@@ -411,11 +411,11 @@ export function header(lang: Lang, sm = false, active = '', ads: AdsMap = {}, hi
       <a href="/"><img class="xt-logo-img" src="${esc(logoSrc)}" alt="XeeTimes"></a>
     </div>
     <nav style="background:var(--nav);">
-      <div class="xt-wrap" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:0 22px;font-size:21px;min-height:68px;position:relative;">
+      <div class="xt-wrap xt-navrow" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:0 22px;font-size:21px;min-height:68px;position:relative;">
         <a href="/" class="xt-navdark" style="color:#fff;padding:13px 16px;display:flex;align-items:center;" aria-label="Home">${ICON.home}</a>
         <span class="xt-desknav" style="display:flex;align-items:center;gap:16px;">${navLinks}</span>
-        <a href="/search" class="xt-navdark xt-mobonly" style="color:#fff;padding:11px 14px;align-items:center;" aria-label="Search">${ICON.search}</a>
         <button class="xt-burger xt-mobonly" data-act="menu" aria-label="Menu"><span></span><span></span><span></span></button>
+        <a href="/search" class="xt-navdark xt-mobonly" style="color:#fff;padding:11px 14px;align-items:center;" aria-label="Search">${ICON.search}</a>
         <span class="xt-desknav" style="position:absolute;${lang === 'dv' ? 'left' : 'right'}:20px;top:50%;transform:translateY(-50%);display:flex;align-items:center;color:#fff;">
           <a href="/search" style="padding:8px 10px;display:flex;align-items:center;color:#fff;" aria-label="Search">${ICON.search}</a>
         </span>
