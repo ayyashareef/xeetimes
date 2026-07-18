@@ -22,7 +22,7 @@ const MAIN: Item[] = [
   { label: 'Tags', href: '/admin/tags', icon: Tags },
   { label: 'Media', href: '/admin/media', icon: ImageIcon },
   { label: 'Comments', href: '/admin/comments', icon: MessageSquare },
-  { label: 'Advertisements', href: '/admin/ads', icon: Megaphone },
+  { label: 'Advertisements', href: '/admin/ads', icon: Megaphone, roles: ['SUPER_ADMIN', 'EDITOR'] },
   { label: 'Pages', href: '/admin/pages', icon: FileStack, roles: ['SUPER_ADMIN', 'EDITOR'] },
 ];
 const SYSTEM: Item[] = [
