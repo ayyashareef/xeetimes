@@ -21,7 +21,7 @@ const WAHEED = path.join(process.cwd(), 'public/fonts/MVWaheed.ttf');
 const FARUMA = path.join(process.cwd(), 'public/fonts/Faruma.ttf');
 const CACHE_DIR = path.join(process.cwd(), '.og-cache');
 const IMG_CACHE = path.join(CACHE_DIR, 'img');
-const OG_VERSION = 'v12';
+const OG_VERSION = 'v13';
 const HEADERS = {
   'Content-Type': 'image/jpeg',
   'Cache-Control': 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800',
@@ -171,7 +171,7 @@ export default async function OgImage({ params }: { params: Promise<{ id: string
   const textW = 1000;
   const long = heading.length > 90;
   const mid = heading.length > 50;
-  const headSizePt = long ? 44 : mid ? 52 : 63;
+  const headSizePt = long ? 49 : mid ? 57 : 68;
   // Headline sits bottom-centre and is centre-aligned ('centre' is symmetric,
   // so no logical/visual RTL flip to worry about — unlike 'left'/'right').
   const [mastImg, headImg, catImg] = await Promise.all([
