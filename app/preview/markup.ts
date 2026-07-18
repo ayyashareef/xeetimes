@@ -350,9 +350,18 @@ function fillAdBox(slot: string, ads: AdsMap): string {
   const ar = def ? `aspect-ratio:${def.w}/${def.h};` : 'flex:1;min-height:0;';
   const list = ads[slot] || [];
   if (!list.length) return `<div class="xt-ad" style="width:100%;${ar}"></div>`;
-  const rotating = list.length > 1;
-  const rot = rotating ? ' data-ad-rotate' : '';
-  return `<div class="xt-ad xt-ad-filled"${rot} style="width:100%;${ar}position:relative;">${list.map((ad, i) => adSlide(ad, i, rotating)).join('')}</div>`;
+  if (list.length === 1) {
+    // Single creative: the box hugs the image's own height (no fixed-aspect
+    // letterbox) so the "Advertisement" label sits right under the ad.
+    const ad = list[0];
+    const img = `<img src="${esc(ad.imageUrl)}" alt="${esc(ad.title || 'Advertisement')}" loading="lazy" decoding="async" style="width:100%;height:auto;display:block;">`;
+    const inner = ad.linkUrl
+      ? `<a href="${esc(ad.linkUrl)}" target="_blank" rel="noopener" data-ad="${esc(ad.id)}" style="display:block;">${img}</a>`
+      : img;
+    return `<div class="xt-ad-filled" data-ad-view="${esc(ad.id)}" style="width:100%;overflow:hidden;">${inner}</div>`;
+  }
+  // Rotating slot: fixed-aspect box with absolutely-stacked slides.
+  return `<div class="xt-ad xt-ad-filled" data-ad-rotate style="width:100%;${ar}position:relative;">${list.map((ad, i) => adSlide(ad, i, true)).join('')}</div>`;
 }
 // A flex column: "Advertisement" eyebrow + a fill-height ad box. Placed in a grid
 // cell that stretches to the neighbouring photo's height.
