@@ -309,8 +309,13 @@ const authorUrl = (lang: Lang, author: Author): string | null =>
 // dashed cream box (via .xt-ad::before "އިޝްތިހާރު"). adBand adds the label above.
 // One slide (image, optionally linked) inside a rotating ad box. Slides stack
 // absolutely; only the first shows until the client rotates them.
-function adSlide(ad: AdData, i: number): string {
-  const img = `<img src="${esc(ad.imageUrl)}" alt="${esc(ad.title || 'Advertisement')}" loading="lazy">`;
+// `rotating` = the slot has >1 slide. Rotating slides must load EAGERLY: a
+// hidden (display:none) slide never counts as "near viewport", so lazy images
+// on slides 2+ only start fetching the moment they're revealed — leaving a blank
+// box on the first rotation. Eager loading preloads every creative up front.
+function adSlide(ad: AdData, i: number, rotating = false): string {
+  const loading = rotating ? 'eager' : 'lazy';
+  const img = `<img src="${esc(ad.imageUrl)}" alt="${esc(ad.title || 'Advertisement')}" loading="${loading}" decoding="async">`;
   const inner = ad.linkUrl
     ? `<a href="${esc(ad.linkUrl)}" target="_blank" rel="noopener" data-ad="${esc(ad.id)}">${img}</a>`
     : img;
@@ -322,8 +327,9 @@ export function adSlot(slot: string, ads: AdsMap): string {
   const box = `width:100%;aspect-ratio:${def.w}/${def.h};`;
   const list = ads[slot] || [];
   if (!list.length) return `<div class="xt-ad xt-ad-${def.kind}" style="${box}"></div>`;
-  const rot = list.length > 1 ? ' data-ad-rotate' : '';
-  return `<div class="xt-ad xt-ad-${def.kind} xt-ad-filled"${rot} style="${box}position:relative;">${list.map(adSlide).join('')}</div>`;
+  const rotating = list.length > 1;
+  const rot = rotating ? ' data-ad-rotate' : '';
+  return `<div class="xt-ad xt-ad-${def.kind} xt-ad-filled"${rot} style="${box}position:relative;">${list.map((ad, i) => adSlide(ad, i, rotating)).join('')}</div>`;
 }
 // Ad with the "ADVERTISEMENT" eyebrow above it (design style).
 function adBand(slot: string, ads: AdsMap): string {
@@ -339,8 +345,9 @@ function fillAdBox(slot: string, ads: AdsMap): string {
   const ar = def ? `aspect-ratio:${def.w}/${def.h};` : 'flex:1;min-height:0;';
   const list = ads[slot] || [];
   if (!list.length) return `<div class="xt-ad" style="width:100%;${ar}"></div>`;
-  const rot = list.length > 1 ? ' data-ad-rotate' : '';
-  return `<div class="xt-ad xt-ad-filled"${rot} style="width:100%;${ar}position:relative;">${list.map(adSlide).join('')}</div>`;
+  const rotating = list.length > 1;
+  const rot = rotating ? ' data-ad-rotate' : '';
+  return `<div class="xt-ad xt-ad-filled"${rot} style="width:100%;${ar}position:relative;">${list.map((ad, i) => adSlide(ad, i, rotating)).join('')}</div>`;
 }
 // A flex column: "Advertisement" eyebrow + a fill-height ad box. Placed in a grid
 // cell that stretches to the neighbouring photo's height.
