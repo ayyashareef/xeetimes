@@ -165,7 +165,30 @@ const shortTitle = (a: Art, lang: Lang) =>
   (lang === 'en' ? a.shortTitle_en || a.shortTitle_dv : a.shortTitle_dv || a.shortTitle_en) || title(a, lang);
 const excerpt = (a: Art, lang: Lang) => (lang === 'en' ? a.excerpt_en ?? a.excerpt_dv : a.excerpt_dv ?? a.excerpt_en) || '';
 const content = (a: Art, lang: Lang) =>
-  embedVideos((lang === 'en' ? a.content_en || a.content_dv : a.content_dv || a.content_en) || '');
+  autop(embedVideos((lang === 'en' ? a.content_en || a.content_dv : a.content_dv || a.content_en) || ''));
+
+// Real block-level elements that must NOT be wrapped in <p>.
+const BLOCK_RE = /^<\/?(?:address|article|aside|blockquote|details|div|dl|fieldset|figure|figcaption|footer|form|h[1-6]|header|hr|main|nav|ol|p|pre|section|table|tbody|thead|tr|td|th|ul|li|iframe|img|video|source|script)[\s/>]/i;
+// WordPress wpautop: the migrated content stores paragraphs as blank-line
+// separated blocks of bare text (no <p>). Wrap those blocks in <p> — leaving
+// real block elements (<img>, <div>, <h*>, our video embeds) alone — so
+// headings and paragraphs sit on their own lines, like the old xeetimes.com.
+function autop(html: string): string {
+  if (!html) return html;
+  const s = html.replace(/\r\n?/g, '\n');
+  const blocks = s.split(/\n{2,}/);
+  // Already block-structured (lots of <p>) — leave it untouched.
+  if ((s.match(/<p[\s>]/gi) || []).length > blocks.length / 2) return html;
+  return blocks
+    .map((b) => {
+      const t = b.trim();
+      if (!t) return '';
+      if (BLOCK_RE.test(t)) return t; // a real block element — keep as-is
+      return `<p>${t.replace(/\n+/g, '<br>')}</p>`; // wrap text / inline block
+    })
+    .filter(Boolean)
+    .join('\n');
+}
 
 // A centred 400×400 in-content ad box (only rendered when a creative exists).
 function midAdBlock(ads: AdsMap): string {
