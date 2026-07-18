@@ -555,12 +555,23 @@ function galleryBlock(a: Art, lang: Lang): string {
 const TS_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '';
 
 function reactionBar(articleId: string, counts: number[]): string {
-  const REACTIONS: [string, string][] = [['👍', 'LIKE'], ['😍', 'LOVE'], ['😂', 'HAHA'], ['😮', 'WOW'], ['😢', 'SAD'], ['😡', 'ANGRY']];
-  const btns = REACTIONS.map(([e, type], i) =>
-    `<button class="xt-react" data-react="${type}" data-article="${esc(articleId)}" style="display:flex;align-items:center;gap:7px;border:1px solid var(--line);background:#faf8f3;padding:8px 15px;cursor:pointer;font-size:19px;">
-       <span>${e}</span><span class="xt-react-n" style="${EN}font-size:13px;font-weight:700;color:var(--ink2);">${counts[i] || 0}</span>
+  // Monochrome line-art reaction icons (stroke = currentColor), one per ReactionType.
+  const svg = (inner: string) =>
+    `<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${inner}</svg>`;
+  const RICON: Record<string, string> = {
+    LIKE: svg('<rect x="3" y="10" width="4" height="10" rx="1"/><path d="M7 10.5 10.4 3.6c1.4-.1 2.5.9 2.5 2.3V8.4h4.8c1.4 0 2.4 1.3 2 2.6l-1.3 5.9c-.2 1-1.1 1.6-2 1.6H7"/>'),
+    LOVE: svg('<path d="M12 20.3 4.4 12.7a4.6 4.6 0 1 1 6.5-6.5l1.1 1.1 1.1-1.1a4.6 4.6 0 1 1 6.5 6.5z"/>'),
+    HAHA: svg('<circle cx="12" cy="12" r="9"/><path d="M7.5 9.6c.6-.7 1.7-.7 2.3 0"/><path d="M14.2 9.6c.6-.7 1.7-.7 2.3 0"/><path d="M7 13.5c1 2 3 3 5 3s4-1 5-3z"/>'),
+    WOW: svg('<circle cx="12" cy="12" r="9"/><path d="M9 10h.01"/><path d="M15 10h.01"/><ellipse cx="12" cy="15" rx="1.9" ry="2.3"/>'),
+    SAD: svg('<circle cx="12" cy="12" r="9"/><path d="M8.3 10.3c.4-.5 1.2-.5 1.6 0"/><path d="M14.1 10.3c.4-.5 1.2-.5 1.6 0"/><path d="M8.6 16.4c.9-1.1 2.1-1.6 3.4-1.6s2.5.5 3.4 1.6"/><path d="M9 12.4c-.3.9-.3 1.7.1 2.3"/>'),
+    ANGRY: svg('<circle cx="12" cy="12" r="9"/><path d="M7.8 9.2 10 10.1"/><path d="M16.2 9.2 14 10.1"/><path d="M8.7 11.7h.01"/><path d="M15.3 11.7h.01"/><path d="M8.6 16.4c.9-1.1 2.1-1.6 3.4-1.6s2.5.5 3.4 1.6"/>'),
+  };
+  const TYPES = ['LIKE', 'LOVE', 'HAHA', 'WOW', 'SAD', 'ANGRY'];
+  const btns = TYPES.map((type, i) =>
+    `<button class="xt-react" data-react="${type}" data-article="${esc(articleId)}" style="display:flex;align-items:center;gap:9px;border:1px solid var(--line);background:#faf8f3;padding:10px 18px;cursor:pointer;color:var(--ink);">
+       <span class="xt-react-i" style="display:flex;">${RICON[type]}</span><span class="xt-react-n" style="${EN}font-size:15px;font-weight:700;color:var(--ink2);">${counts[i] || 0}</span>
      </button>`).join('');
-  return `<div style="display:flex;flex-wrap:wrap;gap:10px;padding:22px 0;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2);margin-bottom:30px;">${btns}</div>`;
+  return `<div data-react-bar style="display:flex;flex-wrap:wrap;gap:10px;padding:22px 0;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2);margin-bottom:30px;">${btns}</div>`;
 }
 
 function commentsBlock(comments: Cmt[], lang: Lang, articleId: string): string {

@@ -127,8 +127,11 @@ body:has(#xt-root) { background: var(--page); }
 #xt-root .xt-submenu a:hover { background: var(--red); color: #fff; }
 #xt-root .xt-share { transition: transform .15s ease, filter .15s ease; }
 #xt-root .xt-share:hover { transform: translateY(-2px); filter: brightness(1.08); }
-#xt-root .xt-react { transition: transform .15s ease, background .15s ease; }
+#xt-root .xt-react { transition: transform .15s ease, background .15s ease, border-color .15s ease, color .15s ease; }
 #xt-root .xt-react:hover { transform: scale(1.06); background: #f3efe7; }
+/* Selected reaction — red fill, white line-icon + count. */
+#xt-root .xt-react.xt-react-on { background: var(--red); border-color: var(--red); color: #fff; }
+#xt-root .xt-react.xt-react-on .xt-react-n { color: #fff; }
 #xt-root .xt-page { transition: background .15s, color .15s; }
 #xt-root .xt-page:hover { background: var(--red); color: #fff; }
 #xt-root .xt-social { transition: transform .15s ease, opacity .15s ease; opacity: .92; }

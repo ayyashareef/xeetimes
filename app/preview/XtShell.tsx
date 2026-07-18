@@ -157,7 +157,14 @@ export default function XtShell({
         const type = react.getAttribute('data-react');
         const articleId = react.getAttribute('data-article');
         if (!type || !articleId) return;
-        const nEl = react.querySelector<HTMLElement>('.xt-react-n');
+        const bar = react.closest<HTMLElement>('[data-react-bar]');
+        const bump = (el: HTMLElement | null, delta: number) => {
+          const c = el?.querySelector<HTMLElement>('.xt-react-n');
+          if (c) c.textContent = String(Math.max(0, (parseInt(c.textContent || '0', 10) || 0) + delta));
+        };
+        const setActive = (el: HTMLElement | null) => {
+          bar?.querySelectorAll<HTMLElement>('[data-react]').forEach((b) => b.classList.toggle('xt-react-on', b === el));
+        };
         fetch('/api/reactions', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -165,10 +172,15 @@ export default function XtShell({
         })
           .then((r) => r.json())
           .then((d) => {
-            if (!nEl) return;
-            const n = parseInt(nEl.textContent || '0', 10) || 0;
-            if (d && d.added) nEl.textContent = String(n + 1);
-            else if (d && d.removed) nEl.textContent = String(Math.max(0, n - 1));
+            if (!d) return;
+            if (d.added) { bump(react, 1); setActive(react); }
+            else if (d.removed) { bump(react, -1); setActive(null); }
+            else if (d.changed) {
+              // switched reactions: +1 the new, -1 the previous one in this bar
+              bump(react, 1);
+              if (d.previous) bump(bar?.querySelector<HTMLElement>(`[data-react="${d.previous}"]`) ?? null, -1);
+              setActive(react);
+            }
           })
           .catch(() => {});
         return;

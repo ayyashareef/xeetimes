@@ -38,7 +38,7 @@ export async function POST(request: Request) {
         where: { id: existing.id },
         data: { type },
       });
-      const response = NextResponse.json({ changed: true, type });
+      const response = NextResponse.json({ changed: true, type, previous: existing.type });
       response.cookies.set('reaction_session', sessionId, { maxAge: 365 * 24 * 60 * 60, path: '/' });
       return response;
     }
