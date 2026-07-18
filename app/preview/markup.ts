@@ -359,7 +359,7 @@ function fillAdBox(slot: string, ads: AdsMap): string {
 function fillAdColumn(slot: string, ads: AdsMap, cls = ''): string {
   return `<div class="${cls}" style="display:flex;flex-direction:column;min-height:0;">
       ${fillAdBox(slot, ads)}
-      <div style="${EN}font-size:13px;letter-spacing:.01em;color:#a49f96;margin-top:8px;text-align:center;">— Advertisement —</div>
+      <div style="${EN}font-size:13px;letter-spacing:.01em;color:#a49f96;margin-top:2px;text-align:center;">— Advertisement —</div>
     </div>`;
 }
 
@@ -546,7 +546,7 @@ export function homeHtml(d: HomeData, lang: Lang): string {
   const sections = d.sections.map((s, idx) => {
     if (!s.articles.length) return '';
     const block = `
-    <section style="padding:8px 0 30px;">
+    <section style="padding:6px 0 12px;">
       ${homeSectionHead(s.name, catUrl(s.slug, lang), lang)}
       <div class="xt-g-4" style="display:grid;grid-template-columns:repeat(4,1fr);gap:22px;">
         ${s.articles.slice(0, 4).map((a, i) => newsCard(a, i, lang)).join('')}
