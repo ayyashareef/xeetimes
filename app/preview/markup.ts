@@ -714,9 +714,11 @@ export function articleHtml(a: Art, related: Art[], comments: Cmt[], lang: Lang,
           </div>
           ${reactionBar(a.id || '', reactionCounts)}
           ${site.commentsEnabled === false ? '' : commentsBlock(comments, lang, a.id || '')}
+          ${fillAdColumn('ARTICLE_SIDEBAR_1', ads, 'xt-artad1-mob')}
           ${rel ? `
           ${secTitle(STR[lang].related)}
           <div class="xt-g-4" style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;">${rel}</div>` : ''}
+          ${fillAdColumn('ARTICLE_SIDEBAR_2', ads, 'xt-artad2-mob')}
         </div>
       </article>
       <aside class="xt-ad-rail">

@@ -306,6 +306,9 @@ body:has(#xt-root) { background: var(--page); }
 
 /* ==================== MOBILE MENU (hamburger + drawer) ==================== */
 #xt-root .xt-mobonly { display: none; }
+/* In-flow mobile copies of the two article side ads — desktop uses the hero-row
+   ad + sidebar instead, so hide these until the mobile breakpoint. */
+#xt-root .xt-artad1-mob, #xt-root .xt-artad2-mob { display: none !important; }
 #xt-root .xt-burger { flex-direction: column; gap: 5px; width: 40px; height: 40px; align-items: center; justify-content: center; cursor: pointer; background: transparent; border: none; flex: none; padding: 0; }
 #xt-root .xt-burger span { display: block; width: 19px; height: 2px; background: #fff; transition: transform .32s cubic-bezier(.4,0,.1,1), opacity .2s ease; }
 #xt-root .xt-backdrop { display: none; position: fixed; inset: 0; z-index: 60; background: rgba(0,0,0,.5); border: none; padding: 0; opacity: 0; pointer-events: none; transition: opacity .38s ease; }
@@ -344,14 +347,18 @@ body:has(#xt-root) { background: var(--page); }
   #xt-root .xt-g-hero { grid-template-columns: minmax(0, 1fr) !important; }
   #xt-root .xt-g-seclead { grid-template-columns: minmax(0, 1fr) !important; }
   #xt-root .xt-art-toprow { grid-template-columns: minmax(0, 1fr) !important; }
+  /* On mobile the two article side ads move into the reading flow: ad #1 after
+     the article (before related), ad #2 after the related section. Hide the
+     desktop positions (hero-row ad + sidebar) and show the in-flow copies. */
   #xt-root .xt-art-topad { display: none !important; }
+  #xt-root .xt-ad-rail { display: none !important; }
+  #xt-root .xt-artad1-mob, #xt-root .xt-artad2-mob { display: flex !important; margin: 24px 0 !important; }
 }
 @media (max-width: 860px) {
   #xt-root .xt-desknav { display: none !important; }
   #xt-root .xt-mobonly { display: flex !important; }
   #xt-root .xt-backdrop { display: block; }
   #xt-root .xt-drawer { display: flex; }
-  #xt-root .xt-ad-rail { display: none !important; }
   /* Spread the three mobile icons across the bar: search | menu | home. */
   #xt-root .xt-navrow { justify-content: space-between !important; gap: 0 !important; }
 }
