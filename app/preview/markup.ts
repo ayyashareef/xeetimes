@@ -155,7 +155,9 @@ const dvDate = (d: Date | null, lang: Lang): string => {
   if (!d) return '';
   void lang;
   const p = mvParts(new Date(d)); // day 2-digit, year 4-digit
-  return `${p.day} ${DV_MONTHS[Number(p.month) - 1]} ${p.year}`;
+  // Isolate the RTL Dhivehi month (FSI…PDI) so it doesn't reorder the numbers
+  // around it — keeps the visual order "14 ޖުލައި 2026" in every context.
+  return `<span style="display:inline-flex;direction:ltr;gap:.3em;"><span>${p.day}</span><span>${DV_MONTHS[Number(p.month) - 1]}</span><span>${p.year}</span></span>`;
 };
 const stripTags = (s: string | null | undefined) => String(s ?? '').replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
 
@@ -463,7 +465,7 @@ function gridCard(a: Art, lang: Lang): string {
       <div class="xt-thumb" style="width:100%;aspect-ratio:4/3;overflow:hidden;background:var(--ph2);position:relative;">${a.featuredImage ? imgFill(a, lang, 640) : `<div class="xt-img" style="position:absolute;inset:0;"><span>ފޮޓޯ</span></div>`}</div>
       <div style="padding:14px 14px 16px;">
         <h3 class="xt-hl" style="margin:0;font-size:16px;font-weight:600;line-height:1.6;color:var(--ink);transition:color .2s;">${esc(shortTitle(a, lang))}</h3>
-        <div style="color:var(--ink3);font-size:12px;margin-top:10px;${EN}text-align:left;" dir="ltr">${esc(dvDate(a.publishedAt, lang))}</div>
+        <div style="color:var(--ink3);font-size:12px;margin-top:10px;${EN}text-align:left;" dir="ltr">${dvDate(a.publishedAt, lang)}</div>
       </div>
     </a>`;
 }
@@ -509,7 +511,7 @@ export function homeHtml(d: HomeData, lang: Lang): string {
           <span style="position:absolute;${lang === 'dv' ? 'right' : 'left'}:18px;top:18px;background:var(--red);color:#fff;font-size:13px;font-weight:700;padding:5px 13px;">${esc(catName(hero, lang))}</span>
           <div style="position:absolute;right:0;bottom:0;left:0;padding:26px;">
             <h1 class="xt-lead-hl" style="margin:0;color:#fff;font-size:35px;font-weight:700;line-height:1.5;transition:color .2s;">${esc(shortTitle(hero, lang))}</h1>
-            <div style="color:#d8d5cf;font-size:13px;margin-top:10px;${EN}" dir="ltr">${esc(dvDate(hero.publishedAt, lang))}</div>
+            <div style="color:#d8d5cf;font-size:13px;margin-top:10px;${EN}" dir="ltr">${dvDate(hero.publishedAt, lang)}</div>
           </div>
         </div>
       </a>
@@ -614,7 +616,7 @@ function commentsBlock(comments: Cmt[], lang: Lang, articleId: string): string {
         <div class="xt-comment">
           <div class="av">${esc(initial(c.authorName || 'A'))}</div>
           <div style="flex:1;min-width:0;">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;"><span style="font-weight:700;font-size:15px;color:var(--ink);">${esc(c.authorName || 'Anonymous')}</span><span style="font-size:12px;color:var(--ink3);${EN}" dir="ltr">${esc(dvDate(c.createdAt, lang))}</span></div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;"><span style="font-weight:700;font-size:15px;color:var(--ink);">${esc(c.authorName || 'Anonymous')}</span><span style="font-size:12px;color:var(--ink3);${EN}" dir="ltr">${dvDate(c.createdAt, lang)}</span></div>
             <p style="margin:0;font-size:16px;line-height:1.9;color:var(--ink2);">${esc(stripTags(c.content)).slice(0, 1200)}</p>
           </div>
         </div>`).join('')
@@ -681,7 +683,7 @@ export function articleHtml(a: Art, related: Art[], comments: Cmt[], lang: Lang,
           <div style="display:flex;align-items:center;gap:16px;margin:0 0 22px;padding:0 0 14px;border-bottom:1px solid var(--line2);">
             ${(() => {
               const u = authorUrl(lang, a.author ?? null);
-              const inner = `${authorAvatar(a.author ?? null, an, 44)}<div><div style="font-weight:700;font-size:15px;color:var(--ink);">${esc(an)}</div><div style="color:var(--ink3);font-size:12px;margin-top:3px;${EN}" dir="ltr">${esc(dvDate(a.publishedAt, lang))}</div></div>`;
+              const inner = `${authorAvatar(a.author ?? null, an, 44)}<div><div style="font-weight:700;font-size:15px;color:var(--ink);">${esc(an)}</div><div style="color:var(--ink3);font-size:12px;margin-top:3px;${EN}" dir="ltr">${dvDate(a.publishedAt, lang)}</div></div>`;
               return u ? `<a href="${u}" style="display:flex;align-items:center;gap:12px;" title="${esc(an)}">${inner}</a>` : `<div style="display:flex;align-items:center;gap:12px;">${inner}</div>`;
             })()}
           </div>
@@ -767,7 +769,7 @@ export function categoryHtml(cp: CatPage, lang: Lang, ads: AdsMap = {}, hidden: 
           <div style="position:absolute;right:0;bottom:0;left:0;padding:26px;">
             <span style="display:inline-block;background:var(--red);color:#fff;font-size:12px;font-weight:700;padding:4px 11px;margin-bottom:12px;">${esc(cp.name)}</span>
             <h2 class="xt-lead-hl" style="margin:0;color:#fff;font-size:31px;font-weight:700;line-height:1.55;transition:color .2s;">${esc(shortTitle(lead, lang))}</h2>
-            <div style="color:#bdb9b1;font-size:13px;margin-top:12px;${EN}" dir="ltr">${esc(dvDate(lead.publishedAt, lang))}</div>
+            <div style="color:#bdb9b1;font-size:13px;margin-top:12px;${EN}" dir="ltr">${dvDate(lead.publishedAt, lang)}</div>
           </div>
         </div>
       </a>
