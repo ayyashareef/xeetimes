@@ -219,6 +219,7 @@ model Advertisement {
   endDate   DateTime?
   clickCount Int     @default(0)
   viewCount  Int     @default(0)
+  rotateSeconds Int  @default(6)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

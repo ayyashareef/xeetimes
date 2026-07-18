@@ -8,7 +8,7 @@
    Light-only design (no theme toggle).
    =================================================================== */
 
-import { AD_SLOT_MAP, type AdsMap } from '@/lib/ad-slots';
+import { AD_SLOT_MAP, type AdsMap, type AdData } from '@/lib/ad-slots';
 
 export type Lang = 'dv' | 'en';
 
@@ -202,7 +202,7 @@ function autop(html: string): string {
 
 // A centred 400×400 in-content ad box (only rendered when a creative exists).
 function midAdBlock(ads: AdsMap): string {
-  if (!ads['ARTICLE_MID']) return '';
+  if (!ads['ARTICLE_MID']?.length) return '';
   return `<div class="xt-adband xt-midad" style="max-width:400px;margin:30px auto;">${adSlot('ARTICLE_MID', ads)}<div class="xt-adband-label">Advertisement</div></div>`;
 }
 // Drop an ad block roughly in the middle of the article body, at a safe
@@ -303,22 +303,23 @@ const authorUrl = (lang: Lang, author: Author): string | null =>
 // ---- Advertisement ---------------------------------------------------------
 // Render an ad placement at its registered size. Empty slot -> the design's
 // dashed cream box (via .xt-ad::before "އިޝްތިހާރު"). adBand adds the label above.
+// One slide (image, optionally linked) inside a rotating ad box. Slides stack
+// absolutely; only the first shows until the client rotates them.
+function adSlide(ad: AdData, i: number): string {
+  const img = `<img src="${esc(ad.imageUrl)}" alt="${esc(ad.title || 'Advertisement')}" loading="lazy">`;
+  const inner = ad.linkUrl
+    ? `<a href="${esc(ad.linkUrl)}" target="_blank" rel="noopener" data-ad="${esc(ad.id)}">${img}</a>`
+    : img;
+  return `<div class="xt-ad-slide" data-ad-view="${esc(ad.id)}" data-secs="${ad.rotateSeconds || 6}" style="position:absolute;inset:0;${i === 0 ? '' : 'display:none;'}">${inner}</div>`;
+}
 export function adSlot(slot: string, ads: AdsMap): string {
   const def = AD_SLOT_MAP[slot];
   if (!def) return '';
-  const ad = ads[slot];
-  if (ad) {
-    const box = `width:100%;aspect-ratio:${def.w}/${def.h};`;
-    const img = `<img src="${esc(ad.imageUrl)}" alt="${esc(ad.title || 'Advertisement')}" loading="lazy">`;
-    const inner = ad.linkUrl
-      ? `<a href="${esc(ad.linkUrl)}" target="_blank" rel="noopener" data-ad="${esc(ad.id)}">${img}</a>`
-      : img;
-    return `<div class="xt-ad xt-ad-${def.kind} xt-ad-filled" data-ad-view="${esc(ad.id)}" style="${box}">${inner}</div>`;
-  }
-  const box = def.kind === 'banner'
-    ? `aspect-ratio:${def.w}/${def.h};width:100%;`
-    : `aspect-ratio:${def.w}/${def.h};width:100%;`;
-  return `<div class="xt-ad xt-ad-${def.kind}" style="${box}"></div>`;
+  const box = `width:100%;aspect-ratio:${def.w}/${def.h};`;
+  const list = ads[slot] || [];
+  if (!list.length) return `<div class="xt-ad xt-ad-${def.kind}" style="${box}"></div>`;
+  const rot = list.length > 1 ? ' data-ad-rotate' : '';
+  return `<div class="xt-ad xt-ad-${def.kind} xt-ad-filled"${rot} style="${box}position:relative;">${list.map(adSlide).join('')}</div>`;
 }
 // Ad with the "ADVERTISEMENT" eyebrow above it (design style).
 function adBand(slot: string, ads: AdsMap): string {
@@ -332,13 +333,10 @@ function adBand(slot: string, ads: AdsMap): string {
 function fillAdBox(slot: string, ads: AdsMap): string {
   const def = AD_SLOT_MAP[slot];
   const ar = def ? `aspect-ratio:${def.w}/${def.h};` : 'flex:1;min-height:0;';
-  const ad = ads[slot];
-  if (ad) {
-    const img = `<img src="${esc(ad.imageUrl)}" alt="${esc(ad.title || 'Advertisement')}" loading="lazy">`;
-    const inner = ad.linkUrl ? `<a href="${esc(ad.linkUrl)}" target="_blank" rel="noopener" data-ad="${esc(ad.id)}">${img}</a>` : img;
-    return `<div class="xt-ad xt-ad-filled" data-ad-view="${esc(ad.id)}" style="width:100%;${ar}">${inner}</div>`;
-  }
-  return `<div class="xt-ad" style="width:100%;${ar}"></div>`;
+  const list = ads[slot] || [];
+  if (!list.length) return `<div class="xt-ad" style="width:100%;${ar}"></div>`;
+  const rot = list.length > 1 ? ' data-ad-rotate' : '';
+  return `<div class="xt-ad xt-ad-filled"${rot} style="width:100%;${ar}position:relative;">${list.map(adSlide).join('')}</div>`;
 }
 // A flex column: "Advertisement" eyebrow + a fill-height ad box. Placed in a grid
 // cell that stretches to the neighbouring photo's height.

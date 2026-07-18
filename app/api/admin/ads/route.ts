@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'No permission' }, { status: 403 });
   }
 
-  const { title, imageUrl, linkUrl, slot, isActive, startDate, endDate } = await request.json();
+  const { title, imageUrl, linkUrl, slot, isActive, startDate, endDate, rotateSeconds } = await request.json();
 
   const ad = await db.advertisement.create({
     data: {
@@ -30,6 +30,7 @@ export async function POST(request: Request) {
       linkUrl: linkUrl || null,
       slot,
       isActive: isActive ?? true,
+      rotateSeconds: Math.max(2, Math.min(120, Number(rotateSeconds) || 6)),
       startDate: startDate ? new Date(startDate) : null,
       endDate: endDate ? new Date(endDate) : null,
     },
@@ -48,7 +49,7 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: 'No permission' }, { status: 403 });
   }
 
-  const { id, title, imageUrl, linkUrl, slot, isActive, startDate, endDate } = await request.json();
+  const { id, title, imageUrl, linkUrl, slot, isActive, startDate, endDate, rotateSeconds } = await request.json();
 
   const ad = await db.advertisement.update({
     where: { id },
@@ -58,6 +59,7 @@ export async function PUT(request: Request) {
       linkUrl: linkUrl || null,
       slot,
       isActive,
+      rotateSeconds: Math.max(2, Math.min(120, Number(rotateSeconds) || 6)),
       startDate: startDate ? new Date(startDate) : null,
       endDate: endDate ? new Date(endDate) : null,
     },

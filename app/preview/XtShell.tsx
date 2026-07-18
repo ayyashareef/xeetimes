@@ -51,6 +51,7 @@ export default function XtShell({
       const viewIds = Array.from(
         new Set(
           Array.from(root.querySelectorAll('[data-ad-view]'))
+            .filter((el) => (el as HTMLElement).offsetParent !== null) // only the visible slide of a rotator
             .map((el) => el.getAttribute('data-ad-view'))
             .filter((x): x is string => !!x),
         ),
@@ -304,12 +305,35 @@ export default function XtShell({
       }
     };
 
+    // Rotate multi-ad slots — each slide shows for its own data-secs, then the
+    // next one fades in and its impression is counted.
+    const rotTimers: number[] = [];
+    root.querySelectorAll<HTMLElement>('[data-ad-rotate]').forEach((box) => {
+      const slides = Array.from(box.querySelectorAll<HTMLElement>('.xt-ad-slide'));
+      if (slides.length < 2) return;
+      let cur = 0;
+      const schedule = () => {
+        const secs = parseInt(slides[cur].getAttribute('data-secs') || '6', 10) || 6;
+        rotTimers.push(window.setTimeout(() => {
+          slides[cur].style.display = 'none';
+          cur = (cur + 1) % slides.length;
+          const s = slides[cur];
+          s.style.display = 'block';
+          const id = s.getAttribute('data-ad-view');
+          if (id) fetch('/api/ads/view', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ids: [id] }) }).catch(() => {});
+          schedule();
+        }, Math.max(2, secs) * 1000));
+      };
+      schedule();
+    });
+
     root.addEventListener('click', onClick);
     root.addEventListener('mouseover', onOver);
     root.addEventListener('mouseout', onOut);
     root.addEventListener('input', onThaana);
     document.addEventListener('keydown', onKey);
     return () => {
+      rotTimers.forEach((t) => clearTimeout(t));
       root.removeEventListener('click', onClick);
       root.removeEventListener('mouseover', onOver);
       root.removeEventListener('mouseout', onOut);

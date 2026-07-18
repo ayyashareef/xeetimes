@@ -15,12 +15,13 @@ export async function getActiveAds(): Promise<AdsMap> {
         { startDate: { lte: now }, endDate: { gte: now } },
       ],
     },
-    orderBy: { createdAt: 'desc' },
-    select: { id: true, imageUrl: true, linkUrl: true, title: true, slot: true },
+    orderBy: { createdAt: 'asc' },
+    select: { id: true, imageUrl: true, linkUrl: true, title: true, slot: true, rotateSeconds: true },
   });
+  // Group every active ad by slot (multiple ads per slot rotate on the client).
   const map: AdsMap = {};
   for (const a of ads) {
-    if (!map[a.slot]) map[a.slot] = { id: a.id, imageUrl: a.imageUrl, linkUrl: a.linkUrl, title: a.title };
+    (map[a.slot] ||= []).push({ id: a.id, imageUrl: a.imageUrl, linkUrl: a.linkUrl, title: a.title, rotateSeconds: a.rotateSeconds || 6 });
   }
   return map;
 }

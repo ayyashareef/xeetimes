@@ -12,6 +12,7 @@ interface Ad {
   linkUrl: string;
   slot: string;
   isActive: boolean;
+  rotateSeconds: number;
   clickCount: number;
   viewCount: number;
   startDate: string | null;
@@ -29,7 +30,7 @@ export default function AdsPage() {
   const [editing, setEditing] = useState<Ad | null>(null);
   const [uploading, setUploading] = useState(false);
   const [form, setForm] = useState({
-    title: '', imageUrl: '', linkUrl: '', slot: 'HOMEPAGE_BANNER', isActive: true, startDate: '', endDate: '',
+    title: '', imageUrl: '', linkUrl: '', slot: 'HOMEPAGE_BANNER', isActive: true, startDate: '', endDate: '', rotateSeconds: 6,
   });
 
   const fetchAds = async () => {
@@ -86,7 +87,7 @@ export default function AdsPage() {
       toast.success(editing ? 'Ad updated' : 'Ad created');
       setEditing(null);
       setShowForm(false);
-      setForm({ title: '', imageUrl: '', linkUrl: '', slot: 'HOMEPAGE_BANNER', isActive: true, startDate: '', endDate: '' });
+      setForm({ title: '', imageUrl: '', linkUrl: '', slot: 'HOMEPAGE_BANNER', isActive: true, startDate: '', endDate: '', rotateSeconds: 6 });
       fetchAds();
     }
   };
@@ -113,7 +114,7 @@ export default function AdsPage() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Advertisements</h1>
         <button
-          onClick={() => { setEditing(null); setForm({ title: '', imageUrl: '', linkUrl: '', slot: 'HOMEPAGE_BANNER', isActive: true, startDate: '', endDate: '' }); setShowForm(true); }}
+          onClick={() => { setEditing(null); setForm({ title: '', imageUrl: '', linkUrl: '', slot: 'HOMEPAGE_BANNER', isActive: true, startDate: '', endDate: '', rotateSeconds: 6 }); setShowForm(true); }}
           className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition text-sm font-medium"
         >
           <Plus className="w-4 h-4" /> New Ad
@@ -161,6 +162,13 @@ export default function AdsPage() {
                   )}
                   {uploading && <p className="text-xs text-primary mt-1">Resizing and uploading...</p>}
                 </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Rotate after (seconds) <span className="text-gray-400 font-normal">— when several ads share this slot</span></label>
+                <input type="number" min={2} max={120} value={form.rotateSeconds}
+                  onChange={(e) => setForm(f => ({ ...f, rotateSeconds: Math.max(2, Math.min(120, parseInt(e.target.value || '6', 10) || 6)) }))}
+                  className="w-32 px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20" />
+                <p className="mt-1 text-xs text-gray-400">Put multiple active ads on the same slot and they rotate; each shows for its own number of seconds.</p>
               </div>
               <label className="flex items-center gap-2">
                 <input type="checkbox" checked={form.isActive} onChange={(e) => setForm(f => ({ ...f, isActive: e.target.checked }))} className="w-4 h-4 rounded" />
@@ -218,7 +226,7 @@ export default function AdsPage() {
                     <span>{ad.clickCount} clicks</span>
                   </div>
                   <div className="flex items-center gap-1 mt-3 pt-3 border-t border-gray-100">
-                    <button onClick={() => { setEditing(ad); setForm({ title: ad.title, imageUrl: ad.imageUrl, linkUrl: ad.linkUrl || '', slot: ad.slot, isActive: ad.isActive, startDate: '', endDate: '' }); setShowForm(true); }}
+                    <button onClick={() => { setEditing(ad); setForm({ title: ad.title, imageUrl: ad.imageUrl, linkUrl: ad.linkUrl || '', slot: ad.slot, isActive: ad.isActive, startDate: '', endDate: '', rotateSeconds: ad.rotateSeconds ?? 6 }); setShowForm(true); }}
                       className="p-1.5 text-gray-400 hover:text-primary rounded"><Edit2 className="w-4 h-4" /></button>
                     {ad.linkUrl ? (
                     <a href={ad.linkUrl} target="_blank" rel="noopener noreferrer" className="p-1.5 text-gray-400 hover:text-blue-600 rounded">
