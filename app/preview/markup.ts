@@ -259,7 +259,7 @@ const CAMERA = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stro
 
 // Author avatar: uploaded image, else a solid ink initial disc.
 const authorAvatar = (author: Author, name: string, size: number): string => {
-  const base = `width:${size}px;height:${size}px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;overflow:hidden;`;
+  const base = `width:${size}px;height:${size}px;border-radius:6px;flex:none;display:flex;align-items:center;justify-content:center;overflow:hidden;`;
   return author?.avatar
     ? `<span style="${base}background:var(--bg2);"><img src="${esc(author.avatar)}" alt="${esc(name)}" style="width:100%;height:100%;object-fit:cover;display:block;"></span>`
     : `<span style="${base}background:var(--ink);font-weight:700;color:#fff;font-size:${Math.max(11, Math.round(size * 0.34))}px;">${esc(initial(name))}</span>`;
