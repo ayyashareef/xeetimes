@@ -354,7 +354,7 @@ function fillAdBox(slot: string, ads: AdsMap): string {
 function fillAdColumn(slot: string, ads: AdsMap, cls = ''): string {
   return `<div class="${cls}" style="display:flex;flex-direction:column;min-height:0;">
       ${fillAdBox(slot, ads)}
-      <div style="${EN}font-size:10px;letter-spacing:.22em;color:#a49f96;text-transform:uppercase;margin-top:8px;text-align:center;">Advertisement</div>
+      <div style="${EN}font-size:13px;letter-spacing:.01em;color:#a49f96;margin-top:8px;text-align:center;">— Advertisement —</div>
     </div>`;
 }
 
