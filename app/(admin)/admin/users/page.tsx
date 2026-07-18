@@ -100,9 +100,10 @@ export default function UsersPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Avatar</label>
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center text-gray-400 text-xl font-semibold shrink-0">
-                  {form.avatar ? <img src={form.avatar} alt="" className="w-full h-full object-cover" /> : (form.name || '?').charAt(0).toUpperCase()}
-                </div>
+                {(() => { const isSite = /ޓައިމްސް|xeetimes/i.test(`${form.username} ${form.name} ${form.name_dv}`); return (
+                <div className={`w-16 h-16 overflow-hidden flex items-center justify-center text-gray-400 text-xl font-semibold shrink-0 ${isSite ? 'rounded-lg bg-white' : 'rounded-full bg-gray-100'}`}>
+                  {form.avatar ? <img src={form.avatar} alt="" className={`w-full h-full ${isSite ? 'object-contain' : 'object-cover'}`} /> : (form.name || '?').charAt(0).toUpperCase()}
+                </div> ); })()}
                 <div className="flex flex-col gap-1.5">
                   <input type="file" accept="image/*" onChange={handleAvatarUpload} className="text-sm text-gray-600" />
                   {form.avatar && <button type="button" onClick={() => setForm(f => ({ ...f, avatar: '' }))} className="text-xs text-red-600 text-left">Remove avatar</button>}

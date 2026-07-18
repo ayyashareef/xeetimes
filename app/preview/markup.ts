@@ -155,7 +155,7 @@ const dvDate = (d: Date | null, lang: Lang): string => {
   if (!d) return '';
   void lang;
   const p = mvParts(new Date(d)); // day 2-digit, year 4-digit
-  return `${p.day}-${EN_MONTHS[Number(p.month) - 1]}-${p.year}`;
+  return `${p.day}-${DV_MONTHS[Number(p.month) - 1]}-${p.year}`;
 };
 const stripTags = (s: string | null | undefined) => String(s ?? '').replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
 
@@ -291,9 +291,12 @@ const CAMERA = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stro
 
 // Author avatar: uploaded image, else a solid ink initial disc.
 const authorAvatar = (author: Author, name: string, size: number): string => {
-  const base = `width:${size}px;height:${size}px;border-radius:6px;flex:none;display:flex;align-items:center;justify-content:center;overflow:hidden;`;
+  // The XeeTimes house byline uses the XT logo — keep it a square that fits the
+  // whole logo (contain). Real people get a round photo (cover).
+  const isSite = /ޓައިމްސް|xeetimes/i.test(`${author?.name || ''} ${author?.name_dv || ''} ${name || ''}`);
+  const base = `width:${size}px;height:${size}px;border-radius:${isSite ? '8px' : '50%'};flex:none;display:flex;align-items:center;justify-content:center;overflow:hidden;`;
   return author?.avatar
-    ? `<span style="${base}background:var(--bg2);"><img src="${esc(author.avatar)}" alt="${esc(name)}" style="width:100%;height:100%;object-fit:cover;display:block;"></span>`
+    ? `<span style="${base}background:${isSite ? '#fff' : 'var(--bg2)'};"><img src="${esc(author.avatar)}" alt="${esc(name)}" style="width:100%;height:100%;object-fit:${isSite ? 'contain' : 'cover'};display:block;"></span>`
     : `<span style="${base}background:var(--ink);font-weight:700;color:#fff;font-size:${Math.max(11, Math.round(size * 0.34))}px;">${esc(initial(name))}</span>`;
 };
 const authorUrl = (lang: Lang, author: Author): string | null =>
@@ -396,7 +399,7 @@ export function header(lang: Lang, sm = false, active = '', ads: AdsMap = {}, hi
     <nav style="background:var(--nav);">
       <div class="xt-wrap" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:0 22px;font-size:21px;min-height:68px;position:relative;">
         <a href="/" class="xt-navdark" style="color:#fff;padding:13px 16px;display:flex;align-items:center;" aria-label="Home">${ICON.home}</a>
-        <span class="xt-desknav" style="display:flex;align-items:center;gap:4px;">${navLinks}</span>
+        <span class="xt-desknav" style="display:flex;align-items:center;gap:16px;">${navLinks}</span>
         <a href="/search" class="xt-navdark xt-mobonly" style="color:#fff;padding:11px 14px;align-items:center;" aria-label="Search">${ICON.search}</a>
         <button class="xt-burger xt-mobonly" data-act="menu" aria-label="Menu"><span></span><span></span><span></span></button>
         <span class="xt-desknav" style="position:absolute;${lang === 'dv' ? 'left' : 'right'}:20px;top:50%;transform:translateY(-50%);display:flex;align-items:center;color:#fff;">

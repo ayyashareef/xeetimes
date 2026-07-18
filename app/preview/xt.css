@@ -262,8 +262,9 @@ body:has(#xt-root) { background: var(--page); }
 #xt-root .xt-lb .xt-lb-btn:hover { background: rgba(255,255,255,.22); }
 #xt-root .xt-lb .xt-lb-close { top: 22px; right: 26px; width: 46px; height: 46px; font-size: 30px; line-height: 1; }
 #xt-root .xt-lb .xt-lb-prev, #xt-root .xt-lb .xt-lb-next { top: 50%; transform: translateY(-50%); width: 54px; height: 54px; font-size: 34px; line-height: 1; }
-#xt-root .xt-lb .xt-lb-prev { left: 24px; }
-#xt-root .xt-lb .xt-lb-next { right: 24px; }
+/* RTL gallery: "previous" (older) sits on the right, "next" on the left. */
+#xt-root .xt-lb .xt-lb-prev { right: 24px; }
+#xt-root .xt-lb .xt-lb-next { left: 24px; }
 
 /* ---- Inline article-card embed (TipTap) ---- */
 #xt-root .xt-article-body .xt-embed-card { display: flex; gap: 16px; align-items: center; border: 1px solid var(--line); padding: 15px 18px; margin: 24px 0; background: var(--bg0); text-decoration: none; transition: box-shadow .2s, transform .2s; }
