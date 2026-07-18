@@ -155,7 +155,7 @@ const dvDate = (d: Date | null, lang: Lang): string => {
   if (!d) return '';
   void lang;
   const p = mvParts(new Date(d)); // day 2-digit, year 4-digit
-  return `${p.day}-${DV_MONTHS[Number(p.month) - 1]}-${p.year}`;
+  return `${p.day} ${DV_MONTHS[Number(p.month) - 1]} ${p.year}`;
 };
 const stripTags = (s: string | null | undefined) => String(s ?? '').replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
 
