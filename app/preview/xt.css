@@ -219,6 +219,10 @@ body:has(#xt-root) { background: var(--page); }
 #xt-root .xt-article-body figcaption { font-family: var(--en); font-size: 13px; color: var(--ink3); text-align: center; margin-top: 8px; }
 #xt-root .xt-article-body a { color: var(--red); text-decoration: underline; }
 #xt-root .xt-article-body ul, #xt-root .xt-article-body ol { margin: 0 0 22px; padding-right: 26px; }
+/* Tables from WP content: ignore the baked-in pixel heights/widths (they leave
+   huge empty gaps), make them responsive and bordered. */
+#xt-root .xt-article-body table { width: 100% !important; height: auto !important; border-collapse: collapse; margin: 14px 0 24px; }
+#xt-root .xt-article-body td, #xt-root .xt-article-body th { height: auto !important; width: auto !important; border: 1px solid var(--line); padding: 8px 11px; vertical-align: top; font-size: 18px; line-height: 1.7; }
 #xt-root .xt-article-body li { margin: 0 0 12px; font-size: 25px; line-height: 1.9; }
 /* Note callout — the design's right-red-border cream box. */
 #xt-root .xt-article-body blockquote {

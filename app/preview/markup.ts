@@ -175,7 +175,15 @@ const BLOCK_RE = /^<\/?(?:address|article|aside|blockquote|details|div|dl|fields
 // headings and paragraphs sit on their own lines, like the old xeetimes.com.
 function autop(html: string): string {
   if (!html) return html;
-  const s = html.replace(/\r\n?/g, '\n');
+  let s = html.replace(/\r\n?/g, '\n');
+  // Protect multi-line block elements (tables, lists, blockquotes, …) so blank
+  // lines INSIDE them aren't treated as paragraph breaks (which would shred a
+  // <table> into fragments and leave a big empty gap).
+  const kept: string[] = [];
+  s = s.replace(/<(table|ul|ol|blockquote|figure|pre|dl)\b[\s\S]*?<\/\1>/gi, (m) => {
+    kept.push(m);
+    return `\n\n${kept.length - 1}\n\n`;
+  });
   const blocks = s.split(/\n{2,}/);
   // Already block-structured (lots of <p>) — leave it untouched.
   if ((s.match(/<p[\s>]/gi) || []).length > blocks.length / 2) return html;
@@ -183,6 +191,8 @@ function autop(html: string): string {
     .map((b) => {
       const t = b.trim();
       if (!t) return '';
+      const ph = t.match(/^(\d+)$/);
+      if (ph && Number(ph[1]) < kept.length) return kept[Number(ph[1])]; // restore protected block
       if (BLOCK_RE.test(t)) return t; // a real block element — keep as-is
       return `<p>${t.replace(/\n+/g, '<br>')}</p>`; // wrap text / inline block
     })
