@@ -21,7 +21,7 @@ const WAHEED = path.join(process.cwd(), 'public/fonts/MVWaheed.ttf');
 const FARUMA = path.join(process.cwd(), 'public/fonts/Faruma.ttf');
 const CACHE_DIR = path.join(process.cwd(), '.og-cache');
 const IMG_CACHE = path.join(CACHE_DIR, 'img');
-const OG_VERSION = 'v13';
+const OG_VERSION = 'v14';
 const HEADERS = {
   'Content-Type': 'image/jpeg',
   'Cache-Control': 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800',
@@ -174,8 +174,7 @@ export default async function OgImage({ params }: { params: Promise<{ id: string
   const headSizePt = long ? 49 : mid ? 57 : 68;
   // Headline sits bottom-centre and is centre-aligned ('centre' is symmetric,
   // so no logical/visual RTL flip to worry about — unlike 'left'/'right').
-  const [mastImg, headImg, catImg] = await Promise.all([
-    renderText('ޒީ ޓައިމްސް', { width: 440, sizePt: 34, color: '#ffffff', align: en ? 'right' : 'left' }),
+  const [headImg, catImg] = await Promise.all([
     renderText(heading, { width: textW, sizePt: headSizePt, color: '#ffffff', align: 'centre' }),
     cat ? renderText(cat, { width: 340, sizePt: 29, color: '#ffffff', align: 'centre' }) : Promise.resolve(null),
   ]);
@@ -188,14 +187,12 @@ export default async function OgImage({ params }: { params: Promise<{ id: string
     hH = Math.round(hH * s);
   }
 
-  // Masthead order mirrors per language: logo sits on the outer edge (right for
-  // Dhivehi, left for English) with the wordmark beside it.
+  // Masthead is just the logo box pinned to the top-left corner (no wordmark).
   const logoBox = (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 78, height: 78, borderRadius: 18, background: '#ffffff', padding: 10 }}>
       <img src={logoSrc} width={58} height={58} style={{ width: 58, height: 58, objectFit: 'contain' }} alt="XeeTimes" />
     </div>
   );
-  const wordmark = mastImg ? <img src={mastImg.src} width={mastImg.w} height={mastImg.h} alt="" /> : <div style={{ display: 'flex' }} />;
   const siteTag = <div style={{ display: 'flex', color: 'rgba(255,255,255,0.85)', fontSize: 29, fontWeight: 600, letterSpacing: 0.4 }}>xeetimes.com</div>;
   const catPill = catImg ? (
     <div style={{ display: 'flex', alignItems: 'center', background: '#c8102e', borderRadius: 999, padding: '13px 28px' }}>
@@ -227,9 +224,8 @@ export default async function OgImage({ params }: { params: Promise<{ id: string
             middle, xeetimes.com centred at the bottom */}
         <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', width: 1200, height: 630, padding: '42px 54px 38px' }}>
           {/* masthead — logo box in the top-left corner */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
             {logoBox}
-            {wordmark}
           </div>
 
           {/* centre block: the centred headline, pushed toward the bottom */}
