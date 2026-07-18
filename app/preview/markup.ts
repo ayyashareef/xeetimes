@@ -689,7 +689,6 @@ export function articleHtml(a: Art, related: Art[], comments: Cmt[], lang: Lang,
             ${insertMidAd(content(a, lang), midAdBlock(ads))}
             ${galleryBlock(a, lang)}
           </div>
-          <div style="margin:8px 0 24px;">${adBand('HOMEPAGE_MID', ads)}</div>
           ${reactionBar(a.id || '', reactionCounts)}
           ${site.commentsEnabled === false ? '' : commentsBlock(comments, lang, a.id || '')}
           ${rel ? `
