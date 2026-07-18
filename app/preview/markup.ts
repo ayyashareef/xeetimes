@@ -157,7 +157,7 @@ const dvDate = (d: Date | null, lang: Lang): string => {
   const p = mvParts(new Date(d)); // day 2-digit, year 4-digit
   // Isolate the RTL Dhivehi month (FSI…PDI) so it doesn't reorder the numbers
   // around it — keeps the visual order "14 ޖުލައި 2026" in every context.
-  return `<span style="display:inline-flex;direction:ltr;gap:.3em;"><span>${p.day}</span><span>${DV_MONTHS[Number(p.month) - 1]}</span><span>${p.year}</span></span>`;
+  return `<span style="display:inline-flex;direction:rtl;gap:.3em;"><span>${p.day}</span><span>${DV_MONTHS[Number(p.month) - 1]}</span><span>${p.year}</span></span>`;
 };
 const stripTags = (s: string | null | undefined) => String(s ?? '').replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
 
