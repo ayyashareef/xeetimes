@@ -25,6 +25,7 @@ export const AD_SLOTS: AdSlotDef[] = [
   { key: 'ARTICLE_SIDEBAR_1', label: 'Article — hero side box', w: 380, h: 320, kind: 'box' },
   { key: 'ARTICLE_MID', label: 'Article — in-content box (middle)', w: 400, h: 400, kind: 'box' },
   { key: 'ARTICLE_SIDEBAR_2', label: 'Article — sidebar (bottom)', w: 300, h: 250, kind: 'box' },
+  { key: 'CATEGORY_SIDE', label: 'Category — lead side box (per category)', w: 400, h: 320, kind: 'box' },
 ];
 
 export const AD_SLOT_MAP: Record<string, AdSlotDef> = Object.fromEntries(
@@ -34,6 +35,6 @@ export const AD_SLOT_MAP: Record<string, AdSlotDef> = Object.fromEntries(
 export const adSizeLabel = (d: AdSlotDef) => `${d.w} × ${d.h}`;
 
 // An active ad resolved for a slot, and the slot->ad map passed to the builders.
-export type AdData = { id: string; imageUrl: string; linkUrl: string | null; title: string; rotateSeconds: number };
+export type AdData = { id: string; imageUrl: string; linkUrl: string | null; title: string; rotateSeconds: number; categorySlug?: string | null };
 // A slot can hold multiple ads that rotate on the client.
 export type AdsMap = Record<string, AdData[]>;

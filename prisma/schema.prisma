@@ -214,6 +214,8 @@ model Advertisement {
   imageUrl  String
   linkUrl   String?
   slot      String
+  // For per-category slots (e.g. CATEGORY_SIDE): which category this ad targets.
+  categorySlug String?
   isActive  Boolean  @default(true)
   startDate DateTime?
   endDate   DateTime?

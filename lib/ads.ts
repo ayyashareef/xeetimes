@@ -16,12 +16,12 @@ export async function getActiveAds(): Promise<AdsMap> {
       ],
     },
     orderBy: { createdAt: 'asc' },
-    select: { id: true, imageUrl: true, linkUrl: true, title: true, slot: true, rotateSeconds: true },
+    select: { id: true, imageUrl: true, linkUrl: true, title: true, slot: true, rotateSeconds: true, categorySlug: true },
   });
   // Group every active ad by slot (multiple ads per slot rotate on the client).
   const map: AdsMap = {};
   for (const a of ads) {
-    (map[a.slot] ||= []).push({ id: a.id, imageUrl: a.imageUrl, linkUrl: a.linkUrl, title: a.title, rotateSeconds: a.rotateSeconds || 6 });
+    (map[a.slot] ||= []).push({ id: a.id, imageUrl: a.imageUrl, linkUrl: a.linkUrl, title: a.title, rotateSeconds: a.rotateSeconds || 6, categorySlug: a.categorySlug });
   }
   return map;
 }

@@ -772,6 +772,14 @@ export function categoryHtml(cp: CatPage, lang: Lang, ads: AdsMap = {}, hidden: 
     </main>${footer(lang, site)}`;
   }
 
+  // Per-category ad beside the lead article: a CATEGORY_SIDE ad targeting this
+  // category (matches the live xeetimes.com, which shows a different creative on
+  // each section). Falls back to the shared ARTICLE_SIDEBAR_1 box when unset.
+  const catAdList = (ads['CATEGORY_SIDE'] || []).filter((a) => a.categorySlug === cp.slug);
+  const sideAd = catAdList.length
+    ? fillAdColumn('CATEGORY_SIDE', { CATEGORY_SIDE: catAdList }, 'xt-seclead-ad')
+    : fillAdColumn('ARTICLE_SIDEBAR_1', ads, 'xt-seclead-ad');
+
   const leadBlock = `
     <section class="xt-g-seclead" style="display:grid;grid-template-columns:minmax(0,1.5fr) 1fr;gap:26px;padding-bottom:30px;align-items:stretch;">
       <a href="${link(lead, lang)}" class="xt-lead" style="display:block;">
@@ -785,7 +793,7 @@ export function categoryHtml(cp: CatPage, lang: Lang, ads: AdsMap = {}, hidden: 
           </div>
         </div>
       </a>
-      ${fillAdColumn('ARTICLE_SIDEBAR_1', ads, 'xt-seclead-ad')}
+      ${sideAd}
     </section>`;
 
   const grid = cp.grid.length ? `
