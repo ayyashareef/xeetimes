@@ -154,8 +154,8 @@ const mvParts = (d: Date): Record<string, string> =>
 const dvDate = (d: Date | null, lang: Lang): string => {
   if (!d) return '';
   void lang;
-  const p = mvParts(new Date(d)); // day/month are already 2-digit, year 4-digit
-  return `${p.day}-${p.month}-${p.year}`;
+  const p = mvParts(new Date(d)); // day 2-digit, year 4-digit
+  return `${p.day}-${EN_MONTHS[Number(p.month) - 1]}-${p.year}`;
 };
 const stripTags = (s: string | null | undefined) => String(s ?? '').replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
 
