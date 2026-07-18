@@ -6,13 +6,12 @@ import { SITE_URL, jsonLd, newsArticleJsonLd } from '@/lib/seo';
 import { getActiveAds } from '@/lib/ads';
 import { getHiddenCategorySlugs } from '@/lib/categories';
 import { getSiteSettings } from '@/lib/settings';
-import XtShell from '../../preview/XtShell';
+import XtShell from '@/app/preview/XtShell';
 import SocialEmbedRenderer from '@/components/public/SocialEmbedRenderer';
 import ArticleViewBeacon from '@/components/public/ArticleViewBeacon';
-import { articleHtml, type Art, type Cmt, type Lang } from '../../preview/markup';
+import { articleHtml, type Art, type Cmt, type Lang } from '@/app/preview/markup';
 
 export const dynamic = 'force-dynamic';
-const LANGS = ['dv', 'en'];
 
 // Resolve /<lang>/<id> to the article, matching the page's id/slug logic.
 function idForms(id: string): string[] {
@@ -32,10 +31,10 @@ function idForms(id: string): string[] {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ lang: string; id: string }>;
+  params: Promise<{ id: string }>;
 }): Promise<Metadata> {
-  const { lang, id } = await params;
-  if (!LANGS.includes(lang)) return {};
+  const { id } = await params;
+  const lang = 'dv';
   const en = lang === 'en';
   const a = await db.article.findFirst({
     where: { OR: [{ id }, { id: `art_${id}` }, { slug: { in: idForms(id) } }], status: 'PUBLISHED' },
@@ -60,7 +59,7 @@ export async function generateMetadata({
     ? a.metaDescription_en || a.excerpt_en || a.metaDescription_dv || a.excerpt_dv
     : a.metaDescription_dv || a.excerpt_dv) || undefined;
   const wpId = a.id.replace(/^art_/, '');
-  const canonical = `${SITE_URL}/${lang}/${wpId}`;
+  const canonical = `${SITE_URL}/${wpId}`;
   // Browser-tab title must be Latin (Thaana renders poorly in tab strips):
   // the Latin meta title when the editor set one, else a generic English
   // fallback. OG/twitter keep the full text title for share cards.
@@ -71,7 +70,6 @@ export async function generateMetadata({
     description: desc,
     alternates: {
       canonical,
-      languages: { dv: `${SITE_URL}/dv/${wpId}`, en: `${SITE_URL}/en/${wpId}`, 'x-default': `${SITE_URL}/dv/${wpId}` },
     },
     openGraph: {
       title: textTitle,
@@ -90,10 +88,10 @@ export async function generateMetadata({
 export default async function ArticlePage({
   params,
 }: {
-  params: Promise<{ lang: string; id: string }>;
+  params: Promise<{ id: string }>;
 }) {
-  const { lang, id } = await params;
-  if (!LANGS.includes(lang)) notFound();
+  const { id } = await params;
+  const lang = 'dv';
   const L = lang as Lang;
 
   // /<lang>/15196 -> Article.id "art_15196"; also accept legacy slugs.

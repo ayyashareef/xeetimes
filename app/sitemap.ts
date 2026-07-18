@@ -9,7 +9,7 @@ const wpId = (id: string) => id.replace(/^art_/, '');
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base: MetadataRoute.Sitemap = [
-    { url: `${BASE_URL}/dv`, lastModified: new Date(), changeFrequency: 'hourly', priority: 1 },
+    { url: `${BASE_URL}`, lastModified: new Date(), changeFrequency: 'hourly', priority: 1 },
   ];
 
   try {
@@ -26,13 +26,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return [
       ...base,
       ...articles.map((a) => ({
-        url: `${BASE_URL}/dv/${wpId(a.id)}`,
+        url: `${BASE_URL}/${wpId(a.id)}`,
         lastModified: a.updatedAt,
         changeFrequency: 'daily' as const,
         priority: 0.8,
       })),
       ...categories.map((c) => ({
-        url: `${BASE_URL}/dv/category/${c.slug}`,
+        url: `${BASE_URL}/category/${c.slug}`,
         lastModified: c.updatedAt,
         changeFrequency: 'daily' as const,
         priority: 0.6,

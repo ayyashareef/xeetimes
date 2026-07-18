@@ -3,19 +3,18 @@ import { db } from '@/lib/db';
 import { getActiveAds } from '@/lib/ads';
 import { getHiddenCategorySlugs } from '@/lib/categories';
 import { getSiteSettings } from '@/lib/settings';
-import XtShell from '../../../preview/XtShell';
-import { authorHtml, type Art, type Lang } from '../../../preview/markup';
+import XtShell from '@/app/preview/XtShell';
+import { authorHtml, type Art, type Lang } from '@/app/preview/markup';
 
 export const dynamic = 'force-dynamic';
-const LANGS = ['dv', 'en'];
 
 export default async function AuthorPage({
   params,
 }: {
-  params: Promise<{ lang: string; id: string }>;
+  params: Promise<{ id: string }>;
 }) {
-  const { lang, id } = await params;
-  if (!LANGS.includes(lang)) notFound();
+  const { id } = await params;
+  const lang = 'dv';
   const L = lang as Lang;
 
   const author = await db.user.findUnique({

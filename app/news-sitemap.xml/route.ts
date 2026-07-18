@@ -22,7 +22,7 @@ export async function GET() {
       const wpId = a.id.replace(/^art_/, '');
       const title = a.shortTitle_dv || a.title_dv || '';
       return `  <url>
-    <loc>${SITE_URL}/dv/${wpId}</loc>
+    <loc>${SITE_URL}/${wpId}</loc>
     <news:news>
       <news:publication>
         <news:name>XeeTimes</news:name>

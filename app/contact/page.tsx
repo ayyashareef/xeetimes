@@ -1,18 +1,17 @@
 import { notFound } from 'next/navigation';
-import XtShell from '../../preview/XtShell';
-import ContactForm from '../../preview/ContactForm';
-import { header, footer, type Lang } from '../../preview/markup';
+import XtShell from '@/app/preview/XtShell';
+import ContactForm from '@/app/preview/ContactForm';
+import { header, footer, type Lang } from '@/app/preview/markup';
 
 export const dynamic = 'force-dynamic';
-const LANGS = ['dv', 'en'];
 
 export default async function ContactPage({
   params,
 }: {
-  params: Promise<{ lang: string }>;
+  params: Promise<Record<string, never>>;
 }) {
-  const { lang } = await params;
-  if (!LANGS.includes(lang)) notFound();
+  const lang = 'dv';
+  void params;
   const L = lang as Lang;
 
   return (

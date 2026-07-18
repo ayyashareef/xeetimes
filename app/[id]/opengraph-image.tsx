@@ -96,8 +96,9 @@ async function loadPhoto(src: string | null | undefined): Promise<string | null>
   return null;
 }
 
-export default async function OgImage({ params }: { params: Promise<{ lang: string; id: string }> }) {
-  const { lang, id } = await params;
+export default async function OgImage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const lang = 'dv';
 
   const forms = new Set<string>([id]);
   for (const fn of [decodeURIComponent, encodeURIComponent]) {

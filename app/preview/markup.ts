@@ -141,8 +141,8 @@ export function esc(s: unknown): string {
 }
 const enc = (s: string) => encodeURIComponent(s);
 const wpId = (a: Art) => (a.id || '').replace(/^art_/, '') || a.slug;
-const link = (a: Art, lang: Lang) => `/${lang}/${encodeURIComponent(wpId(a))}`;
-const catUrl = (slug: string, lang: Lang) => `/${lang}/category/${encodeURIComponent(slug)}`;
+const link = (a: Art, lang: Lang) => `/${encodeURIComponent(wpId(a))}`;
+const catUrl = (slug: string, lang: Lang) => `/category/${encodeURIComponent(slug)}`;
 
 const MV_TZ = 'Indian/Maldives';
 const mvParts = (d: Date): Record<string, string> =>
@@ -265,7 +265,7 @@ const authorAvatar = (author: Author, name: string, size: number): string => {
     : `<span style="${base}background:var(--ink);font-weight:700;color:#fff;font-size:${Math.max(11, Math.round(size * 0.34))}px;">${esc(initial(name))}</span>`;
 };
 const authorUrl = (lang: Lang, author: Author): string | null =>
-  author?.id ? `/${lang}/author/${encodeURIComponent(author.id)}` : null;
+  author?.id ? `/author/${encodeURIComponent(author.id)}` : null;
 
 // ---- Advertisement ---------------------------------------------------------
 // Render an ad placement at its registered size. Empty slot -> the design's
@@ -349,7 +349,7 @@ export function header(lang: Lang, sm = false, active = '', ads: AdsMap = {}, hi
   <button class="xt-backdrop" data-act="menu-close" aria-label="Close menu"></button>
   <aside class="xt-drawer" dir="${lang === 'dv' ? 'rtl' : 'ltr'}">
     <div class="xt-drawer-head">
-      <a href="/${lang}"><img class="xt-dlogo-img" src="${esc(logoSrc)}" alt="XeeTimes"></a>
+      <a href="/"><img class="xt-dlogo-img" src="${esc(logoSrc)}" alt="XeeTimes"></a>
       <button class="xt-drawer-close" data-act="menu-close" aria-label="Close menu"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg></button>
     </div>
     <nav class="xt-drawer-nav">${drawerLinks}</nav>
@@ -361,16 +361,16 @@ export function header(lang: Lang, sm = false, active = '', ads: AdsMap = {}, hi
   </div>
   <header>
     <div class="xt-wrap" style="display:flex;align-items:center;justify-content:center;padding:8px 26px 20px;">
-      <a href="/${lang}"><img class="xt-logo-img" src="${esc(logoSrc)}" alt="XeeTimes"></a>
+      <a href="/"><img class="xt-logo-img" src="${esc(logoSrc)}" alt="XeeTimes"></a>
     </div>
     <nav style="background:var(--nav);">
       <div class="xt-wrap" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:0 22px;font-size:21px;min-height:68px;position:relative;">
-        <a href="/${lang}" class="xt-navdark" style="color:#fff;padding:13px 16px;display:flex;align-items:center;" aria-label="Home">${ICON.home}</a>
+        <a href="/" class="xt-navdark" style="color:#fff;padding:13px 16px;display:flex;align-items:center;" aria-label="Home">${ICON.home}</a>
         <span class="xt-desknav" style="display:flex;align-items:center;gap:4px;">${navLinks}</span>
-        <a href="/${lang}/search" class="xt-navdark xt-mobonly" style="color:#fff;padding:11px 14px;align-items:center;" aria-label="Search">${ICON.search}</a>
+        <a href="/search" class="xt-navdark xt-mobonly" style="color:#fff;padding:11px 14px;align-items:center;" aria-label="Search">${ICON.search}</a>
         <button class="xt-burger xt-mobonly" data-act="menu" aria-label="Menu"><span></span><span></span><span></span></button>
         <span class="xt-desknav" style="position:absolute;${lang === 'dv' ? 'left' : 'right'}:20px;top:50%;transform:translateY(-50%);display:flex;align-items:center;color:#fff;">
-          <a href="/${lang}/search" style="padding:8px 10px;display:flex;align-items:center;color:#fff;" aria-label="Search">${ICON.search}</a>
+          <a href="/search" style="padding:8px 10px;display:flex;align-items:center;color:#fff;" aria-label="Search">${ICON.search}</a>
         </span>
       </div>
     </nav>
@@ -401,7 +401,7 @@ export function footer(lang: Lang, site: Site = {}): string {
   <footer style="background:var(--footer);color:#8f8b84;margin-top:40px;padding:40px 26px 34px;">
     <div class="xt-wrap" style="display:flex;flex-direction:column;align-items:center;gap:26px;text-align:center;">
       <div style="display:flex;align-items:center;gap:34px;" dir="ltr">${social}</div>
-      <a href="/${lang}" style="display:inline-block;"><img src="${esc(footLogo)}" alt="XeeTimes" style="height:62px;width:auto;display:block;"></a>
+      <a href="/" style="display:inline-block;"><img src="${esc(footLogo)}" alt="XeeTimes" style="height:62px;width:auto;display:block;"></a>
       <div style="${EN}font-size:13px;color:#7c7871;letter-spacing:.02em;line-height:2;" dir="ltr">
         xeetimes.com is registered at Ministry of Home Affairs, Maldives<br>
         ${esc(regNo)}<br>
@@ -488,7 +488,7 @@ export function homeHtml(d: HomeData, lang: Lang): string {
   const latestLabel = lang === 'dv' ? 'އެންމެ ފަހުގެ ޚަބަރު' : 'Latest News';
   const latestSection = latest.length ? `
     <section style="padding:16px 0 24px;">
-      ${homeSectionHead(latestLabel, `/${lang}`, lang, false)}
+      ${homeSectionHead(latestLabel, `/`, lang, false)}
       <div class="xt-g-4" style="display:grid;grid-template-columns:repeat(4,1fr);gap:22px;">
         ${latest.map((a, i) => newsCard(a, i, lang)).join('')}
       </div>
@@ -525,7 +525,7 @@ export function homeHtml(d: HomeData, lang: Lang): string {
 // ---- Article ---------------------------------------------------------------
 const SHARE_COLORS: Record<string, string> = { print: '#7b7b7b', mail: '#d9432b', x: '#1d9bf0', facebook: '#3b5998', whatsapp: '#25d366', telegram: '#2ea6da' };
 function shareRail(a: Art, lang: Lang): string {
-  const url = `${SITE_URL}/${lang}/${wpId(a)}`;
+  const url = `${SITE_URL}/${wpId(a)}`;
   const t = shortTitle(a, lang);
   const links: [string, string, string, boolean, string, string][] = [
     [ICON.print, '#', 'Print', false, SHARE_COLORS.print, ''],
@@ -592,7 +592,7 @@ function commentsBlock(comments: Cmt[], lang: Lang, articleId: string): string {
 
 const breadcrumb = (lang: Lang, current: string) => `
   <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink3);margin-bottom:22px;font-weight:600;">
-    <a href="/${lang}" style="color:var(--ink3);">${esc(STR[lang].home)}</a><span style="${EN}">${lang === 'dv' ? '←' : '→'}</span><span style="color:var(--red);">${esc(current)}</span>
+    <a href="/" style="color:var(--ink3);">${esc(STR[lang].home)}</a><span style="${EN}">${lang === 'dv' ? '←' : '→'}</span><span style="color:var(--red);">${esc(current)}</span>
   </div>`;
 
 const secTitle = (name: string) => `
@@ -752,7 +752,7 @@ export function categoryHtml(cp: CatPage, lang: Lang, ads: AdsMap = {}, hidden: 
 export function searchHtml(query: string, articles: Art[], lang: Lang, ads: AdsMap = {}, hidden: string[] = [], site: Site = {}): string {
   const s = STR[lang];
   const searchForm = `
-    <form action="/${lang}/search" method="get" style="display:flex;gap:10px;max-width:680px;margin:0 0 32px;">
+    <form action="/search" method="get" style="display:flex;gap:10px;max-width:680px;margin:0 0 32px;">
       <input name="q" value="${esc(query)}" placeholder="${esc(s.searchPlaceholder)}"${lang === 'dv' ? ' class="xt-thaana"' : ''} dir="${lang === 'dv' ? 'rtl' : 'ltr'}" autocomplete="off" style="flex:1;min-width:0;background:#fff;border:1px solid var(--line);padding:14px 18px;color:var(--ink);font-family:'MVTypewriter','Faruma',sans-serif;font-size:16px;outline:none;">
       <button type="submit" style="flex:none;background:var(--red);color:#fff;border:none;padding:0 26px;font-family:'Ammu','Faruma',sans-serif;font-weight:700;font-size:15px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;">${ICON.search}${esc(s.search)}</button>
     </form>`;

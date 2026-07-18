@@ -35,6 +35,11 @@ const nextConfig = {
       { source: '/:lang(dv|en)/feed', destination: '/feed', permanent: true },
       { source: '/category/:slug/feed', destination: '/feed', permanent: true },
       { source: '/:id(\\d+)/feed', destination: '/feed', permanent: true },
+      // Dhivehi-only site now serves at the root — 301 the old locale prefixes.
+      { source: '/dv', destination: '/', permanent: true },
+      { source: '/dv/:path*', destination: '/:path*', permanent: true },
+      { source: '/en', destination: '/', permanent: true },
+      { source: '/en/:path*', destination: '/:path*', permanent: true },
     ];
   },
 };

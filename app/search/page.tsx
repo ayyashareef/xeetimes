@@ -3,21 +3,20 @@ import { db } from '@/lib/db';
 import { getActiveAds } from '@/lib/ads';
 import { getHiddenCategorySlugs } from '@/lib/categories';
 import { getSiteSettings } from '@/lib/settings';
-import XtShell from '../../preview/XtShell';
-import { searchHtml, type Art, type Lang } from '../../preview/markup';
+import XtShell from '@/app/preview/XtShell';
+import { searchHtml, type Art, type Lang } from '@/app/preview/markup';
 
 export const dynamic = 'force-dynamic';
-const LANGS = ['dv', 'en'];
 
 export default async function SearchPage({
   params,
   searchParams,
 }: {
-  params: Promise<{ lang: string }>;
+  params: Promise<Record<string, never>>;
   searchParams: Promise<{ q?: string }>;
 }) {
-  const { lang } = await params;
-  if (!LANGS.includes(lang)) notFound();
+  const lang = 'dv';
+  void params;
   const L = lang as Lang;
 
   const { q } = await searchParams;

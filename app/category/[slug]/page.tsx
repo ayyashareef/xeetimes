@@ -5,15 +5,14 @@ import { getActiveAds } from '@/lib/ads';
 import { getHiddenCategorySlugs } from '@/lib/categories';
 import { getSiteSettings } from '@/lib/settings';
 import { SITE_URL } from '@/lib/seo';
-import XtShell from '../../../preview/XtShell';
-import { categoryHtml, sectionLabel, type Art, type CatPage, type Lang } from '../../../preview/markup';
+import XtShell from '@/app/preview/XtShell';
+import { categoryHtml, sectionLabel, type Art, type CatPage, type Lang } from '@/app/preview/markup';
 
 export const dynamic = 'force-dynamic';
-const LANGS = ['dv', 'en'];
 
-export async function generateMetadata({ params }: { params: Promise<{ lang: string; slug: string }> }): Promise<Metadata> {
-  const { lang, slug } = await params;
-  if (!LANGS.includes(lang)) return {};
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const lang = 'dv';
   const c = await db.category.findUnique({
     where: { slug },
     select: { name_dv: true, name_en: true, description_dv: true, description_en: true, isActive: true },
@@ -23,7 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   const name = (en ? c.name_en || c.name_dv : c.name_dv) || slug;
   const description = (en ? c.description_en || c.description_dv : c.description_dv)
     || (en ? `Latest ${name} news from the Maldives — XeeTimes.` : `${name} — ޒީ ޓައިމްސް، ރާއްޖޭގެ އެންމެ ފަހުގެ ޚަބަރު.`);
-  const canonical = `${SITE_URL}/${lang}/category/${slug}`;
+  const canonical = `${SITE_URL}/category/${slug}`;
   // Browser-tab title in English: the curated nav label when we have one,
   // else the capitalised slug (category names in the DB are Thaana).
   const tabName = sectionLabel(slug, 'en' as Lang, slug.charAt(0).toUpperCase() + slug.slice(1));
@@ -32,7 +31,6 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
     description,
     alternates: {
       canonical,
-      languages: { dv: `${SITE_URL}/dv/category/${slug}`, en: `${SITE_URL}/en/category/${slug}`, 'x-default': `${SITE_URL}/dv/category/${slug}` },
     },
     openGraph: { title: name, description, url: canonical, siteName: 'XeeTimes', type: 'website' },
   };
@@ -41,10 +39,10 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
 export default async function CategoryPage({
   params,
 }: {
-  params: Promise<{ lang: string; slug: string }>;
+  params: Promise<{ slug: string }>;
 }) {
-  const { lang, slug } = await params;
-  if (!LANGS.includes(lang)) notFound();
+  const { slug } = await params;
+  const lang = 'dv';
   const L = lang as Lang;
   const pick = <T,>(en: T, dv: T) => (L === 'en' ? en : dv);
 
@@ -65,7 +63,7 @@ export default async function CategoryPage({
   });
   if (!category) notFound();
   // Hidden (deactivated) category: don't expose its page — send visitors home.
-  if (!category.isActive) redirect(`/${lang}`);
+  if (!category.isActive) redirect('/');
 
   const [total, articles] = await Promise.all([
     db.article.count({ where: { status: 'PUBLISHED', category: { slug } } }),

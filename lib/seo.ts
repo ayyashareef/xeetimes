@@ -45,7 +45,7 @@ export function webSiteJsonLd(site: SiteData, lang: 'dv' | 'en') {
     publisher: { '@id': `${SITE_URL}#org` },
     potentialAction: {
       '@type': 'SearchAction',
-      target: { '@type': 'EntryPoint', urlTemplate: `${SITE_URL}/${lang}/search?q={search_term_string}` },
+      target: { '@type': 'EntryPoint', urlTemplate: `${SITE_URL}/search?q={search_term_string}` },
       'query-input': 'required name=search_term_string',
     },
   };
@@ -63,7 +63,7 @@ export function newsArticleJsonLd(a: {
   authorId?: string | null;
   section?: string | null;
 }, site: SiteData) {
-  const url = `${SITE_URL}/${a.lang}/${a.wpId}`;
+  const url = `${SITE_URL}/${a.wpId}`;
   const images = [absUrl(a.image), `${url}/opengraph-image`].filter(Boolean);
   return {
     '@context': 'https://schema.org',
@@ -78,7 +78,7 @@ export function newsArticleJsonLd(a: {
     articleSection: a.section || undefined,
     isAccessibleForFree: true,
     author: a.authorName
-      ? [{ '@type': 'Person', name: a.authorName, url: a.authorId ? `${SITE_URL}/${a.lang}/author/${encodeURIComponent(a.authorId)}` : undefined }]
+      ? [{ '@type': 'Person', name: a.authorName, url: a.authorId ? `${SITE_URL}/author/${encodeURIComponent(a.authorId)}` : undefined }]
       : [{ '@type': 'Organization', name: site.siteName_en || 'XeeTimes' }],
     publisher: organizationJsonLd(site),
   };

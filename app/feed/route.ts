@@ -37,7 +37,7 @@ export async function GET() {
 
   const items = articles.map((a) => {
     const id = (a.id || '').replace(/^art_/, '');
-    const link = `${SITE}/dv/${id}`;
+    const link = `${SITE}/${id}`;
     const title = a.title_dv || a.shortTitle_dv || a.title_en || 'XeeTimes';
     const desc = a.excerpt_dv || stripTags(a.content_dv).slice(0, 400);
     const pub = a.publishedAt ? new Date(a.publishedAt).toUTCString() : new Date().toUTCString();
