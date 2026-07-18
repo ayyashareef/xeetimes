@@ -68,8 +68,8 @@ out of git). See [.localdb/README.md](.localdb/README.md).
 > deployed MANUALLY** (`scp` → `npm run build` → `pm2 restart xeetimes`). The
 > exact sequence, the prod DB, and the deploy gotchas are in
 > **[CONTEXT.md](CONTEXT.md)**. Everything below describes the **old hirinews
-> droplet + its CI/CD** — and **push-to-`main` still deploys to that old droplet,
-> not to beta.xeetimes.com.**
+> droplet + its CI/CD**. (The push-to-`main` auto-deploy trigger was **removed
+> 2026-07-18**, so `deploy.yml` is now manual-only and pushing is a safe sync.)
 
 ### Old hirinews droplet & CI/CD (not the XeeTimes beta)
 

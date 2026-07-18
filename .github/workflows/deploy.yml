@@ -1,10 +1,9 @@
 name: Deploy beta
 
-# Auto-deploy to the beta droplet (beta.hirinews.com) on every push to main,
-# or manually via the Actions tab ("Run workflow").
+# Auto-deploy on push is DISABLED. This workflow targets the OLD hirinews droplet
+# (beta.hirinews.com); the live XeeTimes beta is the 168.144.96.165 VM, deployed
+# MANUALLY (see CONTEXT.md). Run this only on purpose, from the Actions tab.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 # Never run two deploys at once.
