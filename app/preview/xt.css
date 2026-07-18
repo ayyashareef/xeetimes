@@ -189,6 +189,9 @@ body:has(#xt-root) { background: var(--page); }
 }
 #xt-root .xt-adband > .xt-adband-label::before { content: "— "; }
 #xt-root .xt-adband > .xt-adband-label::after { content: " —"; }
+/* Header banner: label above the ad, pinned to the left corner. */
+#xt-root .xt-adband.xt-adband-top { text-align: left; }
+#xt-root .xt-adband.xt-adband-top > .xt-adband-label { margin-top: 0; margin-bottom: 6px; }
 
 /* ---- Vertical share rail (article) ---- */
 #xt-root .xt-share-rail { display: flex; flex-direction: column; gap: 8px; width: 44px; flex: none; position: sticky; top: 20px; }

@@ -331,10 +331,15 @@ export function adSlot(slot: string, ads: AdsMap): string {
   const rot = rotating ? ' data-ad-rotate' : '';
   return `<div class="xt-ad xt-ad-${def.kind} xt-ad-filled"${rot} style="${box}position:relative;">${list.map((ad, i) => adSlide(ad, i, rotating)).join('')}</div>`;
 }
-// Ad with the "ADVERTISEMENT" eyebrow above it (design style).
-function adBand(slot: string, ads: AdsMap): string {
+// Ad with the "Advertisement" eyebrow. Default: label centred below the ad.
+// `labelTop` puts the label above the ad, aligned to the left corner (header banner).
+function adBand(slot: string, ads: AdsMap, labelTop = false): string {
   if (!AD_SLOT_MAP[slot]) return '';
-  return `<div class="xt-adband">${adSlot(slot, ads)}<div class="xt-adband-label">Advertisement</div></div>`;
+  const label = `<div class="xt-adband-label">Advertisement</div>`;
+  const ad = adSlot(slot, ads);
+  return labelTop
+    ? `<div class="xt-adband xt-adband-top">${label}${ad}</div>`
+    : `<div class="xt-adband">${ad}${label}</div>`;
 }
 // An ad box beside the hero photo, rendered at the slot's exact aspect ratio
 // (e.g. 436×349 home, 380×320 article) so the creative size is authoritative.
@@ -399,7 +404,7 @@ export function header(lang: Lang, sm = false, active = '', ads: AdsMap = {}, hi
 
   return `
   <div class="xt-wrap" style="padding:16px 26px 8px;">
-    <div style="max-width:1120px;margin:0 auto;text-align:center;">${adBand('HOMEPAGE_BANNER', ads)}</div>
+    <div style="max-width:1120px;margin:0 auto;">${adBand('HOMEPAGE_BANNER', ads, true)}</div>
   </div>
   <header>
     <div class="xt-wrap" style="display:flex;align-items:center;justify-content:center;padding:8px 26px 20px;">
