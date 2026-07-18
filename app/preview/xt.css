@@ -14,6 +14,13 @@
   font-weight: 400 900;
   font-display: swap;
 }
+/* AmmuFK — headings font */
+@font-face {
+  font-family: 'AmmuFK';
+  src: url('/fonts/aammufkF.woff2') format('woff2');
+  font-weight: 400 900;
+  font-display: swap;
+}
 /* MVTypewriter — reading body (MV Faseyha) */
 @font-face {
   font-family: 'MVTypewriter';
@@ -94,7 +101,7 @@ body:has(#xt-root) { background: var(--page); }
 }
 #xt-root h1, #xt-root h2, #xt-root h3, #xt-root h4,
 #xt-root .xt-hl, #xt-root .xt-lead-hl, #xt-root .xt-secname {
-  font-family: 'Ammu', 'Faruma', sans-serif;
+  font-family: 'AmmuFK', 'Ammu', 'Faruma', sans-serif;
   font-weight: 700;
 }
 #xt-root header nav a { font-family: 'Ammu', 'Faruma', sans-serif; }
@@ -123,7 +130,7 @@ body:has(#xt-root) { background: var(--page); }
 #xt-root .xt-hasmenu { position: relative; display: inline-flex; }
 #xt-root .xt-submenu { display: none; position: absolute; top: 100%; inset-inline-start: 0; background: var(--nav); min-width: 172px; z-index: 60; box-shadow: 0 16px 36px rgba(0,0,0,.34); }
 #xt-root .xt-hasmenu:hover .xt-submenu, #xt-root .xt-submenu:hover { display: block; }
-#xt-root .xt-submenu a { display: block; padding: 12px 18px; color: #e6e3dc; font-family: 'Ammu','Faruma',sans-serif; font-size: 15px; transition: background .15s, color .15s; }
+#xt-root .xt-submenu a { display: block; padding: 12px 18px; color: #e6e3dc; font-family: 'AmmuFK','Ammu','Faruma',sans-serif; font-size: 15px; transition: background .15s, color .15s; }
 #xt-root .xt-submenu a:hover { background: var(--red); color: #fff; }
 #xt-root .xt-share { transition: transform .15s ease, filter .15s ease; }
 #xt-root .xt-share:hover { transform: translateY(-2px); filter: brightness(1.08); }
@@ -202,8 +209,8 @@ body:has(#xt-root) { background: var(--page); }
    must live on the container — not only on <p> — or it never applies. */
 #xt-root .xt-article-body { font-size: 25px; line-height: 1.9; color: #26262b; }
 #xt-root .xt-article-body p { margin: 0 0 22px; font-size: 25px; line-height: 1.9; color: #26262b; text-align: justify; }
-#xt-root .xt-article-body h2 { margin: 34px 0 18px; font-size: 35px; font-weight: 700; line-height: 1.5; font-family: 'Ammu','Faruma',sans-serif; }
-#xt-root .xt-article-body h3 { margin: 28px 0 14px; font-size: 32px; font-weight: 700; line-height: 1.5; font-family: 'Ammu','Faruma',sans-serif; }
+#xt-root .xt-article-body h2 { margin: 34px 0 18px; font-size: 35px; font-weight: 700; line-height: 1.5; font-family: 'AmmuFK','Ammu','Faruma',sans-serif; }
+#xt-root .xt-article-body h3 { margin: 28px 0 14px; font-size: 32px; font-weight: 700; line-height: 1.5; font-family: 'AmmuFK','Ammu','Faruma',sans-serif; }
 #xt-root .xt-article-body img { max-width: 100%; height: auto; margin: 12px 0 22px; display: block; }
 /* Embedded video players (YouTube/Facebook) — responsive 16:9. */
 #xt-root .xt-video { position: relative; width: 100%; aspect-ratio: 16 / 9; margin: 16px 0 26px; background: #000; overflow: hidden; }
@@ -220,11 +227,11 @@ body:has(#xt-root) { background: var(--page); }
 }
 #xt-root .xt-article-body blockquote p { margin: 0; font-size: 15px; line-height: 1.9; color: #4a4842; text-align: right; }
 #xt-root .xt-article-body blockquote .xt-quote-body { margin: 0; }
-#xt-root .xt-article-body blockquote .xt-quote-author { display: block; margin-top: 12px; font-style: normal; font-weight: 700; font-size: 14px; color: var(--red); font-family: 'Ammu','Faruma',sans-serif; }
+#xt-root .xt-article-body blockquote .xt-quote-author { display: block; margin-top: 12px; font-style: normal; font-weight: 700; font-size: 14px; color: var(--red); font-family: 'AmmuFK','Ammu','Faruma',sans-serif; }
 
 /* ---- "More news" / load-more + pagination buttons ---- */
 #xt-root .xt-loadmore {
-  font-family: 'Ammu','Faruma',sans-serif; font-size: 16px; font-weight: 700; color: #fff;
+  font-family: 'AmmuFK','Ammu','Faruma',sans-serif; font-size: 16px; font-weight: 700; color: #fff;
   background: var(--ink); border: none; padding: 12px 40px; cursor: pointer; transition: background .18s;
 }
 #xt-root .xt-loadmore:hover { background: var(--red); }
@@ -290,7 +297,7 @@ body:has(#xt-root) { background: var(--page); }
 #xt-root .xt-dlogo-img { height: 42px; width: auto; display: block; }
 #xt-root .xt-drawer-close { background: transparent; width: 40px; height: 40px; border: 1px solid var(--line); display: grid; place-items: center; cursor: pointer; color: var(--ink); flex: none; }
 #xt-root .xt-drawer-nav { display: flex; flex-direction: column; padding: 12px; gap: 2px; flex: 1; overflow-y: auto; }
-#xt-root .xt-dlink { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; font-size: 18px; font-weight: 500; text-decoration: none; font-family: 'Ammu','Faruma',sans-serif; transition: background .15s; }
+#xt-root .xt-dlink { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; font-size: 18px; font-weight: 500; text-decoration: none; font-family: 'AmmuFK','Ammu','Faruma',sans-serif; transition: background .15s; }
 #xt-root .xt-dlink:hover { background: var(--bg0); }
 :root[data-xt-menu="open"] #xt-root .xt-backdrop { opacity: 1; pointer-events: auto; }
 :root[data-xt-menu="open"] #xt-root .xt-drawer { transform: none; }
