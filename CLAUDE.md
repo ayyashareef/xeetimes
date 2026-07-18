@@ -62,7 +62,16 @@ out of git). See [.localdb/README.md](.localdb/README.md).
 - **Admin login (local DB):** `admin@xeetimes.com` / `XeeAdmin@2026` (SUPER_ADMIN;
   created by the seed). Two sample journalists exist too.
 
-## Deployment — beta.hirinews.com & CI/CD
+## Deployment
+
+> ⚠️ **Current live beta = the `168.144.96.165` VM → https://beta.xeetimes.com,
+> deployed MANUALLY** (`scp` → `npm run build` → `pm2 restart xeetimes`). The
+> exact sequence, the prod DB, and the deploy gotchas are in
+> **[CONTEXT.md](CONTEXT.md)**. Everything below describes the **old hirinews
+> droplet + its CI/CD** — and **push-to-`main` still deploys to that old droplet,
+> not to beta.xeetimes.com.**
+
+### Old hirinews droplet & CI/CD (not the XeeTimes beta)
 
 Live beta on a **DigitalOcean droplet** (`206.189.33.144`, Ubuntu 24.04,
 1 vCPU / 1 GB RAM + 2 GB swap, Singapore), behind **Cloudflare** (proxied A
@@ -179,6 +188,7 @@ DATABASE_URL=...hirinews_app npx prisma db push   # apply schema changes locally
 
 ## Source-of-truth pointers
 
+- Durable ops/deploy facts (verified live, current): [CONTEXT.md](CONTEXT.md).
 - Design source: Claude Design project `93d2ea8c-1585-4700-a172-b0345c972711`
   (file `XeeTimes.dc.html` + `assets/xt-logo.png`, `uploads/MVAWaheed.ttf`,
   `uploads/Mv_Faseyha.ttf`). Read via the `claude_design` MCP / `DesignSync` tool.
