@@ -329,9 +329,7 @@ export default function RolesPage() {
                                         : 'bg-primary border-primary'
                                       : 'bg-white border-gray-300 hover:border-gray-400'
                                   } ${disabled ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'}`}
-                                  onClick={() => {
-                                    if (!disabled) togglePermission(role, permission);
-                                  }}
+                                  aria-hidden="true"
                                 >
                                   {checked && (
                                     <Check className="w-3 h-3 text-white" />
