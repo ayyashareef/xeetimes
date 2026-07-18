@@ -69,7 +69,7 @@ const EN_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'
 const STR = {
   dv: {
     latest: 'އެންމެ ފަހުގެ', latestNews: 'އެންމެ ފަހުގެ ޚަބަރު', report: 'ރިޕޯޓް',
-    related: 'މިލިޔުމާ ގުޅޭ', comments: 'ކޮމެންޓް', search: 'ހޯދުން', results: 'ނަތީޖާ',
+    related: 'ގުޅުންހުރި ލިޔުންތައް', comments: 'ކޮމެންޓް', search: 'ހޯދުން', results: 'ނަތީޖާ',
     searchPlaceholder: 'ހޯދާ...', desk: 'ޒީ ޓައިމްސް ޑެސްކް',
     home: 'ފުރަތަމަ ޞަފްޙާ', allNews: 'ހުރިހާ ޚަބަރެއް',
     commentPh: 'ކޮމެންޓް ލިޔުއްވާ...', namePh: 'ނަން', postComment: 'ފޮނުވާ',
@@ -120,7 +120,7 @@ export const sectionLabel = (slug: string | undefined, lang: Lang, fallback: str
   lang === 'en' && slug && MENU_EN[slug] ? MENU_EN[slug] : fallback;
 
 // Latin font (Archivo) inline helper for dates / labels / numerals.
-const EN = "font-family:var(--font-archivo),'Archivo',sans-serif;";
+const EN = "font-family:var(--font-archivo),'Archivo','MV Utheemu','Faruma',sans-serif;";
 
 const ICON: Record<string, string> = {
   home: '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V21h14V9.5"></path><path d="M9.5 21v-6h5v6"></path></svg>',
@@ -164,7 +164,62 @@ const title = (a: Art, lang: Lang) => (lang === 'en' ? a.title_en || a.title_dv 
 const shortTitle = (a: Art, lang: Lang) =>
   (lang === 'en' ? a.shortTitle_en || a.shortTitle_dv : a.shortTitle_dv || a.shortTitle_en) || title(a, lang);
 const excerpt = (a: Art, lang: Lang) => (lang === 'en' ? a.excerpt_en ?? a.excerpt_dv : a.excerpt_dv ?? a.excerpt_en) || '';
-const content = (a: Art, lang: Lang) => (lang === 'en' ? a.content_en || a.content_dv : a.content_dv || a.content_en) || '';
+const content = (a: Art, lang: Lang) =>
+  embedVideos((lang === 'en' ? a.content_en || a.content_dv : a.content_dv || a.content_en) || '');
+
+// A centred 400×400 in-content ad box (only rendered when a creative exists).
+function midAdBlock(ads: AdsMap): string {
+  if (!ads['ARTICLE_MID']) return '';
+  return `<div class="xt-adband xt-midad" style="max-width:400px;margin:30px auto;">${adSlot('ARTICLE_MID', ads)}<div class="xt-adband-label">Advertisement</div></div>`;
+}
+// Drop an ad block roughly in the middle of the article body, at a safe
+// paragraph boundary (blank line, or </p>) so we never split inside a tag.
+function insertMidAd(html: string, adHtml: string): string {
+  if (!adHtml || !html) return html;
+  let blocks = html.split(/\n\s*\n/);
+  if (blocks.length >= 3) {
+    blocks.splice(Math.floor(blocks.length / 2), 0, adHtml);
+    return blocks.join('\n\n');
+  }
+  blocks = html.split(/(?<=<\/p>)/i);
+  if (blocks.length >= 3) {
+    blocks.splice(Math.floor(blocks.length / 2), 0, adHtml);
+    return blocks.join('');
+  }
+  return html + adHtml; // short article: place it after the body
+}
+
+// Extract a YouTube video id from any of its URL shapes.
+function ytVideoId(url: string): string | null {
+  const m = url.match(/(?:youtube\.com\/(?:watch\?[^"'\s<]*?\bv=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+// Build a responsive embed for a supported video URL, or null if unsupported.
+function videoEmbed(url: string): string | null {
+  const yt = ytVideoId(url);
+  if (yt) {
+    return `<div class="xt-video"><iframe src="https://www.youtube-nocookie.com/embed/${yt}" title="Video" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`;
+  }
+  if (/(?:facebook\.com\/[^\s"'<]+\/videos\/|fb\.watch\/)/i.test(url)) {
+    const clean = url.replace(/&amp;/g, '&');
+    return `<div class="xt-video"><iframe src="https://www.facebook.com/plugins/video.php?show_text=false&href=${encodeURIComponent(clean)}" title="Video" loading="lazy" scrolling="no" allowfullscreen></iframe></div>`;
+  }
+  return null;
+}
+// WordPress stored video links as bare oEmbed URLs on their own line, so they
+// render here as un-clickable plain text. Convert every YouTube/Facebook video
+// link (bare or wrapped in <a>) into a responsive embedded player.
+function embedVideos(html: string): string {
+  if (!html || !/youtu|fb\.watch|facebook\.com/i.test(html)) return html;
+  return html
+    // 1) <a href="...video...">…</a> -> embed
+    .replace(/<a\b[^>]*href=["']([^"']+)["'][^>]*>.*?<\/a>/gis, (full, url) => videoEmbed(url) || full)
+    // 2) bare URL (at start, or after whitespace / a tag boundary)
+    .replace(
+      /(^|[\s>])((?:https?:)?\/\/(?:www\.)?(?:youtube\.com\/[^\s<]+|youtu\.be\/[^\s<]+|fb\.watch\/[^\s<]+|facebook\.com\/[^\s<]+\/videos\/[^\s<]+))/gi,
+      (full, pre, url) => { const e = videoEmbed(url); return e ? pre + e : full; },
+    );
+}
 const catName = (a: Art, lang: Lang) =>
   sectionLabel(a.category?.slug, lang, (lang === 'en' ? a.category?.name_en || a.category?.name_dv : a.category?.name_dv || a.category?.name_en) || STR[lang].news);
 const authorName = (a: Art, lang: Lang) => (lang === 'en' ? a.author?.name || a.author?.name_dv : a.author?.name_dv || a.author?.name) || STR[lang].desk;
@@ -271,7 +326,7 @@ export function header(lang: Lang, sm = false, active = '', ads: AdsMap = {}, hi
 
   const navLinks = visibleMenu.map((m) => {
     const on = isOn(m);
-    const base = `color:${on ? '#fff' : '#e6e3dc'};padding:15px 16px;font-weight:600;${on ? 'background:var(--red);' : ''}`;
+    const base = `color:${on ? '#fff' : '#e6e3dc'};padding:18px 20px;font-weight:600;${on ? 'background:var(--red);' : ''}`;
     if (m.children?.length) {
       const kids = m.children.filter((c) => !hidden.includes(c.slug));
       const sub = kids.map((c) => `<a href="${catUrl(c.slug, lang)}">${lbl(c)}</a>`).join('');
@@ -309,7 +364,7 @@ export function header(lang: Lang, sm = false, active = '', ads: AdsMap = {}, hi
       <a href="/${lang}"><img class="xt-logo-img" src="${esc(logoSrc)}" alt="XeeTimes"></a>
     </div>
     <nav style="background:var(--nav);">
-      <div class="xt-wrap" style="display:flex;align-items:center;justify-content:center;gap:4px;padding:0 22px;font-size:16px;position:relative;">
+      <div class="xt-wrap" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:0 22px;font-size:21px;min-height:68px;position:relative;">
         <a href="/${lang}" class="xt-navdark" style="color:#fff;padding:13px 16px;display:flex;align-items:center;" aria-label="Home">${ICON.home}</a>
         <span class="xt-desknav" style="display:flex;align-items:center;gap:4px;">${navLinks}</span>
         <a href="/${lang}/search" class="xt-navdark xt-mobonly" style="color:#fff;padding:11px 14px;align-items:center;" aria-label="Search">${ICON.search}</a>
@@ -354,7 +409,7 @@ export function footer(lang: Lang, site: Site = {}): string {
         <a href="mailto:${esc(email)}" style="color:#7c7871;">${esc(email)}</a>
       </div>
       <div style="${EN}font-size:12px;color:#5c5952;letter-spacing:.02em;" dir="ltr">
-        ${esc(copyright)} &nbsp;·&nbsp; <a href="/${lang}/contact" style="color:#7c7871;">Terms and Conditions</a> &nbsp;·&nbsp; <a href="/${lang}/contact" style="color:#7c7871;">Privacy Policy</a>
+        ${esc(copyright)} &nbsp;·&nbsp; <a href="/wp-content/uploads/2021/01/Terms-Conditions-1.pdf" target="_blank" rel="noopener" style="color:#7c7871;">Terms and Conditions</a> &nbsp;·&nbsp; <a href="/wp-content/uploads/2021/01/Xeetimes_Privacy_Policy.pdf" target="_blank" rel="noopener" style="color:#7c7871;">Privacy Policy</a>
       </div>
     </div>
   </footer>`;
@@ -387,10 +442,11 @@ function homeSectionHead(name: string, url: string, lang: Lang, showMore = true)
     ? `<a href="${url}" class="xt-more" style="display:flex;align-items:center;gap:7px;color:var(--ink2);font-size:13px;font-weight:600;transition:gap .2s;white-space:nowrap;flex:none;">${esc(STR[lang].allNews)} <span style="${EN}">${lang === 'dv' ? '←' : '→'}</span></a>`
     : '';
   return `
-    <div style="display:flex;align-items:center;gap:14px;margin-bottom:22px;">
-      <h2 style="margin:0;font-size:23px;font-weight:700;color:var(--ink);white-space:nowrap;flex:none;">${esc(name)}</h2>
-      <span class="xt-skew"><span></span><span></span></span>
-      <span style="flex:1;height:2px;background:var(--ink);min-width:20px;"></span>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;border-bottom:1px solid var(--line);margin-bottom:22px;">
+      <div style="display:flex;align-items:center;gap:11px;padding-bottom:12px;">
+        <span class="xt-skew"><span></span><span></span></span>
+        <h2 style="margin:0;font-size:30px;font-weight:700;color:var(--ink);white-space:nowrap;">${esc(name)}</h2>
+      </div>
       ${more}
     </div>`;
 }
@@ -414,12 +470,12 @@ export function homeHtml(d: HomeData, lang: Lang): string {
   const heroBlock = hero ? `
     <section class="xt-g-hero" style="display:grid;grid-template-columns:minmax(0,1.5fr) 1fr;gap:26px;padding-bottom:26px;align-items:stretch;">
       <a href="${link(hero, lang)}" class="xt-lead" style="display:block;position:relative;">
-        <div style="position:relative;overflow:hidden;aspect-ratio:16/9;height:100%;min-height:340px;background:var(--ph2);">
+        <div style="position:relative;overflow:hidden;width:100%;aspect-ratio:16/9;height:100%;min-height:340px;background:var(--ph2);">
           ${imgFill(hero, lang, 1200, true)}
           <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,10,12,.86),rgba(10,10,12,.14) 46%,transparent 70%);pointer-events:none;"></div>
           <span style="position:absolute;${lang === 'dv' ? 'right' : 'left'}:18px;top:18px;background:var(--red);color:#fff;font-size:13px;font-weight:700;padding:5px 13px;">${esc(catName(hero, lang))}</span>
           <div style="position:absolute;right:0;bottom:0;left:0;padding:26px;">
-            <h1 class="xt-lead-hl" style="margin:0;color:#fff;font-size:30px;font-weight:700;line-height:1.5;transition:color .2s;">${esc(shortTitle(hero, lang))}</h1>
+            <h1 class="xt-lead-hl" style="margin:0;color:#fff;font-size:35px;font-weight:700;line-height:1.5;transition:color .2s;">${esc(shortTitle(hero, lang))}</h1>
             <div style="color:#d8d5cf;font-size:13px;margin-top:10px;${EN}" dir="ltr">${esc(dvDate(hero.publishedAt, lang))}</div>
           </div>
         </div>
@@ -428,8 +484,8 @@ export function homeHtml(d: HomeData, lang: Lang): string {
     </section>` : '';
 
   // "Latest articles" (ފަހުގެ ލިޔުންތައް) grid right under the hero, like the live site.
-  const latest = (d.news || []).slice(0, 8);
-  const latestLabel = lang === 'dv' ? 'ފަހުގެ ލިޔުންތައް' : 'Latest Articles';
+  const latest = (d.news || []).slice(0, 4);
+  const latestLabel = lang === 'dv' ? 'އެންމެ ފަހުގެ ޚަބަރު' : 'Latest News';
   const latestSection = latest.length ? `
     <section style="padding:16px 0 24px;">
       ${homeSectionHead(latestLabel, `/${lang}`, lang, false)}
@@ -542,8 +598,8 @@ const breadcrumb = (lang: Lang, current: string) => `
 const secTitle = (name: string) => `
   <div style="display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--line);margin-bottom:26px;">
     <div style="display:flex;align-items:center;gap:11px;padding-bottom:12px;">
-      <h1 class="xt-secname" style="margin:0;font-size:27px;font-weight:700;color:var(--ink);">${esc(name)}</h1>
       <span class="xt-skew"><span></span><span></span></span>
+      <h1 class="xt-secname" style="margin:0;font-size:30px;font-weight:700;color:var(--ink);">${esc(name)}</h1>
     </div>
   </div>`;
 
@@ -555,18 +611,13 @@ export function articleHtml(a: Art, related: Art[], comments: Cmt[], lang: Lang,
   // up the same height as the image.
   const heroImg = `
     <figure style="margin:0;height:100%;">
-      <div style="position:relative;overflow:hidden;aspect-ratio:16/9;height:100%;min-height:260px;background:var(--ph2);">
+      <div style="position:relative;overflow:hidden;width:100%;aspect-ratio:16/9;height:100%;min-height:260px;background:var(--ph2);">
         ${imgFill(a, lang, 1080, true)}
-        <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,10,12,.88),rgba(10,10,12,.12) 52%,transparent 74%);pointer-events:none;"></div>
         <span style="position:absolute;${lang === 'dv' ? 'right' : 'left'}:18px;top:18px;background:var(--red);color:#fff;font-size:13px;font-weight:700;padding:5px 13px;">${esc(catName(a, lang))}</span>
-        <div style="position:absolute;right:0;bottom:0;left:0;padding:26px;">
-          <h1 class="xt-lead-hl" style="margin:0;color:#fff;font-size:30px;font-weight:700;line-height:1.5;">${esc(title(a, lang))}</h1>
-          <div style="color:#d8d5cf;font-size:13px;margin-top:10px;${EN}" dir="ltr">${esc(dvDate(a.publishedAt, lang))}</div>
-        </div>
       </div>
     </figure>`;
 
-  const rel = related.slice(0, 4).map((r) => gridCard(r, lang)).join('');
+  const rel = related.slice(0, 3).map((r) => gridCard(r, lang)).join('');
 
   const sidebarLatest = (related.length ? related : []).slice(0, 4);
 
@@ -582,6 +633,7 @@ export function articleHtml(a: Art, related: Art[], comments: Cmt[], lang: Lang,
       <article class="xt-art-flex" style="display:flex;gap:22px;align-items:flex-start;">
         ${shareRail(a, lang)}
         <div style="flex:1;min-width:0;">
+          <h1 class="xt-lead-hl xt-arttitle" style="margin:0 0 18px;color:var(--ink);font-size:35px;font-weight:700;line-height:1.5;">${esc(title(a, lang))}</h1>
           <div style="display:flex;align-items:center;gap:16px;margin:0 0 22px;padding:0 0 14px;border-bottom:1px solid var(--line2);">
             ${(() => {
               const u = authorUrl(lang, a.author ?? null);
@@ -590,7 +642,7 @@ export function articleHtml(a: Art, related: Art[], comments: Cmt[], lang: Lang,
             })()}
           </div>
           <div class="xt-article-body">
-            ${content(a, lang)}
+            ${insertMidAd(content(a, lang), midAdBlock(ads))}
             ${galleryBlock(a, lang)}
           </div>
           <div style="margin:8px 0 24px;">${adBand('HOMEPAGE_MID', ads)}</div>
@@ -598,7 +650,7 @@ export function articleHtml(a: Art, related: Art[], comments: Cmt[], lang: Lang,
           ${site.commentsEnabled === false ? '' : commentsBlock(comments, lang, a.id || '')}
           ${rel ? `
           ${secTitle(STR[lang].related)}
-          <div class="xt-g-4" style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;">${rel}</div>` : ''}
+          <div class="xt-g-4" style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;">${rel}</div>` : ''}
         </div>
       </article>
       <aside class="xt-ad-rail">
@@ -664,14 +716,14 @@ export function categoryHtml(cp: CatPage, lang: Lang, ads: AdsMap = {}, hidden: 
   }
 
   const leadBlock = `
-    <section class="xt-g-seclead" style="display:grid;grid-template-columns:1fr 300px;gap:26px;padding-bottom:30px;align-items:stretch;">
+    <section class="xt-g-seclead" style="display:grid;grid-template-columns:minmax(0,1.5fr) 1fr;gap:26px;padding-bottom:30px;align-items:stretch;">
       <a href="${link(lead, lang)}" class="xt-lead" style="display:block;">
-        <div style="position:relative;overflow:hidden;aspect-ratio:16/9;height:100%;min-height:300px;background:var(--ph2);">
+        <div style="position:relative;overflow:hidden;width:100%;aspect-ratio:16/9;height:100%;min-height:300px;background:var(--ph2);">
           ${imgFill(lead, lang, 1080, true)}
           <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,10,12,.82),transparent 58%);"></div>
           <div style="position:absolute;right:0;bottom:0;left:0;padding:26px;">
             <span style="display:inline-block;background:var(--red);color:#fff;font-size:12px;font-weight:700;padding:4px 11px;margin-bottom:12px;">${esc(cp.name)}</span>
-            <h2 class="xt-lead-hl" style="margin:0;color:#fff;font-size:26px;font-weight:700;line-height:1.55;transition:color .2s;">${esc(shortTitle(lead, lang))}</h2>
+            <h2 class="xt-lead-hl" style="margin:0;color:#fff;font-size:31px;font-weight:700;line-height:1.55;transition:color .2s;">${esc(shortTitle(lead, lang))}</h2>
             <div style="color:#bdb9b1;font-size:13px;margin-top:12px;${EN}" dir="ltr">${esc(dvDate(lead.publishedAt, lang))}</div>
           </div>
         </div>

@@ -23,6 +23,7 @@ export const AD_SLOTS: AdSlotDef[] = [
   { key: 'HOMEPAGE_MID', label: 'Homepage — in-content banner (upper)', w: 2048, h: 256, kind: 'banner' },
   { key: 'HOMEPAGE_MID_2', label: 'Homepage — in-content banner (lower)', w: 2048, h: 256, kind: 'banner' },
   { key: 'ARTICLE_SIDEBAR_1', label: 'Article — hero side box', w: 380, h: 320, kind: 'box' },
+  { key: 'ARTICLE_MID', label: 'Article — in-content box (middle)', w: 400, h: 400, kind: 'box' },
   { key: 'ARTICLE_SIDEBAR_2', label: 'Article — sidebar (bottom)', w: 300, h: 250, kind: 'box' },
 ];
 

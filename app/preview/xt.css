@@ -185,7 +185,7 @@ body:has(#xt-root) { background: var(--page); }
 
 /* ---- Section head skew marks (design "//") ---- */
 #xt-root .xt-skew { display: inline-flex; gap: 4px; }
-#xt-root .xt-skew span { width: 5px; height: 22px; background: var(--red); transform: skewX(-14deg); display: block; }
+#xt-root .xt-skew span { width: 5px; height: 22px; background: var(--red); display: block; }
 
 /* ---- Article reading body ---- MVTypewriter reading face. */
 #xt-root .xt-article-body,
@@ -195,15 +195,21 @@ body:has(#xt-root) { background: var(--page); }
 #xt-root .xt-article-body div, #xt-root .xt-article-body strong, #xt-root .xt-article-body b {
   font-family: 'MV Utheemu', 'Faruma', sans-serif;
 }
-#xt-root .xt-article-body p { margin: 0 0 26px; font-size: 30px; line-height: 1.85; color: #26262b; text-align: justify; }
-#xt-root .xt-article-body h2 { margin: 40px 0 20px; font-size: 36px; font-weight: 700; line-height: 1.5; font-family: 'Ammu','Faruma',sans-serif; }
-#xt-root .xt-article-body h3 { margin: 32px 0 16px; font-size: 32px; font-weight: 700; line-height: 1.5; font-family: 'Ammu','Faruma',sans-serif; }
+/* Most WP articles store the body as bare text (no <p> wrapper), so the size
+   must live on the container — not only on <p> — or it never applies. */
+#xt-root .xt-article-body { font-size: 25px; line-height: 1.9; color: #26262b; }
+#xt-root .xt-article-body p { margin: 0 0 22px; font-size: 25px; line-height: 1.9; color: #26262b; text-align: justify; }
+#xt-root .xt-article-body h2 { margin: 34px 0 18px; font-size: 35px; font-weight: 700; line-height: 1.5; font-family: 'Ammu','Faruma',sans-serif; }
+#xt-root .xt-article-body h3 { margin: 28px 0 14px; font-size: 32px; font-weight: 700; line-height: 1.5; font-family: 'Ammu','Faruma',sans-serif; }
 #xt-root .xt-article-body img { max-width: 100%; height: auto; margin: 12px 0 22px; display: block; }
+/* Embedded video players (YouTube/Facebook) — responsive 16:9. */
+#xt-root .xt-video { position: relative; width: 100%; aspect-ratio: 16 / 9; margin: 16px 0 26px; background: #000; overflow: hidden; }
+#xt-root .xt-video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 #xt-root .xt-article-body figure { margin: 12px 0 22px; }
 #xt-root .xt-article-body figcaption { font-family: var(--en); font-size: 13px; color: var(--ink3); text-align: center; margin-top: 8px; }
 #xt-root .xt-article-body a { color: var(--red); text-decoration: underline; }
 #xt-root .xt-article-body ul, #xt-root .xt-article-body ol { margin: 0 0 22px; padding-right: 26px; }
-#xt-root .xt-article-body li { margin: 0 0 14px; font-size: 30px; line-height: 1.85; }
+#xt-root .xt-article-body li { margin: 0 0 12px; font-size: 25px; line-height: 1.9; }
 /* Note callout — the design's right-red-border cream box. */
 #xt-root .xt-article-body blockquote {
   border-right: 4px solid var(--red); background: #f7f4ee; padding: 16px 18px;
@@ -328,5 +334,7 @@ body:has(#xt-root) { background: var(--page); }
   /* The 30px headline overlaid on the hero image overflows a phone-width image —
      shrink it and let long Thaana words wrap instead of spilling out. */
   #xt-root .xt-lead-hl { font-size: 21px !important; line-height: 1.5 !important; overflow-wrap: anywhere; }
-  #xt-root .xt-article-body p, #xt-root .xt-article-body li { font-size: 24px; line-height: 1.85; }
+  /* Article title sits below the photo (not overlaid), so it can be bigger on phones. */
+  #xt-root h1.xt-arttitle { font-size: 28px !important; line-height: 1.45 !important; }
+  #xt-root .xt-article-body p, #xt-root .xt-article-body li { font-size: 25px; line-height: 1.9; }
 }

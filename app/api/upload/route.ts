@@ -41,38 +41,48 @@ export async function POST(request: Request) {
   let buffer: Buffer = Buffer.from(await file.arrayBuffer());
   let contentType = file.type;
 
-  // Auto-optimize raster images over 1MB
-  if (file.size > OPTIMIZE_THRESHOLD) {
-    buffer = await sharp(buffer)
-      .resize(MAX_DIMENSION, MAX_DIMENSION, { fit: 'inside', withoutEnlargement: true })
-      .jpeg({ quality: 80 })
-      .toBuffer();
-    contentType = 'image/jpeg';
+  // Auto-compress EVERY raster image (not just large ones), preserving the
+  // format so transparency isn't lost. Resize down to a sane max and re-encode
+  // at high (near-lossless) quality — visually the same, much smaller on disk.
+  // GIFs are left untouched (they may be animated).
+  void OPTIMIZE_THRESHOLD;
+  if (contentType !== 'image/gif') {
+    const img = sharp(buffer).rotate().resize(MAX_DIMENSION, MAX_DIMENSION, { fit: 'inside', withoutEnlargement: true });
+    if (contentType === 'image/png') {
+      buffer = await img.png({ compressionLevel: 9 }).toBuffer();
+    } else if (contentType === 'image/webp') {
+      buffer = await img.webp({ quality: 82 }).toBuffer();
+    } else {
+      buffer = await img.jpeg({ quality: 82, mozjpeg: true }).toBuffer();
+      contentType = 'image/jpeg';
+    }
   }
 
-  // XeeTimes-owned photos get a watermark: a big WHITE logo at the bottom-left with a
-  // soft drop shadow (no chip) so it reads on light or dark photos.
+  // XeeTimes-owned photos get the XeeTimes logo watermark (bottom-left), composited
+  // in its brand colours with a soft drop shadow so it reads on light or dark photos.
   if (String(formData.get('watermark') || '') === '1') {
     try {
       const meta = await sharp(buffer).metadata();
       const imgW = meta.width || 1200, imgH = meta.height || 800;
-      const logoW = Math.max(60, Math.min(120, Math.round(imgW * 0.10)));
-      // Recolour the logo to solid white using its own alpha as the mask.
-      const resized = await sharp(path.join(process.cwd(), 'public/logo-white.png')).resize({ width: logoW }).ensureAlpha().toBuffer();
-      const rm = await sharp(resized).metadata();
+      // A consistent proportion of the image width (no tight min/max caps) so the
+      // logo appears the SAME size on every photo once it's displayed at a fixed
+      // container width — earlier caps made small vs large photos differ.
+      const logoW = Math.max(70, Math.min(360, Math.round(imgW * 0.12)));
+      const logo = await sharp(path.join(process.cwd(), 'public/xt-logo.png'))
+        .resize({ width: logoW }).ensureAlpha().png().toBuffer();
+      const rm = await sharp(logo).metadata();
       const lw = rm.width || logoW, lh = rm.height || logoW;
-      const alpha = await sharp(resized).extractChannel('alpha').toColourspace('b-w').raw().toBuffer();
-      const whiteLogo = await sharp({ create: { width: lw, height: lh, channels: 3, background: '#ffffff' } })
-        .joinChannel(alpha, { raw: { width: lw, height: lh, channels: 1 } }).png().toBuffer();
-      const shadowAlpha = Buffer.from(alpha.map((v) => Math.round(v * 0.55)));
+      // Soft shadow from the logo's own alpha for legibility on busy photos.
+      const alpha = await sharp(logo).extractChannel('alpha').toColourspace('b-w').raw().toBuffer();
+      const shadowAlpha = Buffer.from(alpha.map((v) => Math.round(v * 0.5)));
       const shadow = await sharp({ create: { width: lw, height: lh, channels: 3, background: '#000000' } })
-        .joinChannel(shadowAlpha, { raw: { width: lw, height: lh, channels: 1 } }).png().blur(3).toBuffer();
+        .joinChannel(shadowAlpha, { raw: { width: lw, height: lh, channels: 1 } }).png().blur(4).toBuffer();
       const margin = Math.round(imgW * 0.025) + 6;
       const top = Math.max(0, imgH - lh - margin);
       buffer = await sharp(buffer)
         .composite([
-          { input: shadow, left: margin + 2, top: top + 3 },
-          { input: whiteLogo, left: margin, top },
+          { input: shadow, left: margin + 2, top: top + 4 },
+          { input: logo, left: margin, top },
         ])
         .jpeg({ quality: 85 })
         .toBuffer();

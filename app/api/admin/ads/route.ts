@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     data: {
       title,
       imageUrl,
-      linkUrl,
+      linkUrl: linkUrl || null,
       slot,
       isActive: isActive ?? true,
       startDate: startDate ? new Date(startDate) : null,
@@ -55,7 +55,7 @@ export async function PUT(request: Request) {
     data: {
       title,
       imageUrl,
-      linkUrl,
+      linkUrl: linkUrl || null,
       slot,
       isActive,
       startDate: startDate ? new Date(startDate) : null,
@@ -64,6 +64,24 @@ export async function PUT(request: Request) {
   });
 
   await logAudit({ userId: session.user.id, action: 'update', entity: 'Ad', entityId: ad.id, details: { title: ad.title, slot: ad.slot, isActive: ad.isActive } });
+  return NextResponse.json(ad);
+}
+
+// Reset an ad's view/click counters back to 0.
+export async function PATCH(request: Request) {
+  const session = await auth();
+  if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const userRole = (session.user as { role: string }).role as 'SUPER_ADMIN' | 'EDITOR' | 'JOURNALIST' | 'MODERATOR';
+  if (!hasPermission(userRole, 'ad:manage')) {
+    return NextResponse.json({ error: 'No permission' }, { status: 403 });
+  }
+
+  const { id, resetCounts } = await request.json();
+  if (!id || !resetCounts) return NextResponse.json({ error: 'Nothing to do' }, { status: 400 });
+
+  const ad = await db.advertisement.update({ where: { id }, data: { viewCount: 0, clickCount: 0 } });
+  await logAudit({ userId: session.user.id, action: 'update', entity: 'Ad', entityId: ad.id, details: { resetCounts: true } });
   return NextResponse.json(ad);
 }
 

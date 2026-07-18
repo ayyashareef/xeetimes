@@ -21,7 +21,7 @@ const WAHEED = path.join(process.cwd(), 'public/fonts/MVWaheed.ttf');
 const FARUMA = path.join(process.cwd(), 'public/fonts/Faruma.ttf');
 const CACHE_DIR = path.join(process.cwd(), '.og-cache');
 const IMG_CACHE = path.join(CACHE_DIR, 'img');
-const OG_VERSION = 'v9';
+const OG_VERSION = 'v12';
 const HEADERS = {
   'Content-Type': 'image/jpeg',
   'Cache-Control': 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800',
@@ -170,7 +170,7 @@ export default async function OgImage({ params }: { params: Promise<{ lang: stri
   const textW = 1000;
   const long = heading.length > 90;
   const mid = heading.length > 50;
-  const headSizePt = long ? 38 : mid ? 46 : 56;
+  const headSizePt = long ? 44 : mid ? 52 : 63;
   // Headline sits bottom-centre and is centre-aligned ('centre' is symmetric,
   // so no logical/visual RTL flip to worry about — unlike 'left'/'right').
   const [mastImg, headImg, catImg] = await Promise.all([
@@ -180,7 +180,7 @@ export default async function OgImage({ params }: { params: Promise<{ lang: stri
   ]);
   let hW = headImg?.w ?? 0;
   let hH = headImg?.h ?? 0;
-  const MAX_H = 290;
+  const MAX_H = 340;
   if (hH > MAX_H) {
     const s = MAX_H / hH;
     hW = Math.round(hW * s);
@@ -197,13 +197,12 @@ export default async function OgImage({ params }: { params: Promise<{ lang: stri
   const wordmark = mastImg ? <img src={mastImg.src} width={mastImg.w} height={mastImg.h} alt="" /> : <div style={{ display: 'flex' }} />;
   const siteTag = <div style={{ display: 'flex', color: 'rgba(255,255,255,0.85)', fontSize: 29, fontWeight: 600, letterSpacing: 0.4 }}>xeetimes.com</div>;
   const catPill = catImg ? (
-    <div style={{ display: 'flex', alignItems: 'center', background: '#002060', borderRadius: 999, padding: '13px 26px' }}>
+    <div style={{ display: 'flex', alignItems: 'center', background: '#c8102e', borderRadius: 999, padding: '13px 28px' }}>
       <img src={catImg.src} width={catImg.w} height={catImg.h} alt="" />
     </div>
   ) : (
     <div style={{ display: 'flex' }} />
   );
-  const edge = en ? 'flex-start' : 'flex-end';
 
   const png = await new ImageResponse(
     (
@@ -223,29 +222,28 @@ export default async function OgImage({ params }: { params: Promise<{ lang: stri
           <div style={{ position: 'absolute', top: 0, left: 0, width: 1200, height: 630, display: 'flex', background: 'linear-gradient(to bottom, rgba(6,18,45,0.55) 0%, rgba(6,18,45,0) 24%)' }} />
         ) : null}
 
-        {/* content: masthead on the language edge, headline bottom-centre,
-            xeetimes.com pinned bottom-left with the category pill at right */}
-        <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', width: 1200, height: 630, padding: '42px 54px 36px' }}>
-          {/* masthead */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: edge, gap: 16 }}>
-            {en ? logoBox : wordmark}
-            {en ? wordmark : logoBox}
+        {/* content: logo pinned top-left, category + centred headline in the
+            middle, xeetimes.com centred at the bottom */}
+        <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', width: 1200, height: 630, padding: '42px 54px 38px' }}>
+          {/* masthead — logo box in the top-left corner */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 16 }}>
+            {logoBox}
+            {wordmark}
           </div>
 
-          {/* spacer pushes the headline to the bottom */}
-          <div style={{ display: 'flex', flex: 1 }} />
-
-          {/* headline: centred */}
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            {headImg ? (
-              <img src={headImg.src} width={hW} height={hH} alt="" />
-            ) : (
-              <div style={{ direction: en ? 'ltr' : 'rtl', textAlign: 'center', color: '#fff', fontSize: 34, lineHeight: 1.7 }}>{heading}</div>
-            )}
+          {/* centre block: the centred headline, pushed toward the bottom */}
+          <div style={{ display: 'flex', flex: 1, flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', paddingBottom: 22 }}>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              {headImg ? (
+                <img src={headImg.src} width={hW} height={hH} alt="" />
+              ) : (
+                <div style={{ direction: en ? 'ltr' : 'rtl', textAlign: 'center', color: '#fff', fontSize: 34, lineHeight: 1.7 }}>{heading}</div>
+              )}
+            </div>
           </div>
 
-          {/* footer: site tag left, category right */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 24, paddingTop: 20, borderTop: '1px solid rgba(255,255,255,0.18)' }}>
+          {/* footer: site tag on the left, category pill on the right (bottom) */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             {siteTag}
             {catPill}
           </div>

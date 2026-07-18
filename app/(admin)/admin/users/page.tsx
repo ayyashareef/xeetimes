@@ -170,6 +170,7 @@ export default function UsersPage() {
             <thead>
               <tr className="border-b border-gray-100">
                 <th className="text-start text-xs font-medium text-gray-500 uppercase px-4 py-3">Name</th>
+                <th className="text-start text-xs font-medium text-gray-500 uppercase px-4 py-3">Username</th>
                 <th className="text-start text-xs font-medium text-gray-500 uppercase px-4 py-3">Email</th>
                 <th className="text-start text-xs font-medium text-gray-500 uppercase px-4 py-3">Role</th>
                 <th className="text-start text-xs font-medium text-gray-500 uppercase px-4 py-3">Status</th>
@@ -183,6 +184,7 @@ export default function UsersPage() {
                     <div className="text-sm font-medium text-gray-900">{user.name}</div>
                     {user.name_dv && <div className="text-xs text-gray-500 font-dv-body" dir="rtl">{user.name_dv}</div>}
                   </td>
+                  <td className="px-4 py-3 text-sm text-gray-700 font-mono">{user.username || <span className="text-gray-300">—</span>}</td>
                   <td className="px-4 py-3 text-sm text-gray-600">{user.email}</td>
                   <td className="px-4 py-3">
                     <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${roleColors[user.role]}`}>
