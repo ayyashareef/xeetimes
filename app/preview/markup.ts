@@ -625,11 +625,11 @@ export function articleHtml(a: Art, related: Art[], comments: Cmt[], lang: Lang,
   ${header(lang, true, '', ads, [], site)}
   <main class="xt-wrap" style="padding:26px 26px 10px;">
     ${breadcrumb(lang, catName(a, lang))}
-    <div class="xt-art-toprow" style="display:grid;grid-template-columns:minmax(0,1.5fr) 1fr;gap:40px;align-items:stretch;margin-bottom:24px;">
+    <div class="xt-art-toprow" style="display:grid;grid-template-columns:minmax(0,1.73fr) 1fr;gap:40px;align-items:stretch;margin-bottom:24px;">
       ${heroImg}
       ${fillAdColumn('ARTICLE_SIDEBAR_1', ads, 'xt-art-topad')}
     </div>
-    <div class="xt-article-grid" style="display:grid;grid-template-columns:minmax(0,1.5fr) 1fr;gap:40px;align-items:start;">
+    <div class="xt-article-grid" style="display:grid;grid-template-columns:minmax(0,1.73fr) 1fr;gap:40px;align-items:start;">
       <article class="xt-art-flex" style="display:flex;gap:22px;align-items:flex-start;">
         ${shareRail(a, lang)}
         <div style="flex:1;min-width:0;">
