@@ -363,16 +363,23 @@ body:has(#xt-root) { background: var(--page); }
   /* News cards stay 2-up on phones (not a single column). */
   #xt-root .xt-g-4, #xt-root .xt-g-3 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
   #xt-root .xt-gallery { grid-template-columns: minmax(0, 1fr) !important; }
-  #xt-root section, #xt-root main, #xt-root header > div, #xt-root .xt-article-grid { padding-left: 16px !important; padding-right: 16px !important; }
+  /* Tight phone gutters: 5px on the page edges. Sections keep their inline
+     (zero) side padding, so cards sit at just main's 5px. Article body keeps a
+     readable inset. */
+  #xt-root main { padding-left: 5px !important; padding-right: 5px !important; }
+  #xt-root .xt-article-grid { padding-left: 12px !important; padding-right: 12px !important; }
+  /* Card grids: 10px between the two columns (was 22). */
+  #xt-root .xt-g-4, #xt-root .xt-g-3 { gap: 10px !important; }
+  /* Hero + category-lead images span the FULL viewport width (break out of main's 5px). */
+  #xt-root .xt-g-hero, #xt-root .xt-g-seclead { margin-left: -5px !important; margin-right: -5px !important; }
   /* The 30px headline overlaid on the hero image overflows a phone-width image —
      shrink it and let long Thaana words wrap instead of spilling out. */
   #xt-root .xt-lead-hl { font-size: 21px !important; line-height: 1.5 !important; overflow-wrap: anywhere; }
-  /* Article title sits below the photo (not overlaid), so it can be bigger on phones. */
-  #xt-root h1.xt-arttitle { font-size: 28px !important; line-height: 1.45 !important; }
-  /* Article body: 5px smaller than desktop on phones. Size lives on the container
-     too, since most WP bodies are bare text with no <p>. */
-  #xt-root .xt-article-body { font-size: 15px !important; }
-  #xt-root .xt-article-body p, #xt-root .xt-article-body li { font-size: 15px !important; line-height: 1.9; }
+  /* Article title -2px, article body +3px on phones. Body size lives on the
+     container too, since most WP bodies are bare text with no <p>. */
+  #xt-root h1.xt-arttitle { font-size: 26px !important; line-height: 1.45 !important; }
+  #xt-root .xt-article-body { font-size: 18px !important; }
+  #xt-root .xt-article-body p, #xt-root .xt-article-body li { font-size: 18px !important; line-height: 1.9; }
   /* Emoji reactions: all six on a single line. */
   #xt-root [data-react-bar] { flex-wrap: nowrap !important; gap: 5px !important; }
   #xt-root [data-react-bar] .xt-react { flex: 1 1 0; min-width: 0; padding: 9px 2px !important; gap: 4px !important; justify-content: center; }
