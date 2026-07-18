@@ -94,8 +94,16 @@ export default function AdsPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this ad?')) return;
-    const res = await fetch(`/api/admin/ads?id=${id}`, { method: 'DELETE' });
-    if (res.ok) { toast.success('Ad deleted'); fetchAds(); }
+    try {
+      const res = await fetch(`/api/admin/ads?id=${id}`, { method: 'DELETE' });
+      if (res.ok) { toast.success('Ad deleted'); fetchAds(); }
+      else {
+        const data = await res.json().catch(() => ({}));
+        toast.error(data.error || `Delete failed (${res.status})`);
+      }
+    } catch {
+      toast.error('Delete failed — please refresh the page and try again.');
+    }
   };
 
   const handleReset = async (id: string) => {

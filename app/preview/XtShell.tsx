@@ -46,7 +46,11 @@ export default function XtShell({
       document.head.appendChild(s);
     }
 
-    // Ad impressions: count each rendered ad once per page load.
+    // Ad impressions: count each ad AT MOST ONCE per page load. `countedViews`
+    // is shared with the rotator below so a slide that cycles back into view
+    // (every few seconds, indefinitely) is never re-counted — otherwise a single
+    // open tab would rack up hundreds of "views".
+    const countedViews = new Set<string>();
     try {
       const viewIds = Array.from(
         new Set(
@@ -56,6 +60,7 @@ export default function XtShell({
             .filter((x): x is string => !!x),
         ),
       );
+      viewIds.forEach((id) => countedViews.add(id));
       if (viewIds.length) {
         fetch('/api/ads/view', {
           method: 'POST',
@@ -319,8 +324,13 @@ export default function XtShell({
           cur = (cur + 1) % slides.length;
           const s = slides[cur];
           s.style.display = 'block';
+          // Count this slide's impression only the FIRST time it's revealed on
+          // this page load (see countedViews above) — not on every cycle.
           const id = s.getAttribute('data-ad-view');
-          if (id) fetch('/api/ads/view', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ids: [id] }) }).catch(() => {});
+          if (id && !countedViews.has(id)) {
+            countedViews.add(id);
+            fetch('/api/ads/view', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ids: [id] }) }).catch(() => {});
+          }
           schedule();
         }, Math.max(2, secs) * 1000));
       };
