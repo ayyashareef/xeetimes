@@ -384,9 +384,9 @@ body:has(#xt-root) { background: var(--page); }
   #xt-root .xt-lead-hl { font-size: 21px !important; line-height: 1.5 !important; overflow-wrap: anywhere; }
   /* Article title -2px, article body +3px on phones. Body size lives on the
      container too, since most WP bodies are bare text with no <p>. */
-  #xt-root h1.xt-arttitle { font-size: 26px !important; line-height: 1.45 !important; }
-  #xt-root .xt-article-body { font-size: 18px !important; }
-  #xt-root .xt-article-body p, #xt-root .xt-article-body li { font-size: 18px !important; line-height: 1.9; }
+  #xt-root h1.xt-arttitle { font-size: 30px !important; line-height: 1.45 !important; }
+  #xt-root .xt-article-body { font-size: 20px !important; }
+  #xt-root .xt-article-body p, #xt-root .xt-article-body li { font-size: 20px !important; line-height: 1.9; }
   /* Emoji reactions: all six on a single line. */
   #xt-root [data-react-bar] { flex-wrap: nowrap !important; gap: 5px !important; }
   #xt-root [data-react-bar] .xt-react { flex: 1 1 0; min-width: 0; padding: 9px 2px !important; gap: 4px !important; justify-content: center; }

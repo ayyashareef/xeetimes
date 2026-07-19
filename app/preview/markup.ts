@@ -420,7 +420,7 @@ export function header(lang: Lang, sm = false, active = '', ads: AdsMap = {}, hi
       <a href="/"><img class="xt-logo-img" src="${esc(logoSrc)}" alt="XeeTimes"></a>
     </div>
     <nav style="background:var(--nav);">
-      <div class="xt-wrap xt-navrow" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:0 22px;font-size:21px;min-height:68px;position:relative;">
+      <div class="xt-wrap xt-navrow" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:0 22px;font-size:18px;min-height:68px;position:relative;">
         <a href="/" class="xt-navdark" style="color:#fff;padding:13px 16px;display:flex;align-items:center;" aria-label="Home">${ICON.home}</a>
         <span class="xt-desknav" style="display:flex;align-items:center;gap:16px;">${navLinks}</span>
         <button class="xt-burger xt-mobonly" data-act="menu" aria-label="Menu"><span></span><span></span><span></span></button>
@@ -698,7 +698,7 @@ export function articleHtml(a: Art, related: Art[], comments: Cmt[], lang: Lang,
       <article class="xt-art-flex" style="display:flex;gap:22px;align-items:flex-start;">
         ${shareRail(a, lang)}
         <div style="flex:1;min-width:0;">
-          <h1 class="xt-lead-hl xt-arttitle" style="margin:0 0 18px;color:var(--ink);font-size:35px;font-weight:700;line-height:1.5;">${esc(title(a, lang))}</h1>
+          <h1 class="xt-lead-hl xt-arttitle" style="margin:0 0 18px;color:var(--ink);font-size:30px;font-weight:700;line-height:1.5;">${esc(title(a, lang))}</h1>
           <div style="display:flex;align-items:center;gap:16px;margin:0 0 22px;padding:0 0 14px;border-bottom:1px solid var(--line2);">
             ${(() => {
               const u = authorUrl(lang, a.author ?? null);
