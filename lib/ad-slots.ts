@@ -20,10 +20,13 @@ export type AdSlotDef = {
 export const AD_SLOTS: AdSlotDef[] = [
   { key: 'HOMEPAGE_BANNER', label: 'Site — top banner (all pages)', w: 1120, h: 224, kind: 'banner' },
   { key: 'HOME_BOX_1', label: 'Homepage — hero side box', w: 436, h: 349, kind: 'box' },
-  { key: 'HOMEPAGE_MID', label: 'Homepage — in-content banner (upper)', w: 2048, h: 256, kind: 'banner' },
-  { key: 'HOMEPAGE_MID_2', label: 'Homepage — in-content banner (lower)', w: 2048, h: 256, kind: 'banner' },
-  { key: 'HOME_AFTER_HEALTH', label: 'Homepage — under the Health section', w: 1400, h: 300, kind: 'banner' },
-  { key: 'HOME_AFTER_BADHIGE', label: 'Homepage — under the Badhige section', w: 1400, h: 300, kind: 'banner' },
+  // All four homepage in-content banners share one 5:1 shape so they render at
+  // the same height. The box hugs the creative's own aspect, so a creative must
+  // be uploaded at this ratio to fill it (a thinner one just renders shorter).
+  { key: 'HOMEPAGE_MID', label: 'Homepage — in-content banner (upper)', w: 2000, h: 400, kind: 'banner' },
+  { key: 'HOMEPAGE_MID_2', label: 'Homepage — in-content banner (lower)', w: 2000, h: 400, kind: 'banner' },
+  { key: 'HOME_AFTER_HEALTH', label: 'Homepage — under the Health section', w: 2000, h: 400, kind: 'banner' },
+  { key: 'HOME_AFTER_BADHIGE', label: 'Homepage — under the Badhige section', w: 2000, h: 400, kind: 'banner' },
   { key: 'ARTICLE_SIDEBAR_1', label: 'Article — hero side box', w: 380, h: 320, kind: 'box' },
   { key: 'ARTICLE_MID', label: 'Article — in-content box (middle)', w: 400, h: 400, kind: 'box' },
   { key: 'ARTICLE_SIDEBAR_2', label: 'Article — sidebar (bottom)', w: 300, h: 250, kind: 'box' },
