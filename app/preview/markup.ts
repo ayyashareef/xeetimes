@@ -410,9 +410,9 @@ export function header(lang: Lang, sm = false, active = '', ads: AdsMap = {}, hi
     return `<a href="${catUrl(m.slug, lang)}" class="xt-navdark xt-nav-item" style="${base}">${lbl(m)}</a>`;
   }).join('');
 
-  // Mobile drawer: flat list — label-only parents link to their tile page and
-  // still list their children below.
-  const drawerItems = visibleMenu.flatMap((m) => (m.labelOnly ? [m, ...(m.children || [])] : [m]));
+  // Mobile drawer: top-level items only — the "Others" parent links to its tile
+  // page, which is where its children are listed.
+  const drawerItems = visibleMenu;
   const drawerLinks = drawerItems.map((m) =>
     `<a href="${catUrl(m.slug, lang)}" class="xt-dlink" style="${isOn(m as MenuItem) ? 'color:var(--red);' : 'color:var(--ink);'}">${lbl(m)}</a>`,
   ).join('');
