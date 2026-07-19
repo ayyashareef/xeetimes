@@ -271,6 +271,10 @@ function embedVideos(html: string): string {
 }
 const catName = (a: Art, lang: Lang) =>
   sectionLabel(a.category?.slug, lang, (lang === 'en' ? a.category?.name_en || a.category?.name_dv : a.category?.name_dv || a.category?.name_en) || STR[lang].news);
+// The ރިޕޯޓް section also carries plain news and awareness pieces, so labelling
+// those "Report" is misleading — hide its badge. Every other category keeps one.
+const BADGE_HIDDEN = new Set(['report']);
+const badgeHidden = (slug?: string | null) => BADGE_HIDDEN.has(slug || '');
 const authorName = (a: Art, lang: Lang) => (lang === 'en' ? a.author?.name || a.author?.name_dv : a.author?.name_dv || a.author?.name) || STR[lang].desk;
 const initial = (name: string) => name.trim()[0] || 'X';
 const featCaption = (a: Art, lang: Lang) => (lang === 'en' ? a.featuredImageCaption_en || a.featuredImageCaption_dv : a.featuredImageCaption_dv || a.featuredImageCaption_en) || '';
@@ -557,7 +561,7 @@ export function homeHtml(d: HomeData, lang: Lang): string {
         <div style="position:relative;overflow:hidden;width:100%;aspect-ratio:16/9;height:100%;min-height:340px;background:var(--ph2);">
           ${imgFill(hero, lang, 1200, true)}
           <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,10,12,.86),rgba(10,10,12,.14) 46%,transparent 70%);pointer-events:none;"></div>
-          <span style="position:absolute;${lang === 'dv' ? 'right' : 'left'}:18px;top:18px;background:var(--red);color:#fff;font-size:13px;font-weight:700;padding:5px 13px;">${esc(catName(hero, lang))}</span>
+          ${badgeHidden(hero.category?.slug) ? '' : `<span style="position:absolute;${lang === 'dv' ? 'right' : 'left'}:18px;top:18px;background:var(--red);color:#fff;font-size:13px;font-weight:700;padding:5px 13px;">${esc(catName(hero, lang))}</span>`}
           <div style="position:absolute;right:0;bottom:0;left:0;padding:26px;">
             <h1 class="xt-lead-hl" style="margin:0;color:#fff;font-size:25px;font-weight:700;line-height:1.5;transition:color .2s;">${esc(shortTitle(hero, lang))}</h1>
             <div style="color:#d8d5cf;font-size:13px;margin-top:10px;text-align:${lang === 'dv' ? 'right' : 'left'};${EN}" dir="ltr">${dvDate(hero.publishedAt, lang)}</div>
@@ -708,7 +712,7 @@ export function articleHtml(a: Art, related: Art[], comments: Cmt[], lang: Lang,
     <figure style="margin:0;height:100%;">
       <div style="position:relative;overflow:hidden;width:100%;aspect-ratio:16/9;height:100%;min-height:260px;background:var(--ph2);">
         ${imgFill(a, lang, 1080, true)}
-        <span style="position:absolute;${lang === 'dv' ? 'right' : 'left'}:18px;top:18px;background:var(--red);color:#fff;font-size:13px;font-weight:700;padding:5px 13px;">${esc(catName(a, lang))}</span>
+        ${badgeHidden(a.category?.slug) ? '' : `<span style="position:absolute;${lang === 'dv' ? 'right' : 'left'}:18px;top:18px;background:var(--red);color:#fff;font-size:13px;font-weight:700;padding:5px 13px;">${esc(catName(a, lang))}</span>`}
       </div>
     </figure>`;
 
@@ -869,7 +873,7 @@ export function categoryHtml(cp: CatPage, lang: Lang, ads: AdsMap = {}, hidden: 
           ${imgFill(lead, lang, 1080, true)}
           <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,10,12,.82),transparent 58%);"></div>
           <div style="position:absolute;right:0;bottom:0;left:0;padding:26px;">
-            <span style="display:inline-block;background:var(--red);color:#fff;font-size:12px;font-weight:700;padding:4px 11px;margin-bottom:12px;">${esc(cp.name)}</span>
+            ${badgeHidden(cp.slug) ? '' : `<span style="display:inline-block;background:var(--red);color:#fff;font-size:12px;font-weight:700;padding:4px 11px;margin-bottom:12px;">${esc(cp.name)}</span>`}
             <h2 class="xt-lead-hl" style="margin:0;color:#fff;font-size:25px;font-weight:700;line-height:1.55;transition:color .2s;">${esc(shortTitle(lead, lang))}</h2>
             <div style="color:#bdb9b1;font-size:13px;margin-top:12px;text-align:${lang === 'dv' ? 'right' : 'left'};${EN}" dir="ltr">${dvDate(lead.publishedAt, lang)}</div>
           </div>
