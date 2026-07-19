@@ -105,8 +105,8 @@ const MENU: MenuItem[] = [
   { dv: 'އެހެނިހެން', en: 'Others', slug: 'others', labelOnly: true, children: [
     { dv: 'ހުނަރު', en: 'Talent', slug: 'talent' },
     { dv: 'ބަދިގެ', en: 'Recipes', slug: 'badhige' },
-    { dv: 'ތާރީޚު', en: 'History', slug: 'history' },
-    { dv: 'ޙާދިސާ', en: 'Stories', slug: 'haadhisaa' },
+    { dv: 'ތާރީޚް', en: 'History', slug: 'history' },
+    { dv: 'ހާދިސާ', en: 'Stories', slug: 'haadhisaa' },
     { dv: 'ފޮޓޯ', en: 'Photos', slug: 'photo' },
     { dv: 'ވީޑިއޯ', en: 'Videos', slug: 'video' },
   ] },
@@ -578,12 +578,12 @@ export function homeHtml(d: HomeData, lang: Lang): string {
       </div>
     </section>` : '';
 
-  const midAd = `<div style="margin:30px 0;">${adBand('HOMEPAGE_MID', d.ads)}</div>`;
+  const midAd = `<div style="margin:10px 0;">${adBand('HOMEPAGE_MID', d.ads)}</div>`;
 
   const sections = d.sections.map((s, idx) => {
     // The grouped "Others" block (child columns); its badhige ad follows it.
     if (s.group && s.group.length) {
-      const ad = `<div style="margin:30px 0;">${adBand('HOME_AFTER_BADHIGE', d.ads)}</div>`;
+      const ad = `<div style="margin:10px 0;">${adBand('HOME_AFTER_BADHIGE', d.ads)}</div>`;
       return othersGroupHtml(s, lang) + ad;
     }
     if (!s.articles.length) return '';
@@ -598,7 +598,7 @@ export function homeHtml(d: HomeData, lang: Lang): string {
     // plus the mid banner after the business/3rd block.
     const adKey = s.slug === 'health' ? 'HOME_AFTER_HEALTH'
       : idx === 2 ? 'HOMEPAGE_MID_2' : null;
-    const ad = adKey ? `<div style="margin:30px 0;">${adBand(adKey, d.ads)}</div>` : '';
+    const ad = adKey ? `<div style="margin:10px 0;">${adBand(adKey, d.ads)}</div>` : '';
     return block + ad;
   }).join('');
 

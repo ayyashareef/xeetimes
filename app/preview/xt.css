@@ -188,7 +188,7 @@ body:has(#xt-root) { background: var(--page); }
 }
 #xt-root .xt-adband { text-align: center; }
 #xt-root .xt-adband > .xt-adband-label {
-  font-family: var(--en); font-size: 13px; letter-spacing: .01em; color: #a49f96; margin-top: 8px;
+  font-family: var(--en); font-size: 13px; letter-spacing: .01em; color: #a49f96; margin-top: 4px;
 }
 #xt-root .xt-adband > .xt-adband-label::before { content: "— "; }
 #xt-root .xt-adband > .xt-adband-label::after { content: " —"; }
@@ -386,7 +386,7 @@ body:has(#xt-root) { background: var(--page); }
   #xt-root .xt-hero-ad, #xt-root .xt-seclead-ad { padding-left: 10px !important; padding-right: 10px !important; }
   /* Top banner ad spans the full viewport width on phones (no side gutter); the
      "Advertisement" label keeps a small inset so it isn't flush to the edge. */
-  #xt-root .xt-topad { padding: 5px 0 4px !important; }
+  #xt-root .xt-topad { padding: 2px 0 2px !important; }
   #xt-root .xt-topad .xt-adband-label { padding-left: 12px; padding-right: 12px; font-size: 11px; margin-bottom: 2px; }
   /* The 30px headline overlaid on the hero image overflows a phone-width image —
      shrink it and let long Thaana words wrap instead of spilling out. */
