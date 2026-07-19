@@ -707,7 +707,7 @@ export function articleHtml(a: Art, related: Art[], comments: Cmt[], lang: Lang,
         ${shareRail(a, lang)}
         <div style="flex:1;min-width:0;">
           <h1 class="xt-lead-hl xt-arttitle" style="margin:0 0 10px;color:var(--ink);font-size:30px;font-weight:700;line-height:1.5;">${esc(title(a, lang))}</h1>
-          <div style="display:flex;align-items:center;gap:16px;margin:0 0 14px;padding:0 0 10px;border-bottom:1px solid var(--line2);">
+          <div style="display:flex;align-items:center;gap:16px;margin:0 0 18px;padding:12px 0;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2);">
             ${(() => {
               const u = authorUrl(lang, a.author ?? null);
               const inner = `${authorAvatar(a.author ?? null, an, 44)}<div><div style="font-weight:700;font-size:15px;line-height:1.25;color:var(--ink);">${esc(an)}</div><div style="color:var(--ink3);font-size:12px;line-height:1.2;margin-top:1px;text-align:${lang === 'dv' ? 'right' : 'left'};${EN}" dir="ltr">${dvDate(a.publishedAt, lang)}</div></div>`;
