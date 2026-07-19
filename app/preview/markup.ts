@@ -116,6 +116,19 @@ for (const m of MENU) {
   MENU_EN[m.slug] = m.en;
   for (const c of m.children || []) MENU_EN[c.slug] = c.en;
 }
+
+// Big red circular icon tiles for the "Others" (އެހެނިހެން) landing page — one
+// per child section, mirroring the live xeetimes.com /others/ page.
+const tileSvg = (paths: string) =>
+  `<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
+const CAT_TILE_ICON: Record<string, string> = {
+  talent: tileSvg('<path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"/><circle cx="12" cy="8" r="6"/>'),
+  badhige: tileSvg('<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>'),
+  history: tileSvg('<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>'),
+  haadhisaa: tileSvg('<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M12 7v3"/><path d="M12 13h.01"/>'),
+  photo: tileSvg('<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>'),
+  video: tileSvg('<path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/>'),
+};
 export const sectionLabel = (slug: string | undefined, lang: Lang, fallback: string): string =>
   lang === 'en' && slug && MENU_EN[slug] ? MENU_EN[slug] : fallback;
 
@@ -388,16 +401,17 @@ export function header(lang: Lang, sm = false, active = '', ads: AdsMap = {}, hi
       const kids = m.children.filter((c) => !hidden.includes(c.slug));
       const sub = kids.map((c) => `<a href="${catUrl(c.slug, lang)}">${lbl(c)}</a>`).join('');
       const caret = ' <span style="font-size:9px;line-height:1;">▼</span>';
-      const head = m.labelOnly
-        ? `<span class="xt-navdark xt-nav-item" style="${base}display:inline-flex;align-items:center;gap:6px;cursor:pointer;">${lbl(m)}${caret}</span>`
-        : `<a href="${catUrl(m.slug, lang)}" class="xt-navdark xt-nav-item" style="${base}display:inline-flex;align-items:center;gap:6px;">${lbl(m)}${caret}</a>`;
+      // Even the label-only "Others" parent links to its landing page (the icon
+      // tiles) — matches the live site where /others/ is clickable.
+      const head = `<a href="${catUrl(m.slug, lang)}" class="xt-navdark xt-nav-item" style="${base}display:inline-flex;align-items:center;gap:6px;">${lbl(m)}${caret}</a>`;
       return `<div class="xt-hasmenu">${head}<div class="xt-submenu">${sub}</div></div>`;
     }
     return `<a href="${catUrl(m.slug, lang)}" class="xt-navdark xt-nav-item" style="${base}">${lbl(m)}</a>`;
   }).join('');
 
-  // Mobile drawer: flat list — label-only parents contribute their children.
-  const drawerItems = visibleMenu.flatMap((m) => (m.labelOnly ? m.children || [] : [m]));
+  // Mobile drawer: flat list — label-only parents link to their tile page and
+  // still list their children below.
+  const drawerItems = visibleMenu.flatMap((m) => (m.labelOnly ? [m, ...(m.children || [])] : [m]));
   const drawerLinks = drawerItems.map((m) =>
     `<a href="${catUrl(m.slug, lang)}" class="xt-dlink" style="${isOn(m as MenuItem) ? 'color:var(--red);' : 'color:var(--ink);'}">${lbl(m)}</a>`,
   ).join('');
@@ -780,6 +794,27 @@ function pagination(total: number, page = 1): string {
 export function categoryHtml(cp: CatPage, lang: Lang, ads: AdsMap = {}, hidden: string[] = [], site: Site = {}): string {
   const s = STR[lang];
   const lead = cp.lead;
+
+  // "Others" (a label-only nav group like the live /others/): render the child
+  // sections as big red circular icon tiles instead of an article list.
+  const tileParent = MENU.find((m) => m.labelOnly && m.slug === cp.slug);
+  if (tileParent) {
+    const kids = (tileParent.children || []).filter((c) => !hidden.includes(c.slug));
+    const tiles = kids.map((c) => {
+      const ico = CAT_TILE_ICON[c.slug] || '';
+      const name = esc(lang === 'en' ? c.en : c.dv);
+      return `<a href="${catUrl(c.slug, lang)}" class="xt-cat-tile" style="text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:16px;width:150px;">
+        <span class="xt-cat-ico" style="width:132px;height:132px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s;">${ico}</span>
+        <span style="font-family:'Ammu','Faruma',sans-serif;font-size:20px;font-weight:700;color:var(--ink);text-align:center;transition:color .2s;">${name}</span>
+      </a>`;
+    }).join('');
+    return `${header(lang, false, cp.name, ads, hidden, site)}
+    <main class="xt-wrap" style="padding:14px 26px 40px;">
+      ${secTitle(cp.name)}
+      <section style="display:flex;flex-wrap:wrap;justify-content:center;gap:38px 48px;padding:36px 0 12px;">${tiles}</section>
+    </main>
+    ${footer(lang, site)}`;
+  }
 
   const chips = cp.children.map((c) =>
     `<a href="${catUrl(c.slug, lang)}" style="font-size:14px;font-weight:600;padding:8px 16px;border:1px solid var(--line);color:var(--ink2);" data-sh="border-color:var(--red);color:var(--red);">${esc(c.name)}</a>`).join('');

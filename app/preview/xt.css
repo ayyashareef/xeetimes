@@ -128,6 +128,8 @@ body:has(#xt-root) { background: var(--page); }
 #xt-root .xt-lead:hover img { transform: scale(1.04); }
 #xt-root .xt-lead:hover .xt-lead-hl { color: var(--red); }
 #xt-root .xt-sechead:hover h2 { color: var(--red); }
+#xt-root .xt-cat-tile:hover .xt-cat-ico { transform: scale(1.06); box-shadow: 0 10px 24px rgba(200,16,46,.28); }
+#xt-root .xt-cat-tile:hover span:last-child { color: var(--red); }
 #xt-root .xt-thumb img { transition: transform .5s ease; }
 #xt-root .xt-navdark { transition: background .18s, color .18s; }
 #xt-root .xt-navdark:hover { background: var(--red); color: #fff !important; }
