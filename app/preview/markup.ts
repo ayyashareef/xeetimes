@@ -496,7 +496,7 @@ function gridCard(a: Art, lang: Lang): string {
     <a href="${link(a, lang)}" class="xt-gcard" style="display:block;background:var(--bg2);border:1px solid var(--line2);overflow:hidden;">
       <div class="xt-thumb" style="width:100%;aspect-ratio:16/9;overflow:hidden;background:var(--ph2);position:relative;">${a.featuredImage ? imgFill(a, lang, 640) : `<div class="xt-img" style="position:absolute;inset:0;"><span>ފޮޓޯ</span></div>`}</div>
       <div style="padding:14px 14px 16px;">
-        <h3 class="xt-hl" style="margin:0;font-size:16px;font-weight:600;line-height:1.6;color:var(--ink);transition:color .2s;">${esc(shortTitle(a, lang))}</h3>
+        <h3 class="xt-hl" style="margin:0;font-size:16px;font-weight:600;line-height:1.6;color:#54595f;transition:color .2s;">${esc(shortTitle(a, lang))}</h3>
         <div style="color:var(--ink3);font-size:12px;margin-top:10px;${EN}text-align:right;" dir="ltr">${dvDate(a.publishedAt, lang)}</div>
       </div>
     </a>`;
@@ -508,7 +508,7 @@ function homeSectionHead(name: string, url: string, lang: Lang, showMore = true)
   void lang;
   // Section title (clickable -> the category), red "//" marks on the outer edge,
   // and a rule filling the rest — matches the live xeetimes.com section design.
-  const h2 = `<h2 style="margin:0;font-size:33px;font-weight:700;color:var(--ink);white-space:nowrap;transition:color .2s;">${esc(name)}</h2>`;
+  const h2 = `<h2 style="margin:0;font-size:23px;font-weight:700;color:var(--ink);white-space:nowrap;transition:color .2s;">${esc(name)}</h2>`;
   const titleEl = showMore ? `<a href="${esc(url)}" class="xt-sechead" style="text-decoration:none;display:inline-flex;">${h2}</a>` : h2;
   return `
     <div style="display:flex;align-items:center;gap:14px;margin-bottom:22px;">
@@ -551,12 +551,12 @@ export function homeHtml(d: HomeData, lang: Lang): string {
     </section>` : '';
 
   // "Latest articles" (ފަހުގެ ލިޔުންތައް) grid right under the hero, like the live site.
-  const latest = (d.news || []).slice(0, 4);
+  const latest = (d.news || []).slice(0, 8);
   const latestLabel = lang === 'dv' ? 'ފަހުގެ ލިޔުންތައް' : 'Latest News';
   const latestSection = latest.length ? `
     <section style="padding:16px 0 24px;">
       ${homeSectionHead(latestLabel, `/`, lang, false)}
-      <div class="xt-g-4" style="display:grid;grid-template-columns:repeat(4,1fr);gap:22px;">
+      <div class="xt-g-4" style="display:grid;grid-template-columns:repeat(4,1fr);gap:35px 30px;">
         ${latest.map((a, i) => newsCard(a, i, lang)).join('')}
       </div>
     </section>` : '';
@@ -568,7 +568,7 @@ export function homeHtml(d: HomeData, lang: Lang): string {
     const block = `
     <section style="padding:22px 0 26px;">
       ${homeSectionHead(s.name, catUrl(s.slug, lang), lang)}
-      <div class="xt-g-4" style="display:grid;grid-template-columns:repeat(4,1fr);gap:22px;">
+      <div class="xt-g-4" style="display:grid;grid-template-columns:repeat(4,1fr);gap:35px 30px;">
         ${s.articles.slice(0, 4).map((a, i) => newsCard(a, i, lang)).join('')}
       </div>
     </section>`;
