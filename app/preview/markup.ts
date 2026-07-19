@@ -754,9 +754,10 @@ export type CatPage = {
   grid: Art[];
 };
 
-// Category pagination model: page 1 shows the lead + 12-card grid (13 articles);
-// pages 2+ show a 12-card grid. These helpers keep the route and the UI in sync.
-export const CAT_PER_PAGE = 12;
+// Category pagination model (matches the old xeetimes.com density): page 1 shows
+// the lead + an 8-card grid; pages 2+ show an 8-card grid. These helpers keep the
+// route and the UI in sync.
+export const CAT_PER_PAGE = 8;
 export const catPageCount = (total: number): number =>
   total <= CAT_PER_PAGE + 1 ? 1 : 1 + Math.ceil((total - (CAT_PER_PAGE + 1)) / CAT_PER_PAGE);
 

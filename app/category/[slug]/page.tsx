@@ -115,7 +115,7 @@ export default async function CategoryPage({
     children,
     lead: enEmpty || page > 1 ? null : (articles[0] ?? null),
     mostRead: [],
-    grid: enEmpty ? [] : (page === 1 ? articles.slice(1, 13) : articles.slice(0, 12)),
+    grid: enEmpty ? [] : (page === 1 ? articles.slice(1) : articles),
   };
 
   const [ads, hidden, site] = await Promise.all([getActiveAds(), getHiddenCategorySlugs(), getSiteSettings()]);
