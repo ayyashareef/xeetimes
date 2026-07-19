@@ -516,7 +516,7 @@ function homeSectionHead(name: string, url: string, lang: Lang, showMore = true,
   const h2 = `<h2 style="margin:0;font-size:${size}px;font-weight:700;color:var(--ink);white-space:nowrap;transition:color .2s;">${esc(name)}</h2>`;
   const titleEl = showMore ? `<a href="${esc(url)}" class="xt-sechead" style="text-decoration:none;display:inline-flex;">${h2}</a>` : h2;
   return `
-    <div style="display:flex;align-items:center;gap:14px;margin-bottom:22px;">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;">
       <span class="xt-skew"><span></span><span></span></span>
       ${titleEl}
       <div style="flex:1;height:1px;background:var(--line);min-width:20px;"></div>
@@ -533,7 +533,7 @@ function othersGroupHtml(s: HomeSection, lang: Lang): string {
         ${gridCard(c.article, lang)}
       </div>`).join('');
   return `
-    <section style="padding:24px 0 24px;">
+    <section style="padding:12px 0 12px;">
       ${homeSectionHead(s.name, catUrl(s.slug, lang), lang)}
       <div class="xt-g-4" style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;align-items:start;">${cols}</div>
     </section>`;
@@ -575,24 +575,24 @@ export function homeHtml(d: HomeData, lang: Lang): string {
   const latest = (d.news || []).slice(0, 8);
   const latestLabel = lang === 'dv' ? 'ފަހުގެ ލިޔުންތައް' : 'Latest News';
   const latestSection = latest.length ? `
-    <section style="padding:16px 0 24px;">
+    <section style="padding:12px 0 12px;">
       ${homeSectionHead(latestLabel, `/`, lang, false)}
       <div class="xt-g-4" style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;">
         ${latest.map((a, i) => newsCard(a, i, lang)).join('')}
       </div>
     </section>` : '';
 
-  const midAd = `<div style="margin:4px 0;">${adBand('HOMEPAGE_MID', d.ads)}</div>`;
+  const midAd = `<div style="margin:16px 0;">${adBand('HOMEPAGE_MID', d.ads)}</div>`;
 
   const sections = d.sections.map((s, idx) => {
     // The grouped "Others" block (child columns); its badhige ad follows it.
     if (s.group && s.group.length) {
-      const ad = `<div style="margin:4px 0;">${adBand('HOME_AFTER_BADHIGE', d.ads)}</div>`;
+      const ad = `<div style="margin:16px 0;">${adBand('HOME_AFTER_BADHIGE', d.ads)}</div>`;
       return othersGroupHtml(s, lang) + ad;
     }
     if (!s.articles.length) return '';
     const block = `
-    <section class="xt-sec-${esc(s.slug)}" style="padding:24px 0 24px;">
+    <section class="xt-sec-${esc(s.slug)}" style="padding:12px 0 12px;">
       ${homeSectionHead(s.name, catUrl(s.slug, lang), lang)}
       <div class="xt-g-4" style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;">
         ${s.articles.slice(0, 4).map((a, i) => newsCard(a, i, lang)).join('')}
@@ -602,7 +602,7 @@ export function homeHtml(d: HomeData, lang: Lang): string {
     // plus the mid banner after the business/3rd block.
     const adKey = s.slug === 'health' ? 'HOME_AFTER_HEALTH'
       : idx === 2 ? 'HOMEPAGE_MID_2' : null;
-    const ad = adKey ? `<div style="margin:4px 0;">${adBand(adKey, d.ads)}</div>` : '';
+    const ad = adKey ? `<div style="margin:16px 0;">${adBand(adKey, d.ads)}</div>` : '';
     return block + ad;
   }).join('');
 
