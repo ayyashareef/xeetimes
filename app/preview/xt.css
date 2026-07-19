@@ -381,7 +381,7 @@ body:has(#xt-root) { background: var(--page); }
   #xt-root .xt-g-hero, #xt-root .xt-g-seclead { margin-left: -5px !important; margin-right: -5px !important; }
   /* The 30px headline overlaid on the hero image overflows a phone-width image —
      shrink it and let long Thaana words wrap instead of spilling out. */
-  #xt-root .xt-lead-hl { font-size: 21px !important; line-height: 1.5 !important; overflow-wrap: anywhere; }
+  #xt-root .xt-lead-hl { font-size: 25px !important; line-height: 1.5 !important; overflow-wrap: anywhere; }
   /* Article title -2px, article body +3px on phones. Body size lives on the
      container too, since most WP bodies are bare text with no <p>. */
   #xt-root h1.xt-arttitle { font-size: 30px !important; line-height: 1.45 !important; }

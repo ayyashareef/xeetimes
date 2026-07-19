@@ -531,7 +531,7 @@ export function homeHtml(d: HomeData, lang: Lang): string {
           <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,10,12,.86),rgba(10,10,12,.14) 46%,transparent 70%);pointer-events:none;"></div>
           <span style="position:absolute;${lang === 'dv' ? 'right' : 'left'}:18px;top:18px;background:var(--red);color:#fff;font-size:13px;font-weight:700;padding:5px 13px;">${esc(catName(hero, lang))}</span>
           <div style="position:absolute;right:0;bottom:0;left:0;padding:26px;">
-            <h1 class="xt-lead-hl" style="margin:0;color:#fff;font-size:35px;font-weight:700;line-height:1.5;transition:color .2s;">${esc(shortTitle(hero, lang))}</h1>
+            <h1 class="xt-lead-hl" style="margin:0;color:#fff;font-size:25px;font-weight:700;line-height:1.5;transition:color .2s;">${esc(shortTitle(hero, lang))}</h1>
             <div style="color:#d8d5cf;font-size:13px;margin-top:10px;${EN}" dir="ltr">${dvDate(hero.publishedAt, lang)}</div>
           </div>
         </div>
@@ -816,7 +816,7 @@ export function categoryHtml(cp: CatPage, lang: Lang, ads: AdsMap = {}, hidden: 
           <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,10,12,.82),transparent 58%);"></div>
           <div style="position:absolute;right:0;bottom:0;left:0;padding:26px;">
             <span style="display:inline-block;background:var(--red);color:#fff;font-size:12px;font-weight:700;padding:4px 11px;margin-bottom:12px;">${esc(cp.name)}</span>
-            <h2 class="xt-lead-hl" style="margin:0;color:#fff;font-size:31px;font-weight:700;line-height:1.55;transition:color .2s;">${esc(shortTitle(lead, lang))}</h2>
+            <h2 class="xt-lead-hl" style="margin:0;color:#fff;font-size:25px;font-weight:700;line-height:1.55;transition:color .2s;">${esc(shortTitle(lead, lang))}</h2>
             <div style="color:#bdb9b1;font-size:13px;margin-top:12px;${EN}" dir="ltr">${dvDate(lead.publishedAt, lang)}</div>
           </div>
         </div>
