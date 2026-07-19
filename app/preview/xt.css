@@ -189,12 +189,14 @@ body:has(#xt-root) { background: var(--page); }
 #xt-root .xt-adband { text-align: center; }
 #xt-root .xt-adband > .xt-adband-label {
   font-family: var(--en); font-size: 13px; letter-spacing: .01em; color: #a49f96; margin-top: 4px;
+  /* Hug the text: the inherited 1.9 line-height added ~10px of dead space. */
+  line-height: 1;
 }
 #xt-root .xt-adband > .xt-adband-label::before { content: "— "; }
 #xt-root .xt-adband > .xt-adband-label::after { content: " —"; }
 /* Header banner: label above the ad, pinned to the left corner. */
 #xt-root .xt-adband.xt-adband-top { text-align: left; }
-#xt-root .xt-adband.xt-adband-top > .xt-adband-label { margin-top: 0; margin-bottom: 6px; }
+#xt-root .xt-adband.xt-adband-top > .xt-adband-label { margin-top: 0; margin-bottom: 2px; }
 
 /* ---- Vertical share rail (article) ---- */
 #xt-root .xt-share-rail { display: flex; flex-direction: row; flex-wrap: wrap; gap: 9px; margin: 2px 0 24px; }
@@ -387,7 +389,8 @@ body:has(#xt-root) { background: var(--page); }
   /* Top banner ad spans the full viewport width on phones (no side gutter); the
      "Advertisement" label keeps a small inset so it isn't flush to the edge. */
   #xt-root .xt-topad { padding: 2px 0 2px !important; }
-  #xt-root .xt-topad .xt-adband-label { padding-left: 12px; padding-right: 12px; font-size: 11px; margin-bottom: 2px; }
+  /* margin-bottom lives on the higher-specificity .xt-adband-top rule above. */
+  #xt-root .xt-topad .xt-adband-label { padding-left: 12px; padding-right: 12px; font-size: 11px; }
   /* The 30px headline overlaid on the hero image overflows a phone-width image —
      shrink it and let long Thaana words wrap instead of spilling out. */
   #xt-root .xt-lead-hl { font-size: 25px !important; line-height: 1.5 !important; overflow-wrap: anywhere; }
