@@ -427,7 +427,7 @@ export function header(lang: Lang, sm = false, active = '', ads: AdsMap = {}, hi
   </aside>`;
 
   return `
-  <div class="xt-wrap" style="padding:16px 26px 8px;">
+  <div class="xt-wrap xt-topad" style="padding:16px 26px 8px;">
     <div style="max-width:1120px;margin:0 auto;">${adBand('HOMEPAGE_BANNER', ads, true)}</div>
   </div>
   <header>
