@@ -710,7 +710,7 @@ export function articleHtml(a: Art, related: Art[], comments: Cmt[], lang: Lang,
           <div style="display:flex;align-items:center;gap:16px;margin:0 0 14px;padding:0 0 10px;border-bottom:1px solid var(--line2);">
             ${(() => {
               const u = authorUrl(lang, a.author ?? null);
-              const inner = `${authorAvatar(a.author ?? null, an, 44)}<div><div style="font-weight:700;font-size:15px;line-height:1.25;color:var(--ink);">${esc(an)}</div><div style="color:var(--ink3);font-size:12px;line-height:1.2;margin-top:1px;${EN}" dir="ltr">${dvDate(a.publishedAt, lang)}</div></div>`;
+              const inner = `${authorAvatar(a.author ?? null, an, 44)}<div><div style="font-weight:700;font-size:15px;line-height:1.25;color:var(--ink);">${esc(an)}</div><div style="color:var(--ink3);font-size:12px;line-height:1.2;margin-top:1px;text-align:${lang === 'dv' ? 'right' : 'left'};${EN}" dir="ltr">${dvDate(a.publishedAt, lang)}</div></div>`;
               return u ? `<a href="${u}" style="display:flex;align-items:center;gap:12px;" title="${esc(an)}">${inner}</a>` : `<div style="display:flex;align-items:center;gap:12px;">${inner}</div>`;
             })()}
           </div>
