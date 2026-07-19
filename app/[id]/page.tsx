@@ -154,22 +154,34 @@ export default async function ArticlePage({
     select: { authorName: true, content: true, createdAt: true },
   })) as Cmt[];
 
-  const related = (await db.article.findMany({
-    where: { status: 'PUBLISHED', categoryId: article.categoryId, slug: { not: article.slug } },
-    orderBy: { publishedAt: 'desc' },
-    take: 3,
-    select: {
-      id: true,
-      slug: true,
-      title_dv: true,
-      title_en: true,
-      shortTitle_dv: true,
-      shortTitle_en: true,
-      featuredImage: true,
-      publishedAt: true,
-      category: { select: { name_dv: true, name_en: true, slug: true } },
-    },
-  })) as unknown as Art[];
+  const relSelect = {
+    id: true,
+    slug: true,
+    title_dv: true,
+    title_en: true,
+    shortTitle_dv: true,
+    shortTitle_en: true,
+    featuredImage: true,
+    publishedAt: true,
+    category: { select: { name_dv: true, name_en: true, slug: true } },
+  } as const;
+
+  // Bottom "related" grid (4, same category) + sidebar "latest" list (6, any
+  // active category) — kept as separate queries so the sidebar is truly latest.
+  const [related, latest] = (await Promise.all([
+    db.article.findMany({
+      where: { status: 'PUBLISHED', categoryId: article.categoryId, slug: { not: article.slug } },
+      orderBy: { publishedAt: 'desc' },
+      take: 4,
+      select: relSelect,
+    }),
+    db.article.findMany({
+      where: { status: 'PUBLISHED', category: { isActive: true }, slug: { not: article.slug } },
+      orderBy: { publishedAt: 'desc' },
+      take: 6,
+      select: relSelect,
+    }),
+  ])) as unknown as [Art[], Art[]];
 
   const reactionRows = await db.reaction.groupBy({
     by: ['type'],
@@ -195,7 +207,7 @@ export default async function ArticlePage({
     section: L === 'en' ? article.category?.name_en || article.category?.name_dv : article.category?.name_dv,
   }, site);
   return (
-    <XtShell html={articleHtml(article, related, comments, L, ads, hidden, site, reactionCounts)} dir={L === 'dv' ? 'rtl' : 'ltr'}>
+    <XtShell html={articleHtml(article, related, comments, L, ads, hidden, site, reactionCounts, latest)} dir={L === 'dv' ? 'rtl' : 'ltr'}>
       {/* NewsArticle structured data — required for Google News / Top Stories. */}
       {article.status === 'PUBLISHED' && (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(articleLd) }} />

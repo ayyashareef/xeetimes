@@ -68,7 +68,7 @@ const EN_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'
 
 const STR = {
   dv: {
-    latest: 'އެންމެ ފަހުގެ', latestNews: 'އެންމެ ފަހުގެ ޚަބަރު', report: 'ރިޕޯޓް',
+    latest: 'އެންމެ ފަހުގެ', latestNews: 'ފަހުގެ', report: 'ރިޕޯޓް',
     related: 'ގުޅުންހުރި ލިޔުންތައް', comments: 'ކޮމެންޓް', search: 'ހޯދުން', results: 'ނަތީޖާ',
     searchPlaceholder: 'ހޯދާ...', desk: 'ޒީ ޓައިމްސް ޑެސްކް',
     home: 'ފުރަތަމަ ޞަފްޙާ', allNews: 'އިތުރަށް',
@@ -677,7 +677,7 @@ const secTitle = (name: string) => `
     </div>
   </div>`;
 
-export function articleHtml(a: Art, related: Art[], comments: Cmt[], lang: Lang, ads: AdsMap = {}, hidden: string[] = [], site: Site = {}, reactionCounts: number[] = [0, 0, 0, 0, 0, 0]): string {
+export function articleHtml(a: Art, related: Art[], comments: Cmt[], lang: Lang, ads: AdsMap = {}, hidden: string[] = [], site: Site = {}, reactionCounts: number[] = [0, 0, 0, 0, 0, 0], latest: Art[] = []): string {
   void hidden;
   const an = authorName(a, lang);
   // Hero photo styled exactly like the home hero — the headline + category + date
@@ -691,9 +691,9 @@ export function articleHtml(a: Art, related: Art[], comments: Cmt[], lang: Lang,
       </div>
     </figure>`;
 
-  const rel = related.slice(0, 3).map((r) => gridCard(r, lang)).join('');
+  const rel = related.slice(0, 4).map((r) => gridCard(r, lang)).join('');
 
-  const sidebarLatest = (related.length ? related : []).slice(0, 4);
+  const sidebarLatest = (latest.length ? latest : related).slice(0, 6);
 
   return `
   ${header(lang, true, '', ads, [], site)}
@@ -710,7 +710,7 @@ export function articleHtml(a: Art, related: Art[], comments: Cmt[], lang: Lang,
           <div style="display:flex;align-items:center;gap:16px;margin:0 0 14px;padding:0 0 10px;border-bottom:1px solid var(--line2);">
             ${(() => {
               const u = authorUrl(lang, a.author ?? null);
-              const inner = `${authorAvatar(a.author ?? null, an, 44)}<div><div style="font-weight:700;font-size:15px;color:var(--ink);">${esc(an)}</div><div style="color:var(--ink3);font-size:12px;margin-top:3px;${EN}" dir="ltr">${dvDate(a.publishedAt, lang)}</div></div>`;
+              const inner = `${authorAvatar(a.author ?? null, an, 44)}<div><div style="font-weight:700;font-size:15px;line-height:1.25;color:var(--ink);">${esc(an)}</div><div style="color:var(--ink3);font-size:12px;line-height:1.2;margin-top:1px;${EN}" dir="ltr">${dvDate(a.publishedAt, lang)}</div></div>`;
               return u ? `<a href="${u}" style="display:flex;align-items:center;gap:12px;" title="${esc(an)}">${inner}</a>` : `<div style="display:flex;align-items:center;gap:12px;">${inner}</div>`;
             })()}
           </div>
@@ -723,7 +723,7 @@ export function articleHtml(a: Art, related: Art[], comments: Cmt[], lang: Lang,
           ${fillAdColumn('ARTICLE_SIDEBAR_1', ads, 'xt-artad1-mob')}
           ${rel ? `
           ${secTitle(STR[lang].related)}
-          <div class="xt-g-4" style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;">${rel}</div>` : ''}
+          <div class="xt-g-4" style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;">${rel}</div>` : ''}
           ${fillAdColumn('ARTICLE_SIDEBAR_2', ads, 'xt-artad2-mob')}
         </div>
       </article>
