@@ -68,10 +68,11 @@ const SECTION_DEFS: { slug: string; accent: string }[] = [
 // The "Others" (އެހެނިހެން) group — one latest card each, shown as columns under
 // a single header, like the live home.
 const OTHERS_SLUGS = ['talent', 'badhige', 'history', 'haadhisaa'];
-// Full sections shown after the Others group.
-const TAIL_DEFS: { slug: string; accent: string }[] = [
-  { slug: 'photo', accent: 'var(--red)' },
-  { slug: 'video', accent: 'var(--red)' },
+// Full sections shown after the Others group. (Photo trims to 2 cards on
+// phones via CSS — see .xt-sec-photo in xt.css — so desktop keeps a full row.)
+const TAIL_DEFS: { slug: string; accent: string; take: number }[] = [
+  { slug: 'photo', accent: 'var(--red)', take: 4 },
+  { slug: 'video', accent: 'var(--red)', take: 4 },
 ];
 
 export default async function Home({ searchParams }: { searchParams: Promise<{ p?: string; page_id?: string; feed?: string }> }) {
@@ -100,7 +101,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ p
   const [sectionArts, othersArts, tailArts, ads, hidden, site] = await Promise.all([
     Promise.all(SECTION_DEFS.map((def) => byCategory(def.slug, 4))),
     Promise.all(OTHERS_SLUGS.map((slug) => byCategory(slug, 1))),
-    Promise.all(TAIL_DEFS.map((def) => byCategory(def.slug, 4))),
+    Promise.all(TAIL_DEFS.map((def) => byCategory(def.slug, def.take))),
     getActiveAds(),
     getHiddenCategorySlugs(),
     getSiteSettings(),

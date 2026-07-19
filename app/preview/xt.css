@@ -192,8 +192,7 @@ body:has(#xt-root) { background: var(--page); }
   /* Hug the text: the inherited 1.9 line-height added ~10px of dead space. */
   line-height: 1;
 }
-#xt-root .xt-adband > .xt-adband-label::before { content: "— "; }
-#xt-root .xt-adband > .xt-adband-label::after { content: " —"; }
+/* No em-dashes around the label — just "Advertisement". */
 /* Header banner: label above the ad, pinned to the left corner. */
 #xt-root .xt-adband.xt-adband-top { text-align: left; }
 #xt-root .xt-adband.xt-adband-top > .xt-adband-label { margin-top: 0; margin-bottom: 2px; }
@@ -382,6 +381,9 @@ body:has(#xt-root) { background: var(--page); }
   #xt-root .xt-article-grid { padding-left: 12px !important; padding-right: 12px !important; }
   /* Card grids: 10px between the two columns (was 22). */
   #xt-root .xt-g-4, #xt-root .xt-g-3 { gap: 10px !important; }
+  /* Photo section: just one row (2 cards) on phones; desktop keeps all 4.
+     !important because the cards carry an inline display:block. */
+  #xt-root .xt-sec-photo .xt-g-4 > *:nth-child(n+3) { display: none !important; }
   /* Hero + category-lead images span the FULL viewport width (break out of main's 5px). */
   #xt-root .xt-g-hero, #xt-root .xt-g-seclead { margin-left: -5px !important; margin-right: -5px !important; }
   /* ...but the stacked side AD keeps a small side gutter (image stays full-width). */
