@@ -556,7 +556,7 @@ export function homeHtml(d: HomeData, lang: Lang): string {
   const latestSection = latest.length ? `
     <section style="padding:16px 0 24px;">
       ${homeSectionHead(latestLabel, `/`, lang, false)}
-      <div class="xt-g-4" style="display:grid;grid-template-columns:repeat(4,1fr);gap:35px 30px;">
+      <div class="xt-g-4" style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;">
         ${latest.map((a, i) => newsCard(a, i, lang)).join('')}
       </div>
     </section>` : '';
@@ -568,7 +568,7 @@ export function homeHtml(d: HomeData, lang: Lang): string {
     const block = `
     <section style="padding:22px 0 26px;">
       ${homeSectionHead(s.name, catUrl(s.slug, lang), lang)}
-      <div class="xt-g-4" style="display:grid;grid-template-columns:repeat(4,1fr);gap:35px 30px;">
+      <div class="xt-g-4" style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;">
         ${s.articles.slice(0, 4).map((a, i) => newsCard(a, i, lang)).join('')}
       </div>
     </section>`;
