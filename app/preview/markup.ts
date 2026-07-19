@@ -480,7 +480,7 @@ export function newsCard(a: Art, i: number, lang: Lang): string {
 function gridCard(a: Art, lang: Lang): string {
   return `
     <a href="${link(a, lang)}" class="xt-gcard" style="display:block;background:var(--bg2);border:1px solid var(--line2);overflow:hidden;">
-      <div class="xt-thumb" style="width:100%;aspect-ratio:4/3;overflow:hidden;background:var(--ph2);position:relative;">${a.featuredImage ? imgFill(a, lang, 640) : `<div class="xt-img" style="position:absolute;inset:0;"><span>ފޮޓޯ</span></div>`}</div>
+      <div class="xt-thumb" style="width:100%;aspect-ratio:16/9;overflow:hidden;background:var(--ph2);position:relative;">${a.featuredImage ? imgFill(a, lang, 640) : `<div class="xt-img" style="position:absolute;inset:0;"><span>ފޮޓޯ</span></div>`}</div>
       <div style="padding:14px 14px 16px;">
         <h3 class="xt-hl" style="margin:0;font-size:16px;font-weight:600;line-height:1.6;color:var(--ink);transition:color .2s;">${esc(shortTitle(a, lang))}</h3>
         <div style="color:var(--ink3);font-size:12px;margin-top:10px;${EN}text-align:right;" dir="ltr">${dvDate(a.publishedAt, lang)}</div>
