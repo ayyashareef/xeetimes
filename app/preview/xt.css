@@ -388,7 +388,9 @@ body:has(#xt-root) { background: var(--page); }
   #xt-root .xt-hero-ad, #xt-root .xt-seclead-ad { padding-left: 10px !important; padding-right: 10px !important; }
   /* Top banner ad spans the full viewport width on phones (no side gutter); the
      "Advertisement" label keeps a small inset so it isn't flush to the edge. */
-  #xt-root .xt-topad { padding: 2px 0 2px !important; }
+  /* No bottom padding: the space under the banner comes entirely from the
+     logo row's symmetric padding, so it matches the space below the logo. */
+  #xt-root .xt-topad { padding: 2px 0 0 !important; }
   /* margin-bottom lives on the higher-specificity .xt-adband-top rule above. */
   #xt-root .xt-topad .xt-adband-label { padding-left: 12px; padding-right: 12px; font-size: 11px; }
   /* The 30px headline overlaid on the hero image overflows a phone-width image —
