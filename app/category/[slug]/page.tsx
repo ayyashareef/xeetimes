@@ -69,13 +69,16 @@ export default async function CategoryPage({
   // Hidden (deactivated) category: don't expose its page — send visitors home.
   if (!category.isActive) redirect('/');
 
-  const total = await db.article.count({ where: { status: 'PUBLISHED', category: { slug } } });
-  // Page 1: lead + 12-card grid (13). Pages 2+: a 12-card grid. Clamp to range.
+  // An article belongs to this section if it's the primary category OR a
+  // secondary (alt) one — WordPress allowed multiple categories per post.
+  const catWhere = { status: 'PUBLISHED' as const, OR: [{ category: { slug } }, { altCategories: { some: { slug } } }] };
+  const total = await db.article.count({ where: catWhere });
+  // Page 1: lead + 8-card grid. Pages 2+: an 8-card grid. Clamp to range.
   const page = Math.min(rawPage, Math.max(1, catPageCount(total)));
   const skip = page === 1 ? 0 : (CAT_PER_PAGE + 1) + (page - 2) * CAT_PER_PAGE;
   const take = page === 1 ? CAT_PER_PAGE + 1 : CAT_PER_PAGE;
   const articles = (await db.article.findMany({
-      where: { status: 'PUBLISHED', category: { slug } },
+      where: catWhere,
       orderBy: { publishedAt: 'desc' },
       skip,
       take,

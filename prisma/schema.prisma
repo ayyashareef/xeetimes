@@ -82,6 +82,10 @@ model Article {
 
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id])
+  // Secondary categories (WordPress allowed an article in several categories;
+  // beta keeps one primary `category` + these extras so cross-cutting sections
+  // like "video" list every article that belongs to them).
+  altCategories Category[] @relation("ArticleAltCategories")
 
   authorId String
   author   User   @relation(fields: [authorId], references: [id])
@@ -112,7 +116,8 @@ model Category {
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
 
-  articles Article[]
+  articles    Article[]
+  altArticles Article[] @relation("ArticleAltCategories")
 }
 
 model Tag {
