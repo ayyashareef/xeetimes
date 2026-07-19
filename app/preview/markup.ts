@@ -50,7 +50,8 @@ export type Site = {
   commentsEnabled?: boolean;
 };
 
-export type HomeSection = { name: string; slug: string; accent: string; articles: Art[] };
+export type HomeGroupCol = { name: string; slug: string; article: Art };
+export type HomeSection = { name: string; slug: string; accent: string; articles: Art[]; group?: HomeGroupCol[] };
 export type HomeData = {
   hero: Art | null;
   topStories: Art[];
@@ -504,11 +505,11 @@ function gridCard(a: Art, lang: Lang): string {
 
 // Section header (home) — title + "//" skew marks + a horizontal rule filling the
 // rest, with an optional "all news" link, like the live xeetimes.com sections.
-function homeSectionHead(name: string, url: string, lang: Lang, showMore = true): string {
+function homeSectionHead(name: string, url: string, lang: Lang, showMore = true, size = 23): string {
   void lang;
   // Section title (clickable -> the category), red "//" marks on the outer edge,
   // and a rule filling the rest — matches the live xeetimes.com section design.
-  const h2 = `<h2 style="margin:0;font-size:23px;font-weight:700;color:var(--ink);white-space:nowrap;transition:color .2s;">${esc(name)}</h2>`;
+  const h2 = `<h2 style="margin:0;font-size:${size}px;font-weight:700;color:var(--ink);white-space:nowrap;transition:color .2s;">${esc(name)}</h2>`;
   const titleEl = showMore ? `<a href="${esc(url)}" class="xt-sechead" style="text-decoration:none;display:inline-flex;">${h2}</a>` : h2;
   return `
     <div style="display:flex;align-items:center;gap:14px;margin-bottom:22px;">
@@ -516,6 +517,22 @@ function homeSectionHead(name: string, url: string, lang: Lang, showMore = true)
       ${titleEl}
       <div style="flex:1;height:1px;background:var(--line);min-width:20px;"></div>
     </div>`;
+}
+
+// "Others" (އެހެނިހެން) home block: the child sub-categories shown as columns —
+// each with a smaller header + its single latest article — under one big header,
+// like the live xeetimes.com home.
+function othersGroupHtml(s: HomeSection, lang: Lang): string {
+  const cols = (s.group || []).map((c) => `
+      <div>
+        ${homeSectionHead(c.name, catUrl(c.slug, lang), lang, true, 18)}
+        ${gridCard(c.article, lang)}
+      </div>`).join('');
+  return `
+    <section style="padding:22px 0 26px;">
+      ${homeSectionHead(s.name, catUrl(s.slug, lang), lang)}
+      <div class="xt-g-4" style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;align-items:start;">${cols}</div>
+    </section>`;
 }
 
 // ---- Home ------------------------------------------------------------------
@@ -564,6 +581,11 @@ export function homeHtml(d: HomeData, lang: Lang): string {
   const midAd = `<div style="margin:30px 0;">${adBand('HOMEPAGE_MID', d.ads)}</div>`;
 
   const sections = d.sections.map((s, idx) => {
+    // The grouped "Others" block (child columns); its badhige ad follows it.
+    if (s.group && s.group.length) {
+      const ad = `<div style="margin:30px 0;">${adBand('HOME_AFTER_BADHIGE', d.ads)}</div>`;
+      return othersGroupHtml(s, lang) + ad;
+    }
     if (!s.articles.length) return '';
     const block = `
     <section style="padding:22px 0 26px;">
@@ -572,10 +594,9 @@ export function homeHtml(d: HomeData, lang: Lang): string {
         ${s.articles.slice(0, 4).map((a, i) => newsCard(a, i, lang)).join('')}
       </div>
     </section>`;
-    // In-content banners: a dedicated ad under the health and badhige sections
-    // (requested), plus the mid banner after the business/3rd block.
+    // In-content banners: a dedicated ad under the health section (requested),
+    // plus the mid banner after the business/3rd block.
     const adKey = s.slug === 'health' ? 'HOME_AFTER_HEALTH'
-      : s.slug === 'badhige' ? 'HOME_AFTER_BADHIGE'
       : idx === 2 ? 'HOMEPAGE_MID_2' : null;
     const ad = adKey ? `<div style="margin:30px 0;">${adBand(adKey, d.ads)}</div>` : '';
     return block + ad;

@@ -6,7 +6,7 @@ import { getHiddenCategorySlugs } from '@/lib/categories';
 import { getSiteSettings } from '@/lib/settings';
 import { SITE_URL, jsonLd, organizationJsonLd, webSiteJsonLd } from '@/lib/seo';
 import XtShell from '@/app/preview/XtShell';
-import { homeHtml, type Art, type Lang } from '@/app/preview/markup';
+import { homeHtml, type Art, type Lang, type HomeSection } from '@/app/preview/markup';
 
 export const dynamic = 'force-dynamic';
 
@@ -56,7 +56,7 @@ async function byCategory(slug: string, take: number, withContent = false) {
   }) as unknown as Promise<Art[]>;
 }
 
-// XeeTimes home stacks every nav section (4 cards each), in the live site's order.
+// XeeTimes home: the main nav sections (4 cards each), in the live site's order.
 const SECTION_DEFS: { slug: string; accent: string }[] = [
   { slug: 'farudhun', accent: 'var(--red)' },
   { slug: 'report', accent: 'var(--red)' },
@@ -64,10 +64,12 @@ const SECTION_DEFS: { slug: string; accent: string }[] = [
   { slug: 'religion', accent: 'var(--red)' },
   { slug: 'health', accent: 'var(--red)' },
   { slug: 'ilmaai_hilmu', accent: 'var(--red)' },
-  { slug: 'talent', accent: 'var(--red)' },
-  { slug: 'badhige', accent: 'var(--red)' },
-  { slug: 'history', accent: 'var(--red)' },
-  { slug: 'haadhisaa', accent: 'var(--red)' },
+];
+// The "Others" (އެހެނިހެން) group — one latest card each, shown as columns under
+// a single header, like the live home.
+const OTHERS_SLUGS = ['talent', 'badhige', 'history', 'haadhisaa'];
+// Full sections shown after the Others group.
+const TAIL_DEFS: { slug: string; accent: string }[] = [
   { slug: 'photo', accent: 'var(--red)' },
   { slug: 'video', accent: 'var(--red)' },
 ];
@@ -95,19 +97,37 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ p
     }) as unknown as Promise<Art[]>,
   ]);
 
-  const [sectionArts, ads, hidden, site] = await Promise.all([
+  const [sectionArts, othersArts, tailArts, ads, hidden, site] = await Promise.all([
     Promise.all(SECTION_DEFS.map((def) => byCategory(def.slug, 4))),
+    Promise.all(OTHERS_SLUGS.map((slug) => byCategory(slug, 1))),
+    Promise.all(TAIL_DEFS.map((def) => byCategory(def.slug, 4))),
     getActiveAds(),
     getHiddenCategorySlugs(),
     getSiteSettings(),
   ]);
-  const sections = SECTION_DEFS.map((def, i) => {
+  const nameOf = (cat?: { name_dv?: string | null; name_en?: string | null } | null) =>
+    (L === 'en' ? cat?.name_en || cat?.name_dv : cat?.name_dv) || '';
+  const mainSections = SECTION_DEFS.map((def, i) => {
     const articles = sectionArts[i];
     if (!articles.length) return null;
-    const cat = articles[0].category;
-    const name = (L === 'en' ? cat?.name_en || cat?.name_dv : cat?.name_dv) || '';
-    return { name, slug: def.slug, accent: def.accent, articles };
+    return { name: nameOf(articles[0].category), slug: def.slug, accent: def.accent, articles };
   }).filter((s): s is NonNullable<typeof s> => s !== null);
+  // One latest card per Others child, grouped under a single "އެހެނިހެން" header.
+  const othersCols = OTHERS_SLUGS.map((slug, i) => {
+    const arts = othersArts[i];
+    if (!arts.length) return null;
+    return { name: nameOf(arts[0].category), slug, article: arts[0] };
+  }).filter((c): c is NonNullable<typeof c> => c !== null);
+  const tailSections = TAIL_DEFS.map((def, i) => {
+    const articles = tailArts[i];
+    if (!articles.length) return null;
+    return { name: nameOf(articles[0].category), slug: def.slug, accent: def.accent, articles };
+  }).filter((s): s is NonNullable<typeof s> => s !== null);
+  const sections: HomeSection[] = [
+    ...mainSections,
+    ...(othersCols.length ? [{ name: 'އެހެނިހެން', slug: 'others', accent: 'var(--red)', articles: [] as Art[], group: othersCols }] : []),
+    ...tailSections,
+  ];
 
   const hero = featured ?? recent[0] ?? null;
   const heroSlug = hero?.slug;
