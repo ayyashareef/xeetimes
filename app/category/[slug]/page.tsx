@@ -6,7 +6,7 @@ import { getHiddenCategorySlugs } from '@/lib/categories';
 import { getSiteSettings } from '@/lib/settings';
 import { SITE_URL } from '@/lib/seo';
 import XtShell from '@/app/preview/XtShell';
-import { categoryHtml, sectionLabel, type Art, type CatPage, type Lang } from '@/app/preview/markup';
+import { categoryHtml, sectionLabel, catPageCount, CAT_PER_PAGE, type Art, type CatPage, type Lang } from '@/app/preview/markup';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,10 +38,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function CategoryPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const { slug } = await params;
+  const sp = await searchParams;
+  const rawPage = Math.max(1, parseInt(String(Array.isArray(sp.page) ? sp.page[0] : sp.page ?? '1'), 10) || 1);
   const lang = 'dv';
   const L = lang as Lang;
   const pick = <T,>(en: T, dv: T) => (L === 'en' ? en : dv);
@@ -65,12 +69,16 @@ export default async function CategoryPage({
   // Hidden (deactivated) category: don't expose its page — send visitors home.
   if (!category.isActive) redirect('/');
 
-  const [total, articles] = await Promise.all([
-    db.article.count({ where: { status: 'PUBLISHED', category: { slug } } }),
-    db.article.findMany({
+  const total = await db.article.count({ where: { status: 'PUBLISHED', category: { slug } } });
+  // Page 1: lead + 12-card grid (13). Pages 2+: a 12-card grid. Clamp to range.
+  const page = Math.min(rawPage, Math.max(1, catPageCount(total)));
+  const skip = page === 1 ? 0 : (CAT_PER_PAGE + 1) + (page - 2) * CAT_PER_PAGE;
+  const take = page === 1 ? CAT_PER_PAGE + 1 : CAT_PER_PAGE;
+  const articles = (await db.article.findMany({
       where: { status: 'PUBLISHED', category: { slug } },
       orderBy: { publishedAt: 'desc' },
-      take: 13, // 1 lead + a 12-card grid (clean 3-column rows)
+      skip,
+      take,
       select: {
         id: true,
         slug: true,
@@ -88,8 +96,7 @@ export default async function CategoryPage({
         author: { select: { id: true, name_dv: true, name: true, avatar: true } },
         tags: { select: { name_dv: true, name_en: true, slug: true }, take: 1 },
       },
-    }) as unknown as Promise<Art[]>,
-  ]);
+    })) as unknown as Art[];
 
   const children = category.children.map((c) => ({
     name: sectionLabel(c.slug, L, (pick(c.name_en, c.name_dv) || c.name_dv) as string),
@@ -104,10 +111,11 @@ export default async function CategoryPage({
     subtitle: children[0]?.name,
     description: pick(category.description_en, category.description_dv),
     total: enEmpty ? 0 : total,
+    page,
     children,
-    lead: enEmpty ? null : (articles[0] ?? null),
+    lead: enEmpty || page > 1 ? null : (articles[0] ?? null),
     mostRead: [],
-    grid: enEmpty ? [] : articles.slice(1, 13),
+    grid: enEmpty ? [] : (page === 1 ? articles.slice(1, 13) : articles.slice(0, 12)),
   };
 
   const [ads, hidden, site] = await Promise.all([getActiveAds(), getHiddenCategorySlugs(), getSiteSettings()]);

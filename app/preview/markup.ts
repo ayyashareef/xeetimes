@@ -747,22 +747,39 @@ export type CatPage = {
   subtitle?: string;
   description?: string | null;
   total: number;
+  page?: number;
   children: { name: string; slug: string }[];
   lead: Art | null;
   mostRead: Art[];
   grid: Art[];
 };
 
-function pagination(total: number, perPage = 12): string {
-  const pages = Math.max(1, Math.ceil(total / perPage));
+// Category pagination model: page 1 shows the lead + 12-card grid (13 articles);
+// pages 2+ show a 12-card grid. These helpers keep the route and the UI in sync.
+export const CAT_PER_PAGE = 12;
+export const catPageCount = (total: number): number =>
+  total <= CAT_PER_PAGE + 1 ? 1 : 1 + Math.ceil((total - (CAT_PER_PAGE + 1)) / CAT_PER_PAGE);
+
+function pagination(total: number, page = 1): string {
+  const pages = catPageCount(total);
   if (pages <= 1) return '';
-  const nums: string[] = [];
-  for (let i = 1; i <= Math.min(3, pages); i++) nums.push(String(i));
-  if (pages > 4) { nums.push('...'); nums.push(String(pages)); }
-  else if (pages === 4) nums.push('4');
-  return `<div style="display:flex;justify-content:center;gap:8px;padding:6px 0 24px;" dir="ltr">${
-    nums.map((p) => `<span class="xt-page" style="min-width:40px;height:40px;display:grid;place-items:center;border:1px solid var(--line);${EN}font-weight:700;font-size:14px;color:#4a4842;cursor:pointer;">${p}</span>`).join('')
-  }</div>`;
+  const cur = Math.min(Math.max(1, page), pages);
+  const win = [cur - 1, cur, cur + 1].filter((n) => n >= 1 && n <= pages);
+  const seq: (number | '…')[] = [];
+  if (win[0] > 1) { seq.push(1); if (win[0] > 2) seq.push('…'); }
+  seq.push(...win);
+  if (win[win.length - 1] < pages) { if (win[win.length - 1] < pages - 1) seq.push('…'); seq.push(pages); }
+  const cell = (label: string, href: string | null, active: boolean, disabled = false): string => {
+    const style = `min-width:40px;height:40px;padding:0 12px;display:grid;place-items:center;border:1px solid ${active ? 'var(--red)' : 'var(--line)'};background:${active ? 'var(--red)' : 'transparent'};color:${active ? '#fff' : disabled ? 'var(--ink3)' : '#4a4842'};${EN}font-weight:700;font-size:14px;text-decoration:none;${disabled ? 'opacity:.45;pointer-events:none;' : ''}`;
+    return href ? `<a href="${href}" class="xt-page" style="${style}">${label}</a>` : `<span class="xt-page" style="${style}">${label}</span>`;
+  };
+  const items = [cell('‹', cur > 1 ? `?page=${cur - 1}` : null, false, cur === 1)];
+  for (const n of seq) {
+    if (n === '…') items.push(`<span style="min-width:24px;text-align:center;color:var(--ink3);align-self:center;${EN}">…</span>`);
+    else items.push(cell(String(n), n === cur ? null : `?page=${n}`, n === cur));
+  }
+  items.push(cell('›', cur < pages ? `?page=${cur + 1}` : null, false, cur === pages));
+  return `<div style="display:flex;justify-content:center;align-items:center;gap:8px;padding:14px 0 24px;flex-wrap:wrap;" dir="ltr">${items.join('')}</div>`;
 }
 
 export function categoryHtml(cp: CatPage, lang: Lang, ads: AdsMap = {}, hidden: string[] = [], site: Site = {}): string {
@@ -772,7 +789,7 @@ export function categoryHtml(cp: CatPage, lang: Lang, ads: AdsMap = {}, hidden: 
   const chips = cp.children.map((c) =>
     `<a href="${catUrl(c.slug, lang)}" style="font-size:14px;font-weight:600;padding:8px 16px;border:1px solid var(--line);color:var(--ink2);" data-sh="border-color:var(--red);color:var(--red);">${esc(c.name)}</a>`).join('');
 
-  if (!lead) {
+  if (!lead && !cp.grid.length) {
     return `${header(lang, false, cp.name, ads, hidden, site)}
     <main class="xt-wrap" style="padding:30px 26px 10px;">
       ${breadcrumb(lang, cp.name)}
@@ -784,12 +801,13 @@ export function categoryHtml(cp: CatPage, lang: Lang, ads: AdsMap = {}, hidden: 
   // Per-category ad beside the lead article: a CATEGORY_SIDE ad targeting this
   // category (matches the live xeetimes.com, which shows a different creative on
   // each section). Falls back to the shared ARTICLE_SIDEBAR_1 box when unset.
-  const catAdList = (ads['CATEGORY_SIDE'] || []).filter((a) => a.categorySlug === cp.slug);
-  const sideAd = catAdList.length
+  // Only page 1 has a lead (and this ad); pages 2+ are grid-only.
+  const catAdList = lead ? (ads['CATEGORY_SIDE'] || []).filter((a) => a.categorySlug === cp.slug) : [];
+  const sideAd = !lead ? '' : catAdList.length
     ? fillAdColumn('CATEGORY_SIDE', { CATEGORY_SIDE: catAdList }, 'xt-seclead-ad')
     : fillAdColumn('ARTICLE_SIDEBAR_1', ads, 'xt-seclead-ad');
 
-  const leadBlock = `
+  const leadBlock = lead ? `
     <section class="xt-g-seclead" style="display:grid;grid-template-columns:minmax(0,1.5fr) 1fr;gap:26px;padding-bottom:30px;align-items:stretch;">
       <a href="${link(lead, lang)}" class="xt-lead" style="display:block;">
         <div style="position:relative;overflow:hidden;width:100%;aspect-ratio:16/9;height:100%;min-height:300px;background:var(--ph2);">
@@ -803,7 +821,7 @@ export function categoryHtml(cp: CatPage, lang: Lang, ads: AdsMap = {}, hidden: 
         </div>
       </a>
       ${sideAd}
-    </section>`;
+    </section>` : '';
 
   const grid = cp.grid.length ? `
     <section style="display:grid;grid-template-columns:repeat(4,1fr);gap:22px;padding:26px 0;border-top:1px solid var(--line);" class="xt-g-4">
@@ -817,7 +835,7 @@ export function categoryHtml(cp: CatPage, lang: Lang, ads: AdsMap = {}, hidden: 
     ${chips ? `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:22px;">${chips}</div>` : ''}
     ${leadBlock}
     ${grid}
-    ${pagination(cp.total)}
+    ${pagination(cp.total, cp.page ?? 1)}
   </main>
   ${footer(lang, site)}`;
 }

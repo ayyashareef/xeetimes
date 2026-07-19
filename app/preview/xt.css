@@ -147,7 +147,7 @@ body:has(#xt-root) { background: var(--page); }
 #xt-root .xt-react.xt-react-on { background: var(--red); border-color: var(--red); color: #fff; }
 #xt-root .xt-react.xt-react-on .xt-react-n { color: #fff; }
 #xt-root .xt-page { transition: background .15s, color .15s; }
-#xt-root .xt-page:hover { background: var(--red); color: #fff; }
+#xt-root a.xt-page:hover { background: var(--red) !important; color: #fff !important; border-color: var(--red) !important; }
 #xt-root .xt-social { transition: transform .15s ease, opacity .15s ease; opacity: .92; }
 #xt-root .xt-social:hover { transform: translateY(-3px); opacity: 1; color: var(--red) !important; }
 #xt-root .xt-more:hover { gap: 12px; }
