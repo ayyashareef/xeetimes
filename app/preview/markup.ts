@@ -533,7 +533,7 @@ function othersGroupHtml(s: HomeSection, lang: Lang): string {
         ${gridCard(c.article, lang)}
       </div>`).join('');
   return `
-    <section style="padding:22px 0 26px;">
+    <section style="padding:24px 0 24px;">
       ${homeSectionHead(s.name, catUrl(s.slug, lang), lang)}
       <div class="xt-g-4" style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;align-items:start;">${cols}</div>
     </section>`;
@@ -592,7 +592,7 @@ export function homeHtml(d: HomeData, lang: Lang): string {
     }
     if (!s.articles.length) return '';
     const block = `
-    <section class="xt-sec-${esc(s.slug)}" style="padding:22px 0 26px;">
+    <section class="xt-sec-${esc(s.slug)}" style="padding:24px 0 24px;">
       ${homeSectionHead(s.name, catUrl(s.slug, lang), lang)}
       <div class="xt-g-4" style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;">
         ${s.articles.slice(0, 4).map((a, i) => newsCard(a, i, lang)).join('')}

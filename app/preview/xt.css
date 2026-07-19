@@ -321,7 +321,9 @@ body:has(#xt-root) { background: var(--page); }
 #xt-root .xt-dlogo-img { height: 42px; width: auto; display: block; }
 #xt-root .xt-drawer-close { background: transparent; width: 40px; height: 40px; border: 1px solid var(--line); display: grid; place-items: center; cursor: pointer; color: var(--ink); flex: none; }
 #xt-root .xt-drawer-nav { display: flex; flex-direction: column; padding: 12px; gap: 2px; flex: 1; overflow-y: auto; }
-#xt-root .xt-dlink { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; font-size: 18px; font-weight: 500; text-decoration: none; font-family: 'Ammu','Faruma',sans-serif; transition: background .15s; }
+/* flex-start (not space-between) so a caret stays next to its label instead of
+   being pushed to the far edge. */
+#xt-root .xt-dlink { display: flex; align-items: center; justify-content: flex-start; gap: 7px; padding: 14px 16px; font-size: 18px; font-weight: 500; text-decoration: none; font-family: 'Ammu','Faruma',sans-serif; transition: background .15s; }
 #xt-root .xt-dlink:hover { background: var(--bg0); }
 :root[data-xt-menu="open"] #xt-root .xt-backdrop { opacity: 1; pointer-events: auto; }
 :root[data-xt-menu="open"] #xt-root .xt-drawer { transform: none; }
