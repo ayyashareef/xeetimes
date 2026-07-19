@@ -688,8 +688,7 @@ export function articleHtml(a: Art, related: Art[], comments: Cmt[], lang: Lang,
 
   return `
   ${header(lang, true, '', ads, [], site)}
-  <main class="xt-wrap" style="padding:26px 26px 10px;">
-    ${breadcrumb(lang, catName(a, lang))}
+  <main class="xt-wrap" style="padding:12px 26px 10px;">
     <div class="xt-art-toprow" style="display:grid;grid-template-columns:minmax(0,1.73fr) 1fr;gap:40px;align-items:stretch;margin-bottom:24px;">
       ${heroImg}
       ${fillAdColumn('ARTICLE_SIDEBAR_1', ads, 'xt-art-topad')}
