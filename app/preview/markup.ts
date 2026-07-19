@@ -790,8 +790,13 @@ export const CAT_PER_PAGE = 8;
 export const catPageCount = (total: number): number =>
   total <= CAT_PER_PAGE + 1 ? 1 : 1 + Math.ceil((total - (CAT_PER_PAGE + 1)) / CAT_PER_PAGE);
 
-function pagination(total: number, page = 1): string {
-  const pages = catPageCount(total);
+// Author pages are a uniform 10-per-page grid (matches the live site).
+export const AUTHOR_PER_PAGE = 10;
+export const authorPageCount = (total: number): number =>
+  Math.max(1, Math.ceil(total / AUTHOR_PER_PAGE));
+
+// Takes the page COUNT (callers apply their own per-page maths).
+function pagination(pages: number, page = 1): string {
   if (pages <= 1) return '';
   const cur = Math.min(Math.max(1, page), pages);
   const win = [cur - 1, cur, cur + 1].filter((n) => n >= 1 && n <= pages);
@@ -884,7 +889,7 @@ export function categoryHtml(cp: CatPage, lang: Lang, ads: AdsMap = {}, hidden: 
     ${chips ? `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:22px;">${chips}</div>` : ''}
     ${leadBlock}
     ${grid}
-    ${pagination(cp.total, cp.page ?? 1)}
+    ${pagination(catPageCount(cp.total), cp.page ?? 1)}
   </main>
   ${footer(lang, site)}`;
 }
@@ -912,7 +917,7 @@ export function searchHtml(query: string, articles: Art[], lang: Lang, ads: AdsM
 
 // ---- Author profile --------------------------------------------------------
 export type Person = { id: string; name: string; name_dv: string | null; avatar: string | null; bio_dv: string | null; bio_en: string | null };
-export function authorHtml(p: Person, articles: Art[], lang: Lang, ads: AdsMap = {}, hidden: string[] = [], site: Site = {}): string {
+export function authorHtml(p: Person, articles: Art[], lang: Lang, ads: AdsMap = {}, hidden: string[] = [], site: Site = {}, total = 0, page = 1): string {
   const name = (lang === 'en' ? p.name || p.name_dv : p.name_dv || p.name) || STR[lang].desk;
   const bio = (lang === 'en' ? p.bio_en || p.bio_dv : p.bio_dv || p.bio_en) || '';
   const authorObj: Author = { id: p.id, name: p.name, name_dv: p.name_dv, avatar: p.avatar };
@@ -929,5 +934,6 @@ export function authorHtml(p: Person, articles: Art[], lang: Lang, ads: AdsMap =
       </div>
     </div>
     ${grid}
+    ${pagination(authorPageCount(total || articles.length), page)}
   </main>${footer(lang, site)}`;
 }
