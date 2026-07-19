@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: { params: Promise<Record<stri
   const en = lang === 'en';
   // Browser-tab title stays Latin (Thaana next to the favicon is unreadable
   // on most systems); the Dhivehi name lives in description/JSON-LD instead.
-  const title = 'XeeTimes — Maldives News | Latest Dhivehi News';
+  const title = 'XeeTimes - Exclusive Profiles | Social Concerns | Health and Wellbeing Articles';
   const description = en
     ? 'XeeTimes (ޒީ ޓައިމްސް) — the latest news from the Maldives: politics, sports, business, world news and reports, updated daily in Dhivehi.'
     : 'ޒީޓައިމްސް- ތަފާތު ޝައުގުވެރި މުހިންމު މައުލޫމާތާއި ވީޑިއޯ';
