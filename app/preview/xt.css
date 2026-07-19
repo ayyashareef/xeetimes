@@ -127,6 +127,7 @@ body:has(#xt-root) { background: var(--page); }
 #xt-root .xt-gcard:hover .xt-thumb img { transform: scale(1.06); }
 #xt-root .xt-lead:hover img { transform: scale(1.04); }
 #xt-root .xt-lead:hover .xt-lead-hl { color: var(--red); }
+#xt-root .xt-sechead:hover h2 { color: var(--red); }
 #xt-root .xt-thumb img { transition: transform .5s ease; }
 #xt-root .xt-navdark { transition: background .18s, color .18s; }
 #xt-root .xt-navdark:hover { background: var(--red); color: #fff !important; }
@@ -379,6 +380,8 @@ body:has(#xt-root) { background: var(--page); }
   #xt-root .xt-g-4, #xt-root .xt-g-3 { gap: 10px !important; }
   /* Hero + category-lead images span the FULL viewport width (break out of main's 5px). */
   #xt-root .xt-g-hero, #xt-root .xt-g-seclead { margin-left: -5px !important; margin-right: -5px !important; }
+  /* ...but the stacked side AD keeps a small side gutter (image stays full-width). */
+  #xt-root .xt-hero-ad, #xt-root .xt-seclead-ad { padding-left: 10px !important; padding-right: 10px !important; }
   /* The 30px headline overlaid on the hero image overflows a phone-width image —
      shrink it and let long Thaana words wrap instead of spilling out. */
   #xt-root .xt-lead-hl { font-size: 25px !important; line-height: 1.5 !important; overflow-wrap: anywhere; }

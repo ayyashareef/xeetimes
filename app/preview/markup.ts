@@ -134,6 +134,7 @@ const ICON: Record<string, string> = {
   youtube: '<svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M23 12s0-3.2-.4-4.7a2.5 2.5 0 0 0-1.7-1.7C19.4 5.2 12 5.2 12 5.2s-7.4 0-8.9.4A2.5 2.5 0 0 0 1.4 7.3C1 8.8 1 12 1 12s0 3.2.4 4.7a2.5 2.5 0 0 0 1.7 1.7c1.5.4 8.9.4 8.9.4s7.4 0 8.9-.4a2.5 2.5 0 0 0 1.7-1.7c.4-1.5.4-4.7.4-4.7zM9.8 15V9l5.2 3-5.2 3z"></path></svg>',
   viber: '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C7.9 2 3.5 3.9 3.5 9.4c0 2.6 1 4.7 2.3 6v3.3l3-1.6c1 .2 2 .3 3.2.3 4.1 0 8.5-1.9 8.5-7.3S16.1 2 12 2zm4.8 10.7c-.2.5-1 1-1.5 1.1-.4.1-.9.1-1.4-.1-.3-.1-.8-.3-1.4-.5-2.4-1-4-3.5-4.1-3.6-.1-.2-1-1.3-1-2.4s.6-1.7.8-1.9c.2-.2.4-.3.6-.3h.4c.1 0 .3 0 .5.4l.6 1.4c.1.1.1.3 0 .4l-.2.4c-.1.1-.2.2-.1.4.1.2.5.9 1.1 1.4.8.7 1.4.9 1.6 1 .1.1.3.1.4-.1l.6-.7c.1-.2.3-.1.5-.1l1.3.6c.2.1.3.2.4.2.1.3.1.6-.1 1z"></path></svg>',
   messenger: '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.4 2 2 6.1 2 11.6c0 3.1 1.4 5.9 3.7 7.7v3.7l3.4-1.9c.9.3 1.9.4 2.9.4 5.6 0 10-4.1 10-9.6S17.6 2 12 2zm1 12.9-2.6-2.7L5.6 15l5.3-5.6 2.6 2.7L18.4 9l-5.4 5.9z"></path></svg>',
+  instagram: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"></circle></svg>',
 };
 
 export function esc(s: unknown): string {
@@ -438,7 +439,8 @@ export function header(lang: Lang, sm = false, active = '', ads: AdsMap = {}, hi
 export function footer(lang: Lang, site: Site = {}): string {
   const sl = site.socialLinks || {};
   const order: [string, string | undefined][] = [
-    ['facebook', sl.facebook], ['viber', sl.viber], ['youtube', sl.youtube],
+    ['facebook', sl.facebook], ['instagram', sl.instagram || 'https://www.instagram.com/xeetimes/'],
+    ['viber', sl.viber], ['youtube', sl.youtube],
     ['x', sl.x || sl.twitter], ['messenger', sl.messenger],
   ];
   let items = order.filter(([, u]) => !!u).map(([name, u]) => ({ name, url: u as string }));
@@ -447,8 +449,6 @@ export function footer(lang: Lang, site: Site = {}): string {
     `<a href="${esc(s.url)}" target="_blank" rel="noopener" class="xt-social" style="color:#fff;" aria-label="${esc(s.name)}">${ICON[s.name] || ICON.facebook}</a>`,
   ).join('');
 
-  const regNo = site.registrationNo || 'REG NO: 2249/2020';
-  const phone = site.phone || '+960 7625573';
   const email = site.email || 'info@xeetimes.com';
   const copyright = site.copyright || 'Copyright 2021 © All rights Reserved';
   const footLogo = site.logoWhite || '/xt-logo-white.png';
@@ -459,9 +459,6 @@ export function footer(lang: Lang, site: Site = {}): string {
       <div style="display:flex;align-items:center;gap:34px;" dir="ltr">${social}</div>
       <a href="/" style="display:inline-block;"><img src="${esc(footLogo)}" alt="XeeTimes" style="height:62px;width:auto;display:block;"></a>
       <div style="${EN}font-size:13px;color:#7c7871;letter-spacing:.02em;line-height:2;" dir="ltr">
-        xeetimes.com is registered at Ministry of Home Affairs, Maldives<br>
-        ${esc(regNo)}<br>
-        Hotline: <a href="tel:${esc(phone.replace(/\s+/g, ''))}" style="color:#7c7871;">${esc(phone)}</a><br>
         <a href="mailto:${esc(email)}" style="color:#7c7871;">${esc(email)}</a>
       </div>
       <div style="${EN}font-size:12px;color:#5c5952;letter-spacing:.02em;" dir="ltr">
@@ -486,7 +483,7 @@ function gridCard(a: Art, lang: Lang): string {
       <div class="xt-thumb" style="width:100%;aspect-ratio:4/3;overflow:hidden;background:var(--ph2);position:relative;">${a.featuredImage ? imgFill(a, lang, 640) : `<div class="xt-img" style="position:absolute;inset:0;"><span>ފޮޓޯ</span></div>`}</div>
       <div style="padding:14px 14px 16px;">
         <h3 class="xt-hl" style="margin:0;font-size:16px;font-weight:600;line-height:1.6;color:var(--ink);transition:color .2s;">${esc(shortTitle(a, lang))}</h3>
-        <div style="color:var(--ink3);font-size:12px;margin-top:10px;${EN}text-align:left;" dir="ltr">${dvDate(a.publishedAt, lang)}</div>
+        <div style="color:var(--ink3);font-size:12px;margin-top:10px;${EN}text-align:right;" dir="ltr">${dvDate(a.publishedAt, lang)}</div>
       </div>
     </a>`;
 }
@@ -494,16 +491,16 @@ function gridCard(a: Art, lang: Lang): string {
 // Section header (home) — title + "//" skew marks + a horizontal rule filling the
 // rest, with an optional "all news" link, like the live xeetimes.com sections.
 function homeSectionHead(name: string, url: string, lang: Lang, showMore = true): string {
-  const more = showMore
-    ? `<a href="${url}" class="xt-more" style="display:flex;align-items:center;gap:7px;color:var(--ink2);font-size:13px;font-weight:600;transition:gap .2s;white-space:nowrap;flex:none;">${esc(STR[lang].allNews)} <span style="${EN}">${lang === 'dv' ? '←' : '→'}</span></a>`
-    : '';
+  void lang;
+  // Section title (clickable -> the category), red "//" marks on the outer edge,
+  // and a rule filling the rest — matches the live xeetimes.com section design.
+  const h2 = `<h2 style="margin:0;font-size:33px;font-weight:700;color:var(--ink);white-space:nowrap;transition:color .2s;">${esc(name)}</h2>`;
+  const titleEl = showMore ? `<a href="${esc(url)}" class="xt-sechead" style="text-decoration:none;display:inline-flex;">${h2}</a>` : h2;
   return `
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;border-bottom:1px solid var(--line);margin-bottom:22px;">
-      <div style="display:flex;align-items:center;gap:11px;padding-bottom:12px;">
-        <span class="xt-skew"><span></span><span></span></span>
-        <h2 style="margin:0;font-size:30px;font-weight:700;color:var(--ink);white-space:nowrap;">${esc(name)}</h2>
-      </div>
-      ${more}
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:22px;">
+      <span class="xt-skew"><span></span><span></span></span>
+      ${titleEl}
+      <div style="flex:1;height:1px;background:var(--line);min-width:20px;"></div>
     </div>`;
 }
 
@@ -541,7 +538,7 @@ export function homeHtml(d: HomeData, lang: Lang): string {
 
   // "Latest articles" (ފަހުގެ ލިޔުންތައް) grid right under the hero, like the live site.
   const latest = (d.news || []).slice(0, 4);
-  const latestLabel = lang === 'dv' ? 'އެންމެ ފަހުގެ ޚަބަރު' : 'Latest News';
+  const latestLabel = lang === 'dv' ? 'ފަހުގެ ލިޔުންތައް' : 'Latest News';
   const latestSection = latest.length ? `
     <section style="padding:16px 0 24px;">
       ${homeSectionHead(latestLabel, `/`, lang, false)}
@@ -555,15 +552,18 @@ export function homeHtml(d: HomeData, lang: Lang): string {
   const sections = d.sections.map((s, idx) => {
     if (!s.articles.length) return '';
     const block = `
-    <section style="padding:6px 0 12px;">
+    <section style="padding:22px 0 26px;">
       ${homeSectionHead(s.name, catUrl(s.slug, lang), lang)}
       <div class="xt-g-4" style="display:grid;grid-template-columns:repeat(4,1fr);gap:22px;">
         ${s.articles.slice(0, 4).map((a, i) => newsCard(a, i, lang)).join('')}
       </div>
     </section>`;
-    // A second wide in-content banner mid-way down the section stack (matches the
-    // live site placing an ad after the business block).
-    const ad = idx === 2 ? `<div style="margin:30px 0;">${adBand('HOMEPAGE_MID_2', d.ads)}</div>` : '';
+    // In-content banners: a dedicated ad under the health and badhige sections
+    // (requested), plus the mid banner after the business/3rd block.
+    const adKey = s.slug === 'health' ? 'HOME_AFTER_HEALTH'
+      : s.slug === 'badhige' ? 'HOME_AFTER_BADHIGE'
+      : idx === 2 ? 'HOMEPAGE_MID_2' : null;
+    const ad = adKey ? `<div style="margin:30px 0;">${adBand(adKey, d.ads)}</div>` : '';
     return block + ad;
   }).join('');
 
@@ -579,17 +579,17 @@ export function homeHtml(d: HomeData, lang: Lang): string {
 }
 
 // ---- Article ---------------------------------------------------------------
-const SHARE_COLORS: Record<string, string> = { print: '#7b7b7b', mail: '#d9432b', x: '#1d9bf0', facebook: '#3b5998', whatsapp: '#25d366', telegram: '#2ea6da' };
+const SHARE_COLORS: Record<string, string> = { print: '#7b7b7b', mail: '#d9432b', x: '#1d9bf0', facebook: '#3b5998', whatsapp: '#25d366', telegram: '#2ea6da', viber: '#7360f2', instagram: 'linear-gradient(45deg,#f09433,#dc2743,#bc1888)' };
 function shareRail(a: Art, lang: Lang): string {
   const url = `${SITE_URL}/${wpId(a)}`;
   const t = shortTitle(a, lang);
   const links: [string, string, string, boolean, string, string][] = [
-    [ICON.print, '#', 'Print', false, SHARE_COLORS.print, ''],
-    [ICON.mail, `mailto:?subject=${enc(t)}&body=${enc(url)}`, 'Email', false, SHARE_COLORS.mail, ''],
     [ICON.x, `https://twitter.com/intent/tweet?url=${enc(url)}&text=${enc(t)}`, 'X', true, SHARE_COLORS.x, ''],
     [ICON.facebook, `https://www.facebook.com/sharer/sharer.php?u=${enc(url)}`, 'Facebook', true, SHARE_COLORS.facebook, ''],
     [ICON.whatsapp, `https://api.whatsapp.com/send?text=${enc(t + ' ' + url)}`, 'WhatsApp', true, SHARE_COLORS.whatsapp, ''],
     [ICON.telegram, `https://t.me/share/url?url=${enc(url)}&text=${enc(t)}`, 'Telegram', true, SHARE_COLORS.telegram, ''],
+    [ICON.viber, `viber://forward?text=${enc(t + ' ' + url)}`, 'Viber', true, SHARE_COLORS.viber, ''],
+    [ICON.instagram, 'https://www.instagram.com/xeetimes/', 'Instagram', true, SHARE_COLORS.instagram, ''],
   ];
   return `<div class="xt-share-rail" dir="ltr">${links.map(([ic, h, ti, blank, bg]) =>
     `<a class="xt-share" href="${h}" title="${ti}" style="background:${bg};"${blank ? ' target="_blank" rel="noopener"' : (ti === 'Print' ? ' onclick="window.print();return false;"' : '')}>${ic}</a>`).join('')}</div>`;
@@ -654,11 +654,6 @@ function commentsBlock(comments: Cmt[], lang: Lang, articleId: string): string {
     </div>
     ${comments.length ? `<div style="margin-bottom:26px;">${list}</div>` : ''}`;
 }
-
-const breadcrumb = (lang: Lang, current: string) => `
-  <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink3);margin-bottom:22px;font-weight:600;">
-    <a href="/" style="color:var(--ink3);">${esc(STR[lang].home)}</a><span style="${EN}">${lang === 'dv' ? '←' : '→'}</span><span style="color:var(--red);">${esc(current)}</span>
-  </div>`;
 
 const secTitle = (name: string) => `
   <div style="display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--line);margin-bottom:26px;">
@@ -791,8 +786,7 @@ export function categoryHtml(cp: CatPage, lang: Lang, ads: AdsMap = {}, hidden: 
 
   if (!lead && !cp.grid.length) {
     return `${header(lang, false, cp.name, ads, hidden, site)}
-    <main class="xt-wrap" style="padding:30px 26px 10px;">
-      ${breadcrumb(lang, cp.name)}
+    <main class="xt-wrap" style="padding:14px 26px 10px;">
       ${secTitle(cp.name)}
       <p style="color:var(--ink3);font-size:16px;">${esc(s.noCat)}</p>
     </main>${footer(lang, site)}`;
@@ -829,8 +823,7 @@ export function categoryHtml(cp: CatPage, lang: Lang, ads: AdsMap = {}, hidden: 
     </section>` : '';
 
   return `${header(lang, false, cp.name, ads, hidden, site)}
-  <main class="xt-wrap" style="padding:30px 26px 10px;">
-    ${breadcrumb(lang, cp.name)}
+  <main class="xt-wrap" style="padding:14px 26px 10px;">
     ${secTitle(cp.name)}
     ${chips ? `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:22px;">${chips}</div>` : ''}
     ${leadBlock}

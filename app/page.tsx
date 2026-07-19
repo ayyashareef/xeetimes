@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: { params: Promise<Record<stri
   const title = 'XeeTimes — Maldives News | Latest Dhivehi News';
   const description = en
     ? 'XeeTimes (ޒީ ޓައިމްސް) — the latest news from the Maldives: politics, sports, business, world news and reports, updated daily in Dhivehi.'
-    : 'ޒީ ޓައިމްސް — ރާއްޖޭގެ އެންމެ ފަހުގެ ޚަބަރު: ސިޔާސީ، ކުޅިވަރު، ވިޔަފާރި، ދުނިޔެ އަދި ރިޕޯޓް. Latest Maldives news in Dhivehi from XeeTimes.';
+    : 'ޒީ ޓައިމްސް - ތަފާތު ޝައުގުވެރި މުހިންމު މައުލޫމާތާއި ވީޑިއޯ';
   return {
     title: { absolute: title },
     description,
