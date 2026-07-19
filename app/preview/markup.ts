@@ -916,7 +916,6 @@ export function authorHtml(p: Person, articles: Art[], lang: Lang, ads: AdsMap =
   const name = (lang === 'en' ? p.name || p.name_dv : p.name_dv || p.name) || STR[lang].desk;
   const bio = (lang === 'en' ? p.bio_en || p.bio_dv : p.bio_dv || p.bio_en) || '';
   const authorObj: Author = { id: p.id, name: p.name, name_dv: p.name_dv, avatar: p.avatar };
-  const countTxt = `${articles.length} ${lang === 'en' ? 'articles' : 'ޚަބަރު'}`;
   const grid = articles.length
     ? `<div class="xt-g-4" style="display:grid;grid-template-columns:repeat(4,1fr);gap:22px;">${articles.map((a) => gridCard(a, lang)).join('')}</div>`
     : `<p style="color:var(--ink3);font-size:16px;">${lang === 'en' ? 'No articles yet.' : esc(STR.dv.noCat)}</p>`;
@@ -927,7 +926,6 @@ export function authorHtml(p: Person, articles: Art[], lang: Lang, ads: AdsMap =
       <div style="min-width:0;">
         <h1 class="xt-secname" style="margin:0;font-size:32px;font-weight:700;color:var(--ink);">${esc(name)}</h1>
         ${bio ? `<p style="margin:8px 0 0;font-size:15px;line-height:1.9;color:var(--ink2);max-width:680px;">${esc(bio)}</p>` : ''}
-        <span style="display:block;margin-top:6px;font-size:13px;color:var(--ink3);${EN}" dir="ltr">${esc(countTxt)}</span>
       </div>
     </div>
     ${grid}
