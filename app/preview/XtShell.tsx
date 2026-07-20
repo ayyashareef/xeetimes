@@ -97,9 +97,11 @@ export default function XtShell({
       lb.className = 'xt-lb';
       lb.innerHTML =
         '<button class="xt-lb-btn xt-lb-close" aria-label="Close">&times;</button>' +
-        (imgs.length > 1 ? '<button class="xt-lb-btn xt-lb-prev" aria-label="Previous">&#8250;</button>' : '') +
+        // Prev points left (on the left), next points right (on the right) —
+        // the usual gallery convention, even though the page itself is RTL.
+        (imgs.length > 1 ? '<button class="xt-lb-btn xt-lb-prev" aria-label="Previous">&#8249;</button>' : '') +
         '<img class="xt-lb-img" alt="">' +
-        (imgs.length > 1 ? '<button class="xt-lb-btn xt-lb-next" aria-label="Next">&#8249;</button>' : '');
+        (imgs.length > 1 ? '<button class="xt-lb-btn xt-lb-next" aria-label="Next">&#8250;</button>' : '');
       root.appendChild(lb);
       document.body.style.overflow = 'hidden';
       showLb(i);
