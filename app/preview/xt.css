@@ -274,7 +274,9 @@ body:has(#xt-root) { background: var(--page); }
 #xt-root .xt-lb { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; background: rgba(4,6,12,.92); padding: 40px; animation: xt-lb-in .18s ease; }
 @keyframes xt-lb-in { from { opacity: 0; } to { opacity: 1; } }
 #xt-root .xt-lb .xt-lb-img { max-width: 92vw; max-height: 88vh; width: auto; height: auto; box-shadow: 0 20px 60px rgba(0,0,0,.5); object-fit: contain; }
-#xt-root .xt-lb .xt-lb-btn { position: absolute; background: rgba(255,255,255,.1); color: #fff; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .15s; }
+/* direction:ltr — ‹ and › are bidi-mirrored glyphs, so inside the RTL root they
+   would render flipped (left button showing ›). */
+#xt-root .xt-lb .xt-lb-btn { position: absolute; direction: ltr; background: rgba(255,255,255,.1); color: #fff; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .15s; }
 #xt-root .xt-lb .xt-lb-btn:hover { background: rgba(255,255,255,.22); }
 #xt-root .xt-lb .xt-lb-close { top: 22px; right: 26px; width: 46px; height: 46px; font-size: 30px; line-height: 1; }
 #xt-root .xt-lb .xt-lb-prev, #xt-root .xt-lb .xt-lb-next { top: 50%; transform: translateY(-50%); width: 54px; height: 54px; font-size: 34px; line-height: 1; }
