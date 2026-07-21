@@ -190,7 +190,8 @@ export default async function ArticlePage({
   });
   const rc: Record<string, number> = {};
   for (const r of reactionRows) rc[r.type] = r._count.type;
-  const reactionCounts = ['LIKE', 'LOVE', 'HAHA', 'WOW', 'SAD', 'ANGRY'].map((t) => rc[t] || 0);
+  // Same order as the reaction bar in markup.ts (reactionBar TYPES).
+  const reactionCounts = ['ANGRY', 'SAD', 'WOW', 'HAHA', 'LIKE', 'LOVE', 'WINK'].map((t) => rc[t] || 0);
 
   const [ads, hidden, site] = await Promise.all([getActiveAds(), getHiddenCategorySlugs(), getSiteSettings()]);
   const artForLd = article as unknown as { updatedAt?: Date | null; excerpt_dv?: string | null; metaDescription_dv?: string | null };

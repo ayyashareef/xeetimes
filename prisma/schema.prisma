@@ -195,6 +195,7 @@ enum ReactionType {
   WOW
   SAD
   ANGRY
+  WINK
 }
 
 model Reaction {

@@ -650,16 +650,19 @@ function galleryBlock(a: Art, lang: Lang): string {
 const TS_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '';
 
 function reactionBar(articleId: string, counts: number[]): string {
-  // Colourful emoji reactions, one per ReactionType.
+  // 7 emoji reactions matching the live xeetimes.com bar (angry, sleepy, wow,
+  // haha, cool, love, wink). The enum keys are internal ids; the emoji is what
+  // readers see (so LIKE=cool, SAD=sleepy — names kept to avoid a DB rename).
   const RICON: Record<string, string> = {
-    LIKE: '👍',
-    LOVE: '❤️',
-    HAHA: '😃',
-    WOW: '😮',
-    SAD: '😢',
-    ANGRY: '😡',
+    ANGRY: '😠',
+    SAD: '😴',
+    WOW: '😲',
+    HAHA: '😄',
+    LIKE: '😎',
+    LOVE: '😍',
+    WINK: '😉',
   };
-  const TYPES = ['LIKE', 'LOVE', 'HAHA', 'WOW', 'SAD', 'ANGRY'];
+  const TYPES = ['ANGRY', 'SAD', 'WOW', 'HAHA', 'LIKE', 'LOVE', 'WINK'];
   const btns = TYPES.map((type, i) =>
     `<button class="xt-react" data-react="${type}" data-article="${esc(articleId)}" style="display:flex;align-items:center;gap:9px;border:1px solid var(--line);background:#faf8f3;padding:10px 18px;cursor:pointer;color:var(--ink);">
        <span class="xt-react-i" style="display:flex;font-size:23px;line-height:1;font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif;">${RICON[type]}</span><span class="xt-react-n" style="${EN}font-size:15px;font-weight:700;color:var(--ink2);">${counts[i] || 0}</span>
