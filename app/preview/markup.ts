@@ -583,7 +583,7 @@ export function homeHtml(d: HomeData, lang: Lang): string {
   // Featured hero = big image (headline overlaid) + a side ad that fills the same
   // height, like the article page. Image is cover-fitted (never stretched).
   const heroBlock = hero ? `
-    <section class="xt-g-hero" style="display:grid;grid-template-columns:minmax(0,1.2fr) 1fr;gap:26px;padding-bottom:26px;align-items:stretch;">
+    <section class="xt-g-hero" style="display:grid;grid-template-columns:minmax(0,1.5fr) 1fr;gap:26px;padding-bottom:26px;align-items:stretch;">
       <a href="${link(hero, lang)}" class="xt-lead" style="display:block;position:relative;">
         <div style="position:relative;overflow:hidden;width:100%;aspect-ratio:16/9;height:100%;min-height:340px;background:var(--ph2);">
           ${imgFill(hero, lang, 1200, true)}
@@ -755,7 +755,7 @@ export function articleHtml(a: Art, related: Art[], comments: Cmt[], lang: Lang,
   return `
   ${header(lang, true, '', ads, [], site)}
   <main class="xt-wrap" style="padding:12px 26px 10px;">
-    <div class="xt-art-toprow" style="display:grid;grid-template-columns:minmax(0,1.4fr) 1fr;gap:40px;align-items:stretch;margin-bottom:24px;">
+    <div class="xt-art-toprow" style="display:grid;grid-template-columns:minmax(0,1.73fr) 1fr;gap:40px;align-items:stretch;margin-bottom:24px;">
       ${heroImg}
       ${fillAdColumn('ARTICLE_SIDEBAR_1', ads, 'xt-art-topad')}
     </div>
@@ -900,7 +900,7 @@ export function categoryHtml(cp: CatPage, lang: Lang, ads: AdsMap = {}, hidden: 
     : fillAdColumn('ARTICLE_SIDEBAR_1', ads, 'xt-seclead-ad');
 
   const leadBlock = lead ? `
-    <section class="xt-g-seclead" style="display:grid;grid-template-columns:minmax(0,1.2fr) 1fr;gap:26px;padding-bottom:30px;align-items:stretch;">
+    <section class="xt-g-seclead" style="display:grid;grid-template-columns:minmax(0,1.5fr) 1fr;gap:26px;padding-bottom:30px;align-items:stretch;">
       <a href="${link(lead, lang)}" class="xt-lead" style="display:block;">
         <div style="position:relative;overflow:hidden;width:100%;aspect-ratio:16/9;height:100%;min-height:300px;background:var(--ph2);">
           ${imgFill(lead, lang, 1080, true)}
