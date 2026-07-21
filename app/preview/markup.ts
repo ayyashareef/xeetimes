@@ -547,7 +547,7 @@ function featuredSectionHtml(s: HomeSection, lang: Lang): string {
   const small = s.articles[1];
   const bigCard = `
     <a href="${link(big, lang)}" class="xt-lead" style="display:block;">
-      <div style="position:relative;overflow:hidden;width:100%;aspect-ratio:16/9;height:100%;min-height:300px;background:var(--ph2);">
+      <div style="position:relative;overflow:hidden;width:100%;aspect-ratio:16/9;background:var(--ph2);">
         ${imgFill(big, lang, 1080, true)}
         <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,10,12,.82),transparent 58%);"></div>
         <div style="position:absolute;right:0;bottom:0;left:0;padding:24px;">
@@ -559,7 +559,7 @@ function featuredSectionHtml(s: HomeSection, lang: Lang): string {
   return `
     <section class="xt-sec-${esc(s.slug)}" style="padding:24px 0;">
       ${homeSectionHead(s.name, catUrl(s.slug, lang), lang)}
-      <div class="xt-g-feat" style="display:grid;grid-template-columns:2fr 1fr;gap:20px;align-items:start;">
+      <div class="xt-g-feat" style="display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:20px;align-items:start;">
         ${bigCard}
         ${small ? gridCard(small, lang) : ''}
       </div>
