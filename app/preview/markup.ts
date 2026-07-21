@@ -733,7 +733,7 @@ export function articleHtml(a: Art, related: Art[], comments: Cmt[], lang: Lang,
     <div class="xt-article-grid" style="display:grid;grid-template-columns:minmax(0,1.73fr) 1fr;gap:40px;align-items:start;">
       <article class="xt-art-flex" style="min-width:0;">
         <div style="min-width:0;">
-          <h1 class="xt-lead-hl xt-arttitle" style="margin:0 0 10px;color:var(--ink);font-size:30px;font-weight:700;line-height:1.5;">${esc(title(a, lang))}</h1>
+          <h1 class="xt-lead-hl xt-arttitle" style="margin:0 0 10px;color:var(--ink);font-size:34px;font-weight:700;line-height:1.5;">${esc(title(a, lang))}</h1>
           <div style="display:flex;align-items:center;gap:16px;margin:0 0 18px;padding:12px 0;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2);">
             ${(() => {
               const u = authorUrl(lang, a.author ?? null);
