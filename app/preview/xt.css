@@ -133,6 +133,10 @@ body:has(#xt-root) { background: var(--page); }
 #xt-root .xt-thumb img { transition: transform .5s ease; }
 #xt-root .xt-navdark { transition: background .18s, color .18s; }
 #xt-root .xt-navdark:hover { background: var(--red); color: #fff !important; }
+/* Nudge the home icon up so it sits level with the Thaana nav text (whose
+   glyphs render in the upper part of their line box). Reset on mobile, where
+   it sits among plain icons instead. */
+#xt-root .xt-navhome { transform: translateY(-4px); }
 #xt-root .xt-nav-item { position: relative; }
 #xt-root .xt-nav-item::after { content: ""; position: absolute; right: 0; bottom: -2px; height: 3px; width: 0; background: var(--red); transition: width .22s ease; }
 #xt-root .xt-nav-item:hover::after { width: 100%; }
@@ -342,6 +346,7 @@ body:has(#xt-root) { background: var(--page); }
      and the body reads full-width below. The article carries an inline
      `align-items:flex-start`, so force `stretch` (!important) or the body div
      shrinks to its content width. */
+  #xt-root .xt-navhome { transform: none; }
   #xt-root .xt-art-flex { flex-direction: column !important; align-items: stretch !important; }
   #xt-root .xt-art-flex > div { width: 100%; }
   /* Share icons: full-width row, spread edge-to-edge (no white gap on the right). */

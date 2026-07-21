@@ -137,7 +137,7 @@ export const sectionLabel = (slug: string | undefined, lang: Lang, fallback: str
 const EN = "font-family:var(--font-archivo),'Archivo','MV Utheemu','Faruma',sans-serif;";
 
 const ICON: Record<string, string> = {
-  home: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V21h14V9.5"></path><path d="M9.5 21v-6h5v6"></path></svg>',
+  home: '<svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V21h14V9.5"></path><path d="M9.5 21v-6h5v6"></path></svg>',
   search: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.5" y2="16.5"></line></svg>',
   print: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>',
   mail: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>',
@@ -441,7 +441,7 @@ export function header(lang: Lang, sm = false, active = '', ads: AdsMap = {}, hi
     </div>
     <nav style="background:var(--nav);">
       <div class="xt-wrap xt-navrow" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:0 22px;font-size:18px;min-height:68px;position:relative;">
-        <a href="/" class="xt-navdark" style="color:#fff;padding:13px 16px;display:flex;align-items:center;" aria-label="Home">${ICON.home}</a>
+        <a href="/" class="xt-navdark xt-navhome" style="color:#fff;padding:13px 16px;display:flex;align-items:center;" aria-label="Home">${ICON.home}</a>
         <span class="xt-desknav" style="display:flex;align-items:center;gap:16px;">${navLinks}</span>
         <button class="xt-burger xt-mobonly" data-act="menu" aria-label="Menu"><span></span><span></span><span></span></button>
         <a href="/search" class="xt-navdark xt-mobonly" style="color:#fff;padding:11px 14px;align-items:center;" aria-label="Search">${ICON.search}</a>
