@@ -51,7 +51,7 @@ export type Site = {
 };
 
 export type HomeGroupCol = { name: string; slug: string; article: Art };
-export type HomeSection = { name: string; slug: string; accent: string; articles: Art[]; group?: HomeGroupCol[] };
+export type HomeSection = { name: string; slug: string; accent: string; articles: Art[]; group?: HomeGroupCol[]; featured?: boolean };
 export type HomeData = {
   hero: Art | null;
   topStories: Art[];
@@ -539,6 +539,33 @@ function othersGroupHtml(s: HomeSection, lang: Lang): string {
     </section>`;
 }
 
+// A "featured" home section (photo / video): one big lead card (right, ~2/3,
+// headline overlaid on the image) + one smaller card (left), like the live home.
+function featuredSectionHtml(s: HomeSection, lang: Lang): string {
+  const big = s.articles[0];
+  if (!big) return '';
+  const small = s.articles[1];
+  const bigCard = `
+    <a href="${link(big, lang)}" class="xt-lead" style="display:block;">
+      <div style="position:relative;overflow:hidden;width:100%;aspect-ratio:16/9;height:100%;min-height:300px;background:var(--ph2);">
+        ${imgFill(big, lang, 1080, true)}
+        <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,10,12,.82),transparent 58%);"></div>
+        <div style="position:absolute;right:0;bottom:0;left:0;padding:24px;">
+          <h2 class="xt-lead-hl" style="margin:0;color:#fff;font-size:24px;font-weight:700;line-height:1.55;transition:color .2s;">${esc(shortTitle(big, lang))}</h2>
+          <div style="color:#bdb9b1;font-size:13px;margin-top:10px;text-align:${lang === 'dv' ? 'right' : 'left'};${EN}" dir="ltr">${dvDate(big.publishedAt, lang)}</div>
+        </div>
+      </div>
+    </a>`;
+  return `
+    <section class="xt-sec-${esc(s.slug)}" style="padding:24px 0;">
+      ${homeSectionHead(s.name, catUrl(s.slug, lang), lang)}
+      <div class="xt-g-feat" style="display:grid;grid-template-columns:2fr 1fr;gap:20px;align-items:start;">
+        ${bigCard}
+        ${small ? gridCard(small, lang) : ''}
+      </div>
+    </section>`;
+}
+
 // ---- Home ------------------------------------------------------------------
 export function homeHtml(d: HomeData, lang: Lang): string {
   const site = d.site || {};
@@ -590,6 +617,8 @@ export function homeHtml(d: HomeData, lang: Lang): string {
       const ad = `<div style="margin:16px 0;">${adBand('HOME_AFTER_BADHIGE', d.ads)}</div>`;
       return othersGroupHtml(s, lang) + ad;
     }
+    // Photo / video: a big featured card + one small card.
+    if (s.featured) return featuredSectionHtml(s, lang);
     if (!s.articles.length) return '';
     const block = `
     <section class="xt-sec-${esc(s.slug)}" style="padding:12px 0 12px;">
@@ -619,7 +648,7 @@ export function homeHtml(d: HomeData, lang: Lang): string {
 
 // ---- Article ---------------------------------------------------------------
 const SHARE_COLORS: Record<string, string> = { print: '#7b7b7b', mail: '#d9432b', x: '#1d9bf0', facebook: '#3b5998', whatsapp: '#25d366', telegram: '#2ea6da', viber: '#7360f2', instagram: 'linear-gradient(45deg,#f09433,#dc2743,#bc1888)' };
-function shareRail(a: Art, lang: Lang): string {
+function shareRail(a: Art, lang: Lang, extraClass = ''): string {
   const url = `${SITE_URL}/${wpId(a)}`;
   const t = shortTitle(a, lang);
   const links: [string, string, string, boolean, string, string][] = [
@@ -630,7 +659,7 @@ function shareRail(a: Art, lang: Lang): string {
     [ICON.viber, `viber://forward?text=${enc(t + ' ' + url)}`, 'Viber', true, SHARE_COLORS.viber, ''],
     [ICON.instagram, 'https://www.instagram.com/xeetimes/', 'Instagram', true, SHARE_COLORS.instagram, ''],
   ];
-  return `<div class="xt-share-rail" dir="ltr">${links.map(([ic, h, ti, blank, bg]) =>
+  return `<div class="xt-share-rail ${extraClass}" dir="ltr">${links.map(([ic, h, ti, blank, bg]) =>
     `<a class="xt-share" href="${h}" title="${ti}" style="background:${bg};"${blank ? ' target="_blank" rel="noopener"' : (ti === 'Print' ? ' onclick="window.print();return false;"' : '')}>${ic}</a>`).join('')}</div>`;
 }
 
@@ -731,17 +760,18 @@ export function articleHtml(a: Art, related: Art[], comments: Cmt[], lang: Lang,
       ${fillAdColumn('ARTICLE_SIDEBAR_1', ads, 'xt-art-topad')}
     </div>
     <div class="xt-article-grid" style="display:grid;grid-template-columns:minmax(0,1.73fr) 1fr;gap:40px;align-items:start;">
-      <article class="xt-art-flex" style="min-width:0;">
-        <div style="min-width:0;">
+      <article class="xt-art-flex" style="display:flex;gap:22px;align-items:flex-start;">
+        ${shareRail(a, lang, 'xt-share-desk')}
+        <div style="flex:1;min-width:0;">
           <h1 class="xt-lead-hl xt-arttitle" style="margin:0 0 10px;color:var(--ink);font-size:34px;font-weight:700;line-height:1.5;">${esc(title(a, lang))}</h1>
           <div style="display:flex;align-items:center;gap:16px;margin:0 0 18px;padding:12px 0;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2);">
             ${(() => {
               const u = authorUrl(lang, a.author ?? null);
-              const inner = `${authorAvatar(a.author ?? null, an, 44)}<div><div style="font-weight:700;font-size:15px;line-height:1.25;color:var(--ink);">${esc(an)}</div><div style="color:var(--ink3);font-size:12px;line-height:1.2;margin-top:1px;text-align:${lang === 'dv' ? 'right' : 'left'};${EN}" dir="ltr">${dvDate(a.publishedAt, lang)}</div></div>`;
+              const inner = `${authorAvatar(a.author ?? null, an, 44)}<div><div style="font-weight:700;font-size:15px;line-height:1.25;color:var(--ink);">${esc(an)}</div><div style="color:var(--ink3);font-size:12px;line-height:1.2;margin-top:5px;text-align:${lang === 'dv' ? 'right' : 'left'};${EN}" dir="ltr">${dvDate(a.publishedAt, lang)}</div></div>`;
               return u ? `<a href="${u}" style="display:flex;align-items:center;gap:12px;" title="${esc(an)}">${inner}</a>` : `<div style="display:flex;align-items:center;gap:12px;">${inner}</div>`;
             })()}
           </div>
-          ${shareRail(a, lang)}
+          ${shareRail(a, lang, 'xt-share-mob')}
           <div class="xt-article-body">
             ${insertMidAd(content(a, lang), midAdBlock(ads))}
             ${galleryBlock(a, lang)}

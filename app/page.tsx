@@ -68,11 +68,11 @@ const SECTION_DEFS: { slug: string; accent: string }[] = [
 // The "Others" (އެހެނިހެން) group — one latest card each, shown as columns under
 // a single header, like the live home.
 const OTHERS_SLUGS = ['talent', 'badhige', 'history', 'haadhisaa'];
-// Full sections shown after the Others group. (Photo trims to 2 cards on
-// phones via CSS — see .xt-sec-photo in xt.css — so desktop keeps a full row.)
+// Photo + video: a "featured" layout (1 big lead card + 1 small), so only 2
+// articles each are needed.
 const TAIL_DEFS: { slug: string; accent: string; take: number }[] = [
-  { slug: 'photo', accent: 'var(--red)', take: 4 },
-  { slug: 'video', accent: 'var(--red)', take: 4 },
+  { slug: 'photo', accent: 'var(--red)', take: 2 },
+  { slug: 'video', accent: 'var(--red)', take: 2 },
 ];
 
 export default async function Home({ searchParams }: { searchParams: Promise<{ p?: string; page_id?: string; feed?: string }> }) {
@@ -122,7 +122,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ p
   const tailSections = TAIL_DEFS.map((def, i) => {
     const articles = tailArts[i];
     if (!articles.length) return null;
-    return { name: nameOf(articles[0].category), slug: def.slug, accent: def.accent, articles };
+    return { name: nameOf(articles[0].category), slug: def.slug, accent: def.accent, articles, featured: true };
   }).filter((s): s is NonNullable<typeof s> => s !== null);
   const sections: HomeSection[] = [
     ...mainSections,

@@ -202,7 +202,11 @@ body:has(#xt-root) { background: var(--page); }
 #xt-root .xt-adband.xt-adband-top > .xt-adband-label { margin-top: 0; margin-bottom: 2px; }
 
 /* ---- Vertical share rail (article) ---- */
-#xt-root .xt-share-rail { display: flex; flex-direction: row; flex-wrap: wrap; gap: 9px; margin: 2px 0 24px; }
+#xt-root .xt-share-rail { display: flex; gap: 9px; }
+/* Desktop: a sticky vertical rail beside the article. */
+#xt-root .xt-share-desk { flex-direction: column; width: 44px; flex: none; position: sticky; top: 20px; }
+/* Mobile-only: a horizontal row under the byline (hidden on desktop). */
+#xt-root .xt-share-mob { display: none; flex-direction: row; flex-wrap: wrap; justify-content: space-between; width: 100%; margin: 2px 0 24px; }
 #xt-root .xt-share { width: 44px; height: 44px; display: grid; place-items: center; color: #fff; cursor: pointer; }
 #xt-root .xt-ad-rail { display: flex; flex-direction: column; gap: 28px; }
 
@@ -350,7 +354,8 @@ body:has(#xt-root) { background: var(--page); }
   #xt-root .xt-art-flex { flex-direction: column !important; align-items: stretch !important; }
   #xt-root .xt-art-flex > div { width: 100%; }
   /* Share icons: full-width row, spread edge-to-edge (no white gap on the right). */
-  #xt-root .xt-share-rail { position: static; flex-direction: row; flex-wrap: wrap; width: 100%; justify-content: space-between; }
+  #xt-root .xt-share-desk { display: none; }
+  #xt-root .xt-share-mob { display: flex; }
   #xt-root .xt-ad-rail { position: static; flex-direction: row; flex-wrap: wrap; }
 }
 @media (max-width: 1000px) {
@@ -384,6 +389,8 @@ body:has(#xt-root) { background: var(--page); }
 @media (max-width: 600px) {
   /* News cards stay 2-up on phones (not a single column). */
   #xt-root .xt-g-4, #xt-root .xt-g-3 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  /* Featured photo/video section stacks (big card then small) on phones. */
+  #xt-root .xt-g-feat { grid-template-columns: 1fr !important; }
   #xt-root .xt-gallery { grid-template-columns: minmax(0, 1fr) !important; }
   /* Tight phone gutters: 5px on the page edges. Sections keep their inline
      (zero) side padding, so cards sit at just main's 5px. Article body keeps a
