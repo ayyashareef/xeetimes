@@ -509,7 +509,7 @@ function gridCard(a: Art, lang: Lang): string {
 
 // Section header (home) — title + "//" skew marks + a horizontal rule filling the
 // rest, with an optional "all news" link, like the live xeetimes.com sections.
-function homeSectionHead(name: string, url: string, lang: Lang, showMore = true, size = 23): string {
+function homeSectionHead(name: string, url: string, lang: Lang, showMore = true, size = 28): string {
   void lang;
   // Section title (clickable -> the category), red "//" marks on the outer edge,
   // and a rule filling the rest — matches the live xeetimes.com section design.
