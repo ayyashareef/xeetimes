@@ -436,7 +436,7 @@ export function header(lang: Lang, sm = false, active = '', ads: AdsMap = {}, hi
     <div style="max-width:1120px;margin:0 auto;">${adBand('HOMEPAGE_BANNER', ads, true)}</div>
   </div>
   <header>
-    <div class="xt-wrap" style="display:flex;align-items:center;justify-content:center;padding:10px 26px;">
+    <div class="xt-wrap" style="display:flex;align-items:center;justify-content:center;padding:10px 26px 20px;">
       <a href="/"><img class="xt-logo-img" src="${esc(logoSrc)}" alt="XeeTimes"></a>
     </div>
     <nav style="background:var(--nav);">
@@ -725,6 +725,7 @@ function commentsBlock(comments: Cmt[], lang: Lang, articleId: string): string {
       <div style="display:flex;justify-content:flex-start;">
         <button type="button" data-act="comment" style="background:#1f8a4c;color:#fff;border:none;padding:11px 30px;font-family:'Ammu','Faruma',sans-serif;font-size:16px;font-weight:700;cursor:pointer;">${esc(s.postComment)}</button>
       </div>
+      <div style="margin-top:12px;"><a href="/comment-guideline" style="font-size:14px;color:var(--ink3);text-decoration:underline;">ކޮމެންޓް ކުރުމުގެ ގައިޑްލައިން</a></div>
       <p class="xt-cmsg" style="margin:12px 0 0;font-size:14px;color:var(--ink3);display:none;"></p>
     </div>
     ${comments.length ? `<div style="margin-bottom:26px;">${list}</div>` : ''}`;
