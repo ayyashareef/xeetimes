@@ -795,7 +795,7 @@ export function articleHtml(a: Art, related: Art[], comments: Cmt[], lang: Lang,
             ${sidebarLatest.map((m) => `
               <a href="${link(m, lang)}" class="xt-card" style="display:block;">
                 <div class="xt-thumb" style="width:100%;aspect-ratio:4/3;overflow:hidden;background:var(--ph2);margin-bottom:8px;position:relative;">${m.featuredImage ? imgFill(m, lang, 384) : `<div class="xt-img" style="position:absolute;inset:0;"><span>ފޮޓޯ</span></div>`}</div>
-                <h4 class="xt-hl" style="margin:0;font-size:13px;font-weight:600;line-height:1.55;color:var(--ink);transition:color .2s;">${esc(shortTitle(m, lang))}</h4>
+                <h4 class="xt-hl" style="margin:0;font-size:17px;font-weight:600;line-height:1.55;color:var(--ink);transition:color .2s;">${esc(shortTitle(m, lang))}</h4>
               </a>`).join('')}
           </div>
         </div>
