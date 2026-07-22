@@ -207,7 +207,7 @@ body:has(#xt-root) { background: var(--page); }
 /* Mobile-only: a horizontal row under the byline (hidden on desktop). */
 #xt-root .xt-share-mob { display: none; flex-direction: row; flex-wrap: wrap; justify-content: space-between; width: 100%; margin: 2px 0 24px; }
 #xt-root .xt-share { width: 44px; height: 44px; display: grid; place-items: center; color: #fff; cursor: pointer; }
-#xt-root .xt-ad-rail { display: flex; flex-direction: column; gap: 28px; }
+#xt-root .xt-ad-rail { display: flex; flex-direction: column; gap: 18px; }
 
 /* ---- Comments ---- */
 #xt-root .xt-comment { display: flex; gap: 14px; padding: 18px 0; border-bottom: 1px solid var(--line2); }

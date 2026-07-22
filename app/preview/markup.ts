@@ -771,14 +771,12 @@ export function articleHtml(a: Art, related: Art[], comments: Cmt[], lang: Lang,
   return `
   ${header(lang, true, '', ads, [], site)}
   <main class="xt-wrap" style="padding:12px 26px 10px;">
-    <div class="xt-art-toprow" style="display:grid;grid-template-columns:minmax(0,1.73fr) 1fr;gap:20px;align-items:stretch;margin-bottom:12px;">
-      ${heroImg}
-      ${fillAdColumn('ARTICLE_SIDEBAR_1', ads, 'xt-art-topad')}
-    </div>
     <div class="xt-article-grid" style="display:grid;grid-template-columns:minmax(0,1.73fr) 1fr;gap:20px;align-items:start;">
-      <article class="xt-art-flex" style="display:flex;gap:22px;align-items:flex-start;">
-        ${shareRail(a, lang, 'xt-share-desk')}
-        <div style="flex:1;min-width:0;">
+      <article class="xt-art-col" style="min-width:0;">
+        ${heroImg}
+        <div class="xt-art-flex" style="display:flex;gap:22px;align-items:flex-start;margin-top:14px;">
+          ${shareRail(a, lang, 'xt-share-desk')}
+          <div style="flex:1;min-width:0;">
           <h1 class="xt-lead-hl xt-arttitle" style="margin:0 0 10px;color:var(--ink);font-size:34px;font-weight:700;line-height:1.5;">${esc(title(a, lang))}</h1>
           <div style="display:flex;align-items:center;gap:16px;margin:0 0 18px;padding:12px 0;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2);">
             ${(() => {
@@ -799,9 +797,11 @@ export function articleHtml(a: Art, related: Art[], comments: Cmt[], lang: Lang,
           ${secTitle(STR[lang].related)}
           <div class="xt-g-4" style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;">${rel}</div>` : ''}
           ${fillAdColumn('ARTICLE_SIDEBAR_2', ads, 'xt-artad2-mob')}
+          </div>
         </div>
       </article>
       <aside class="xt-ad-rail">
+        ${fillAdColumn('ARTICLE_SIDEBAR_1', ads, 'xt-art-topad')}
         <div>
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid var(--ink);">
             <span style="width:5px;height:28px;background:var(--red);flex:none;"></span>
