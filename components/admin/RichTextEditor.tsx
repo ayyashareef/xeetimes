@@ -24,7 +24,7 @@ import { SocialEmbed, detectPlatform } from '@/lib/social-embed';
 import { ArticleCard } from '@/lib/article-card';
 import ArticlePicker, { type PickArticle } from './ArticlePicker';
 
-const DV_MONTHS = ['ޖެނުއަރީ', 'ފެބްރުއަރީ', 'މާރިޗު', 'އޭޕްރީލު', 'މޭ', 'ޖޫން', 'ޖުލައި', 'އޯގަސްޓު', 'ސެޕްޓެމްބަރު', 'އޮކްޓޯބަރު', 'ނޮވެމްބަރު', 'ޑިސެމްބަރު'];
+const DV_MONTHS = ['ޖެނުއަރީ', 'ފެބްރުއަރީ', 'މާޗް', 'އޭޕްރީލު', 'މެއި', 'ޖޫން', 'ޖުލައި', 'އޯގަސްޓު', 'ސެޕްޓެމްބަރ', 'އޮކްޓޯބަރ', 'ނޮވެމްބަރ', 'ޑިސެމްބަރ'];
 function mvDate(iso: string | null): string {
   if (!iso) return '';
   const p = new Intl.DateTimeFormat('en-GB', { timeZone: 'Indian/Maldives', year: 'numeric', month: '2-digit', day: '2-digit' })
