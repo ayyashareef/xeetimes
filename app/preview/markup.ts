@@ -788,8 +788,8 @@ export function articleHtml(a: Art, related: Art[], comments: Cmt[], lang: Lang,
       <aside class="xt-ad-rail">
         <div>
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid var(--ink);">
-            <span style="width:5px;height:20px;background:var(--red);flex:none;"></span>
-            <h3 class="xt-secname" style="margin:0;font-size:18px;font-weight:700;color:var(--ink);">${esc(STR[lang].latestNews)}</h3>
+            <span style="width:5px;height:28px;background:var(--red);flex:none;"></span>
+            <h3 class="xt-secname" style="margin:0;font-size:28px;font-weight:700;color:var(--ink);">${esc(STR[lang].latestNews)}</h3>
           </div>
           <div class="xt-g-side" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
             ${sidebarLatest.map((m) => `
