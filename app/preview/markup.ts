@@ -371,15 +371,6 @@ function fillAdBox(slot: string, ads: AdsMap): string {
   if (!list.length) return `<div class="xt-ad" style="width:100%;${ar}"></div>`;
   if (list.length === 1) {
     const ad = list[0];
-    // Fixed-size box (e.g. the 397×397 article/category squares): the creative
-    // fits the box (object-fit:contain) so every ad renders the same size.
-    if (def?.fixed) {
-      const img = `<img src="${esc(ad.imageUrl)}" alt="${esc(ad.title || 'Advertisement')}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:contain;display:block;">`;
-      const inner = ad.linkUrl
-        ? `<a href="${esc(ad.linkUrl)}" target="_blank" rel="noopener" data-ad="${esc(ad.id)}" style="display:block;width:100%;height:100%;">${img}</a>`
-        : img;
-      return `<div class="xt-ad-filled" data-ad-view="${esc(ad.id)}" style="width:100%;max-width:${def.w}px;${ar}overflow:hidden;margin:0 auto;">${inner}</div>`;
-    }
     // Single creative: the box hugs the image's own height (no fixed-aspect
     // letterbox) so the "Advertisement" label sits right under the ad.
     const img = `<img src="${esc(ad.imageUrl)}" alt="${esc(ad.title || 'Advertisement')}" loading="lazy" decoding="async" style="width:100%;height:auto;display:block;">`;
@@ -556,7 +547,7 @@ function featuredSectionHtml(s: HomeSection, lang: Lang): string {
   const small = s.articles[1];
   const bigCard = `
     <a href="${link(big, lang)}" class="xt-lead" style="display:block;">
-      <div style="position:relative;overflow:hidden;width:100%;aspect-ratio:16/9;background:var(--ph2);">
+      <div style="position:relative;overflow:hidden;width:100%;aspect-ratio:741/400;background:var(--ph2);">
         ${imgFill(big, lang, 1080, true)}
         <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,10,12,.82),transparent 58%);"></div>
         <div style="position:absolute;right:0;bottom:0;left:0;padding:24px;">
@@ -646,7 +637,7 @@ export function homeHtml(d: HomeData, lang: Lang): string {
 
   return `
   ${header(lang, false, '', d.ads, d.hidden || [], site)}
-  <main class="xt-wrap" style="padding:30px 26px 10px;">
+  <main class="xt-wrap" style="padding:30px 0 10px;">
     ${heroBlock}
     ${latestSection}
     ${midAd}
@@ -701,11 +692,15 @@ function reactionBar(articleId: string, counts: number[]): string {
     WINK: '😉',
   };
   const TYPES = ['ANGRY', 'SAD', 'WOW', 'HAHA', 'LIKE', 'LOVE', 'WINK'];
-  const btns = TYPES.map((type, i) =>
-    `<button class="xt-react" data-react="${type}" data-article="${esc(articleId)}" style="display:flex;align-items:center;gap:9px;border:1px solid var(--line);background:#faf8f3;padding:10px 18px;cursor:pointer;color:var(--ink);">
-       <span class="xt-react-i" style="display:flex;font-size:23px;line-height:1;font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif;">${RICON[type]}</span><span class="xt-react-n" style="${EN}font-size:15px;font-weight:700;color:var(--ink2);">${counts[i] || 0}</span>
-     </button>`).join('');
-  return `<div data-react-bar style="display:flex;flex-wrap:wrap;gap:10px;padding:22px 0;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2);margin-bottom:30px;">${btns}</div>`;
+  // Just the emoji with a small red count badge on top (like the live site);
+  // all seven stay on one line (desktop + mobile).
+  const btns = TYPES.map((type, i) => {
+    const n = counts[i] || 0;
+    return `<button class="xt-react" data-react="${type}" data-article="${esc(articleId)}" style="position:relative;display:flex;align-items:center;justify-content:center;border:none;background:none;padding:2px;cursor:pointer;">
+       <span class="xt-react-i" style="display:flex;font-size:38px;line-height:1;font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif;">${RICON[type]}</span><span class="xt-react-n" style="position:absolute;top:-5px;right:-6px;min-width:19px;height:19px;padding:0 5px;border-radius:10px;background:var(--red);color:#fff;font-size:11px;font-weight:700;line-height:19px;text-align:center;box-sizing:border-box;${EN}${n ? '' : 'display:none;'}">${n}</span>
+     </button>`;
+  }).join('');
+  return `<div data-react-bar style="display:flex;flex-wrap:nowrap;justify-content:center;gap:16px;padding:20px 0;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2);margin-bottom:30px;">${btns}</div>`;
 }
 
 function commentsBlock(comments: Cmt[], lang: Lang, articleId: string): string {

@@ -96,7 +96,7 @@ body:has(#xt-root) { background: var(--page); }
 }
 /* Centered content container (main body, header content, footer content).
    ~1240px like hirinews.com — narrower middle, full-width header/footer bars. */
-#xt-root .xt-wrap { max-width: 1240px; margin: 0 auto; }
+#xt-root .xt-wrap { max-width: 1136px; margin: 0 auto; }
 #xt-root ::selection { background: var(--red); color: #fff; }
 #xt-root, #xt-root * { box-sizing: border-box; }
 #xt-root a { color: inherit; text-decoration: none; }
@@ -148,11 +148,10 @@ body:has(#xt-root) { background: var(--page); }
 #xt-root .xt-submenu a:hover { background: var(--red); color: #fff; }
 #xt-root .xt-share { transition: transform .15s ease, filter .15s ease; }
 #xt-root .xt-share:hover { transform: translateY(-2px); filter: brightness(1.08); }
-#xt-root .xt-react { transition: transform .15s ease, background .15s ease, border-color .15s ease, color .15s ease; }
-#xt-root .xt-react:hover { transform: scale(1.06); background: #f3efe7; }
-/* Selected reaction — red fill, white line-icon + count. */
-#xt-root .xt-react.xt-react-on { background: var(--red); border-color: var(--red); color: #fff; }
-#xt-root .xt-react.xt-react-on .xt-react-n { color: #fff; }
+#xt-root .xt-react { transition: transform .15s ease; }
+#xt-root .xt-react:hover { transform: scale(1.14); }
+/* Selected reaction — the emoji sits a touch larger. */
+#xt-root .xt-react.xt-react-on { transform: scale(1.12); }
 #xt-root .xt-page { transition: background .15s, color .15s; }
 #xt-root a.xt-page:hover { background: var(--red) !important; color: #fff !important; border-color: var(--red) !important; }
 #xt-root .xt-social { transition: transform .15s ease, opacity .15s ease; opacity: .92; }
@@ -172,7 +171,7 @@ body:has(#xt-root) { background: var(--page); }
 #xt-root .xt-img > span { font-family: var(--en); color: var(--phink); font-size: 15px; text-align: center; padding: 0 24px; }
 
 /* Logo — centred, from assets/xt-logo.png (design shows ~78px tall). */
-#xt-root .xt-logo-img { height: 78px; width: auto; display: block; image-rendering: -webkit-optimize-contrast; }
+#xt-root .xt-logo-img { height: 68px; width: auto; display: block; image-rendering: -webkit-optimize-contrast; }
 
 /* ---- Advertisement slots ---- filled ad shows its image; empty shows the
    design's dashed cream box with the Dhivehi "އިޝްތިހާރު" label. */
@@ -421,7 +420,7 @@ body:has(#xt-root) { background: var(--page); }
   #xt-root h1.xt-arttitle { font-size: 30px !important; line-height: 1.45 !important; }
   #xt-root .xt-article-body { font-size: 20px !important; }
   #xt-root .xt-article-body p, #xt-root .xt-article-body li { font-size: 20px !important; line-height: 1.9; }
-  /* Emoji reactions: all six on a single line. */
-  #xt-root [data-react-bar] { flex-wrap: nowrap !important; gap: 5px !important; }
-  #xt-root [data-react-bar] .xt-react { flex: 1 1 0; min-width: 0; padding: 9px 2px !important; gap: 4px !important; justify-content: center; }
+  /* Emoji reactions: all seven on a single line — smaller emoji to fit. */
+  #xt-root [data-react-bar] { flex-wrap: nowrap !important; gap: 6px !important; }
+  #xt-root [data-react-bar] .xt-react-i { font-size: 31px !important; }
 }

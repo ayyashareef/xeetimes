@@ -168,7 +168,11 @@ export default function XtShell({
         const bar = react.closest<HTMLElement>('[data-react-bar]');
         const bump = (el: HTMLElement | null, delta: number) => {
           const c = el?.querySelector<HTMLElement>('.xt-react-n');
-          if (c) c.textContent = String(Math.max(0, (parseInt(c.textContent || '0', 10) || 0) + delta));
+          if (c) {
+            const n = Math.max(0, (parseInt(c.textContent || '0', 10) || 0) + delta);
+            c.textContent = String(n);
+            c.style.display = n > 0 ? '' : 'none'; // hide the badge at zero
+          }
         };
         const setActive = (el: HTMLElement | null) => {
           bar?.querySelectorAll<HTMLElement>('[data-react]').forEach((b) => b.classList.toggle('xt-react-on', b === el));
