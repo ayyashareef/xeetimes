@@ -370,9 +370,18 @@ function fillAdBox(slot: string, ads: AdsMap): string {
   const list = ads[slot] || [];
   if (!list.length) return `<div class="xt-ad" style="width:100%;${ar}"></div>`;
   if (list.length === 1) {
+    const ad = list[0];
+    // Fixed-size box (e.g. the 397×397 article/category squares): the creative
+    // fits the box (object-fit:contain) so every ad renders the same size.
+    if (def?.fixed) {
+      const img = `<img src="${esc(ad.imageUrl)}" alt="${esc(ad.title || 'Advertisement')}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:contain;display:block;">`;
+      const inner = ad.linkUrl
+        ? `<a href="${esc(ad.linkUrl)}" target="_blank" rel="noopener" data-ad="${esc(ad.id)}" style="display:block;width:100%;height:100%;">${img}</a>`
+        : img;
+      return `<div class="xt-ad-filled" data-ad-view="${esc(ad.id)}" style="width:100%;max-width:${def.w}px;${ar}overflow:hidden;margin:0 auto;">${inner}</div>`;
+    }
     // Single creative: the box hugs the image's own height (no fixed-aspect
     // letterbox) so the "Advertisement" label sits right under the ad.
-    const ad = list[0];
     const img = `<img src="${esc(ad.imageUrl)}" alt="${esc(ad.title || 'Advertisement')}" loading="lazy" decoding="async" style="width:100%;height:auto;display:block;">`;
     const inner = ad.linkUrl
       ? `<a href="${esc(ad.linkUrl)}" target="_blank" rel="noopener" data-ad="${esc(ad.id)}" style="display:block;">${img}</a>`

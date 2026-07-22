@@ -12,6 +12,9 @@ export type AdSlotDef = {
   w: number;
   h: number;
   kind: AdKind;
+  // Render the creative in a fixed box at w×h (object-fit) instead of hugging its
+  // own aspect — so every creative in the slot is the same size (like the old site).
+  fixed?: boolean;
 };
 
 // Sizes mirror the live xeetimes.com placements: a 1120×224 top banner (5:1),
@@ -27,10 +30,12 @@ export const AD_SLOTS: AdSlotDef[] = [
   { key: 'HOMEPAGE_MID_2', label: 'Homepage — in-content banner (lower)', w: 2000, h: 400, kind: 'banner' },
   { key: 'HOME_AFTER_HEALTH', label: 'Homepage — under the Health section', w: 2000, h: 400, kind: 'banner' },
   { key: 'HOME_AFTER_BADHIGE', label: 'Homepage — under the Badhige section', w: 2000, h: 400, kind: 'banner' },
-  { key: 'ARTICLE_SIDEBAR_1', label: 'Article — hero side box', w: 380, h: 320, kind: 'box' },
-  { key: 'ARTICLE_MID', label: 'Article — in-content box (middle)', w: 400, h: 400, kind: 'box' },
-  { key: 'ARTICLE_SIDEBAR_2', label: 'Article — sidebar (bottom)', w: 300, h: 250, kind: 'box' },
-  { key: 'CATEGORY_SIDE', label: 'Category — lead side box (per category)', w: 400, h: 320, kind: 'box' },
+  // Article/category box ads: fixed 397×397 square (matches the live site), so
+  // every creative renders the same size regardless of its own dimensions.
+  { key: 'ARTICLE_SIDEBAR_1', label: 'Article — hero side box', w: 397, h: 397, kind: 'box', fixed: true },
+  { key: 'ARTICLE_MID', label: 'Article — in-content box (middle)', w: 397, h: 397, kind: 'box', fixed: true },
+  { key: 'ARTICLE_SIDEBAR_2', label: 'Article — sidebar (bottom)', w: 397, h: 397, kind: 'box', fixed: true },
+  { key: 'CATEGORY_SIDE', label: 'Category — lead side box (per category)', w: 397, h: 397, kind: 'box', fixed: true },
 ];
 
 export const AD_SLOT_MAP: Record<string, AdSlotDef> = Object.fromEntries(
