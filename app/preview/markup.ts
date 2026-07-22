@@ -447,7 +447,7 @@ export function header(lang: Lang, sm = false, active = '', ads: AdsMap = {}, hi
     <div style="max-width:1120px;margin:0 auto;">${adBand('HOMEPAGE_BANNER', ads, true)}</div>
   </div>
   <header>
-    <div class="xt-wrap" style="display:flex;align-items:center;justify-content:center;padding:10px 26px 20px;">
+    <div class="xt-wrap xt-logorow" style="display:flex;align-items:center;justify-content:center;padding:10px 26px 20px;">
       <a href="/"><img class="xt-logo-img" src="${esc(logoSrc)}" alt="XeeTimes"></a>
     </div>
     <nav style="background:var(--nav);">

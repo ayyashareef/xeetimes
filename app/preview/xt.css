@@ -410,6 +410,8 @@ body:has(#xt-root) { background: var(--page); }
   /* No bottom padding: the space under the banner comes entirely from the
      logo row's symmetric padding, so it matches the space below the logo. */
   #xt-root .xt-topad { padding: 2px 3px 0 !important; }
+  /* Tighter header on phones: less space around the logo. */
+  #xt-root .xt-logorow { padding-top: 4px !important; padding-bottom: 9px !important; }
   /* margin-bottom lives on the higher-specificity .xt-adband-top rule above. */
   #xt-root .xt-topad .xt-adband-label { padding-left: 12px; padding-right: 12px; font-size: 11px; }
   /* The 30px headline overlaid on the hero image overflows a phone-width image —
