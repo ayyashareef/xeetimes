@@ -346,6 +346,17 @@ export function adSlot(slot: string, ads: AdsMap): string {
   const box = `width:100%;aspect-ratio:${def.w}/${def.h};`;
   const list = ads[slot] || [];
   if (!list.length) return `<div class="xt-ad xt-ad-${def.kind}" style="${box}"></div>`;
+  // A single 'box' creative hugs its own height (no fixed-aspect letterbox), so a
+  // portrait/tall creative renders full-size instead of shrunk inside a landscape
+  // box. Banners keep the fixed aspect so they all stay the same size.
+  if (list.length === 1 && def.kind === 'box') {
+    const ad = list[0];
+    const img = `<img src="${esc(ad.imageUrl)}" alt="${esc(ad.title || 'Advertisement')}" loading="lazy" decoding="async" style="width:100%;height:auto;display:block;">`;
+    const inner = ad.linkUrl
+      ? `<a href="${esc(ad.linkUrl)}" target="_blank" rel="noopener" data-ad="${esc(ad.id)}" style="display:block;">${img}</a>`
+      : img;
+    return `<div class="xt-ad xt-ad-${def.kind} xt-ad-filled" data-ad-view="${esc(ad.id)}" style="width:100%;overflow:hidden;">${inner}</div>`;
+  }
   const rotating = list.length > 1;
   const rot = rotating ? ' data-ad-rotate' : '';
   return `<div class="xt-ad xt-ad-${def.kind} xt-ad-filled"${rot} style="${box}position:relative;">${list.map((ad, i) => adSlide(ad, i, rotating)).join('')}</div>`;
@@ -725,7 +736,7 @@ function commentsBlock(comments: Cmt[], lang: Lang, articleId: string): string {
       <div style="display:flex;justify-content:flex-start;">
         <button type="button" data-act="comment" style="background:#1f8a4c;color:#fff;border:none;padding:11px 30px;font-family:'Ammu','Faruma',sans-serif;font-size:16px;font-weight:700;cursor:pointer;">${esc(s.postComment)}</button>
       </div>
-      <div style="margin-top:12px;"><a href="/comment-guideline" style="font-size:14px;color:var(--ink3);text-decoration:underline;">ކޮމެންޓް ކުރުމުގެ ގައިޑްލައިން</a></div>
+      <div style="margin-top:12px;"><a href="/comment-guideline" style="font-size:14px;color:var(--ink3);text-decoration:none;">ކޮމެންޓް ކުރުމުގެ ގައިޑްލައިން</a></div>
       <p class="xt-cmsg" style="margin:12px 0 0;font-size:14px;color:var(--ink3);display:none;"></p>
     </div>
     ${comments.length ? `<div style="margin-bottom:26px;">${list}</div>` : ''}`;
