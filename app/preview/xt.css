@@ -370,9 +370,9 @@ body:has(#xt-root) { background: var(--page); }
 #xt-root .xt-drawer { display: none; position: fixed; top: 0; bottom: 0; right: 0; z-index: 61; width: 300px; max-width: 85vw; flex-direction: column; background: var(--bg); box-shadow: -24px 0 70px rgba(0,0,0,.35); transform: translateX(106%); transition: transform .44s cubic-bezier(.4,0,.1,1); }
 #xt-root .xt-drawer-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--line); flex: none; }
 #xt-root .xt-dlogo-img { height: 42px; width: auto; display: block; }
-/* Logo inside the dark nav bar — phones only (the white logo row is hidden
-   there, so the header collapses to a single bar). Uses the WHITE logo variant:
-   the standard mark's "XEETIMES" wordmark is dark and disappears on the bar. */
+/* Logo inside the nav bar — phones only (the separate logo row is hidden there,
+   so the header collapses to a single bar). Uses the STANDARD mark, whose
+   "XEETIMES" wordmark is black — the phone bar is page-coloured, not dark. */
 #xt-root .xt-moblogo { display: none; align-items: center; padding: 4px 8px; }
 #xt-root .xt-moblogo img { height: 40px; width: auto; display: block; }
 #xt-root .xt-drawer-close { background: transparent; width: 40px; height: 40px; border: 1px solid var(--line); display: grid; place-items: center; cursor: pointer; color: var(--ink); flex: none; }
@@ -430,6 +430,18 @@ body:has(#xt-root) { background: var(--page); }
      burger past the right edge, where #xt-root's overflow-x clipped it away —
      taking it out of flow removes that failure mode entirely. */
   #xt-root .xt-navrow { direction: ltr; gap: 0 !important; }
+  /* The phone bar takes the page colour instead of the dark nav. The <nav>
+     carries an inline background, so this needs !important to win. Everything
+     drawn on the bar was white for the dark version has to flip to ink.
+     Sticky over same-coloured content would leave no edge, so keep a hairline. */
+  #xt-root header nav { background: var(--bg) !important; border-bottom: 1px solid var(--line); }
+  #xt-root .xt-navrow > a.xt-mobonly { color: var(--ink) !important; }
+  /* ...but the shared .xt-navdark hover paints a red plate, so the icon has to
+     go back to white there (this rule is later, so it would otherwise win). */
+  #xt-root .xt-navrow > a.xt-mobonly:hover { color: #fff !important; }
+  #xt-root .xt-burger span { background: var(--ink); }
+  /* Larger tap target / icon on phones (18px reads small on the light bar). */
+  #xt-root .xt-navrow > a.xt-mobonly svg { width: 27px; height: 27px; }
   #xt-root .xt-navrow > a.xt-mobonly {
     position: absolute; left: 8px; top: 50%; transform: translateY(-50%);
   }

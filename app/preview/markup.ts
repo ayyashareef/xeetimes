@@ -459,7 +459,7 @@ export function header(lang: Lang, sm = false, active = '', ads: AdsMap = {}, hi
         <!-- Phone bar: search (left) | logo (centre) | menu (right). The first two
              are pinned absolutely by xt.css, leaving the logo centred in flow. -->
         <a href="/search" class="xt-navdark xt-mobonly" style="color:#fff;padding:11px 14px;align-items:center;" aria-label="Search">${ICON.search}</a>
-        <a href="/" class="xt-moblogo" aria-label="XeeTimes"><img src="${esc(site.logoWhite || '/xt-logo-white.png')}" alt="XeeTimes"></a>
+        <a href="/" class="xt-moblogo" aria-label="XeeTimes"><img src="${esc(logoSrc)}" alt="XeeTimes"></a>
         <button class="xt-burger xt-mobonly" data-act="menu" aria-label="Menu"><span></span><span></span><span></span></button>
         <span class="xt-desknav" style="position:absolute;${lang === 'dv' ? 'left' : 'right'}:20px;top:50%;transform:translateY(-50%);display:flex;align-items:center;color:#fff;">
           <a href="/search" style="padding:8px 10px;display:flex;align-items:center;color:#fff;" aria-label="Search">${ICON.search}</a>
