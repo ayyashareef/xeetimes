@@ -31,14 +31,15 @@ export async function generateMetadata(): Promise<Metadata> {
 // `photo` overrides the account's avatar, and is the ONLY way to give a picture
 // to someone with no account — drop the file in public/uploads/team/ and point
 // at it here.
-const ROSTER: { id?: string; name?: string; title?: string; photo?: string; lead?: boolean }[] = [
+const ROSTER: { id?: string; name?: string; nameDv?: string; title?: string; photo?: string; lead?: boolean }[] = [
   { id: 'usr_5', title: 'Founder and Chief Editor', lead: true },  // Zeena Zahir
   { id: 'usr_42' },                                     // Dr. Aminath Shafiya Adam
-  // No User record yet, so no avatar to inherit — add `photo` once the file
-  // is in public/uploads/team/ and they will render like everyone else.
-  { name: 'Professor Dr. Hassan Ugail' },
+  // No User record yet, so there is no avatar or Thaana name to inherit — both
+  // are given here. Add `photo` once the file is in public/uploads/team/ and
+  // they will render like everyone else.
+  { name: 'Professor Dr. Hassan Ugail', nameDv: 'ޕްރޮފެސަރ ޑރ. ޙަސަން އުޤައިލް' },
   { id: 'usr_11' },                                     // Dr. Anara Naeem
-  { name: 'Dr. Mohamed Shifan' },
+  { name: 'Dr. Mohamed Shifan', nameDv: 'ޑރ. މުޙައްމަދު ޝިފާން' },
   { id: 'usr_6' },                                      // Mariyam Shaneeza
   { id: 'usr_14' },                                     // Al-Usthaaza Mariyam Shabana
   { id: 'usr_32' },                                     // Husna Fahmy
@@ -78,7 +79,7 @@ export default async function OurTeamPage() {
   const members: TeamMember[] = ROSTER.flatMap((r): TeamMember[] => {
     const title = r.title ?? 'Contributor';
     if (!r.id) {
-      return [{ id: null, name: r.name || '', name_dv: null, avatar: r.photo ?? null, role: '', title, lead: r.lead }];
+      return [{ id: null, name: r.name || '', name_dv: r.nameDv ?? null, avatar: r.photo ?? null, role: '', title, lead: r.lead }];
     }
     const u = byId.get(r.id);
     if (!u) return [];
