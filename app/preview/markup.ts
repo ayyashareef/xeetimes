@@ -1041,25 +1041,38 @@ export type TeamMember = {
   avatar: string | null;
   role: string;
   title?: string | null;
+  /** The chief editor: rendered alone and larger above the rest. */
+  lead?: boolean;
 };
 
 export function teamHtml(members: TeamMember[], lang: Lang, ads: AdsMap = {}, hidden: string[] = [], site: Site = {}): string {
   const heading = 'XeeTimes Writers and Contributors';
-  const cards = members.map((m) => {
+  const card = (m: TeamMember, size: number) => {
     const name = (lang === 'en' ? m.name || m.name_dv : m.name_dv || m.name) || '';
     const inner = `
-        <span class="xt-team-pic" style="display:block;transition:transform .2s ease;">${authorAvatar({ id: m.id || '', name: m.name, name_dv: m.name_dv, avatar: m.avatar }, name, 128)}</span>
-        <span class="xt-hl" style="margin-top:18px;font-size:19px;font-weight:700;line-height:1.6;color:var(--ink);transition:color .2s;">${esc(name)}</span>
+        <span class="xt-team-pic" style="display:block;transition:transform .2s ease;">${authorAvatar({ id: m.id || '', name: m.name, name_dv: m.name_dv, avatar: m.avatar }, name, size)}</span>
+        <span class="xt-hl" style="margin-top:18px;font-size:${m.lead ? 21 : 19}px;font-weight:700;line-height:1.6;color:var(--ink);transition:color .2s;">${esc(name)}</span>
         ${m.title ? `<span style="margin-top:7px;font-size:13px;color:var(--ink3);${EN}letter-spacing:.02em;" dir="ltr">${esc(m.title)}</span>` : ''}`;
     const box = 'display:flex;flex-direction:column;align-items:center;text-align:center;padding:26px 12px;';
     // Only people with an account have an author page to link to.
     return m.id
       ? `<a href="/author/${encodeURIComponent(m.id)}" class="xt-team-card" style="${box}">${inner}</a>`
       : `<div class="xt-team-card" style="${box}">${inner}</div>`;
-  }).join('');
+  };
+
+  // The chief editor sits alone and a little larger, centred above the rest —
+  // the rest run 4-up beneath her.
+  const lead = members.find((m) => m.lead);
+  const rest = members.filter((m) => !m.lead);
+  const leadBlock = lead
+    ? `<section style="display:flex;justify-content:center;padding:18px 0 6px;">${card(lead, 156)}</section>`
+    : '';
+  const grid = rest.length
+    ? `<section class="xt-g-team" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;padding:6px 0 40px;">${rest.map((m) => card(m, 128)).join('')}</section>`
+    : '';
 
   const body = members.length
-    ? `<section class="xt-g-team" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;padding:14px 0 40px;">${cards}</section>`
+    ? `${leadBlock}${grid}`
     : `<p style="color:var(--ink3);font-size:16px;padding:10px 0 40px;">${lang === 'en' ? 'No team members to show yet.' : 'ޓީމުގެ މެންބަރުން ނެތް.'}</p>`;
 
   return `${header(lang, false, '', ads, hidden, site)}

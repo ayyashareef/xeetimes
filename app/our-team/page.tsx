@@ -28,12 +28,17 @@ export async function generateMetadata(): Promise<Metadata> {
 //
 // Order and titles as supplied by the newsroom. Only the chief editor carries a
 // title — the rest are listed plainly, matching how the list was given.
-const ROSTER: { id?: string; name?: string; title?: string }[] = [
-  { id: 'usr_5', title: 'Founder and Chief Editor' },  // Zeena Zahir
+// `photo` overrides the account's avatar, and is the ONLY way to give a picture
+// to someone with no account — drop the file in public/uploads/team/ and point
+// at it here.
+const ROSTER: { id?: string; name?: string; title?: string; photo?: string; lead?: boolean }[] = [
+  { id: 'usr_5', title: 'Founder and Chief Editor', lead: true },  // Zeena Zahir
   { id: 'usr_42' },                                     // Dr. Aminath Shafiya Adam
-  { name: 'Professor Dr. Hassan Ugail' },               // no User record yet
+  // No User record yet, so no avatar to inherit — add `photo` once the file
+  // is in public/uploads/team/ and they will render like everyone else.
+  { name: 'Professor Dr. Hassan Ugail' },
   { id: 'usr_11' },                                     // Dr. Anara Naeem
-  { name: 'Dr. Mohamed Shifan' },                       // no User record yet
+  { name: 'Dr. Mohamed Shifan' },
   { id: 'usr_6' },                                      // Mariyam Shaneeza
   { id: 'usr_14' },                                     // Al-Usthaaza Mariyam Shabana
   { id: 'usr_32' },                                     // Husna Fahmy
@@ -69,11 +74,15 @@ export default async function OurTeamPage() {
 
   // Keep the roster's order. An id that no longer resolves (a deleted account)
   // is dropped rather than rendered blank.
+  // Everyone except the chief editor is a Contributor unless given a title.
   const members: TeamMember[] = ROSTER.flatMap((r): TeamMember[] => {
-    if (!r.id) return [{ id: null, name: r.name || '', name_dv: null, avatar: null, role: '', title: r.title ?? null }];
+    const title = r.title ?? 'Contributor';
+    if (!r.id) {
+      return [{ id: null, name: r.name || '', name_dv: null, avatar: r.photo ?? null, role: '', title, lead: r.lead }];
+    }
     const u = byId.get(r.id);
     if (!u) return [];
-    return [{ id: u.id, name: u.name, name_dv: u.name_dv, avatar: u.avatar, role: u.role, title: r.title ?? null }];
+    return [{ id: u.id, name: u.name, name_dv: u.name_dv, avatar: r.photo ?? u.avatar, role: u.role, title, lead: r.lead }];
   });
 
   const [ads, hidden, site] = await Promise.all([getActiveAds(), getHiddenCategorySlugs(), getSiteSettings()]);
