@@ -523,6 +523,12 @@ body:has(#xt-root) { background: var(--page); }
   #xt-root h1.xt-arttitle { font-size: 30px !important; line-height: 1.45 !important; }
   #xt-root .xt-article-body { font-size: 20px !important; }
   #xt-root .xt-article-body p, #xt-root .xt-article-body li { font-size: 20px !important; line-height: 1.9; }
+  /* Footer on phones: close up the gaps around the logo and the email line.
+     The 26px column gap plus the email's line-height:2 left a big hole above
+     and below the address. Desktop keeps the roomier spacing. */
+  #xt-root .xt-foot-col { gap: 12px !important; }
+  #xt-root .xt-foot-mail { line-height: 1.35 !important; }
+  #xt-root footer { padding-top: 30px !important; padding-bottom: 24px !important; }
   /* Emoji reactions: all seven on a single line — smaller emoji to fit. */
   #xt-root [data-react-bar] { flex-wrap: nowrap !important; gap: 6px !important; }
   #xt-root [data-react-bar] .xt-react-i { font-size: 31px !important; }

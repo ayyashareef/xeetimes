@@ -484,18 +484,16 @@ export function footer(lang: Lang, site: Site = {}): string {
     `<a href="${esc(s.url)}" target="_blank" rel="noopener" class="xt-social" style="color:#fff;" aria-label="${esc(s.name)}">${ICON[s.name] || ICON.facebook}</a>`,
   ).join('');
 
-  const email = site.email || 'info@xeetimes.com';
+  // The contact address is no longer shown in the footer (removed on request);
+  // `site.email` is still used by the contact page.
   const copyright = site.copyright || 'Copyright 2021 © All rights Reserved';
   const footLogo = site.logoWhite || '/xt-logo-white.png';
 
   return `
   <footer style="background:var(--footer);color:#8f8b84;margin-top:40px;padding:40px 26px 34px;">
-    <div class="xt-wrap" style="display:flex;flex-direction:column;align-items:center;gap:26px;text-align:center;">
+    <div class="xt-wrap xt-foot-col" style="display:flex;flex-direction:column;align-items:center;gap:26px;text-align:center;">
       <div style="display:flex;align-items:center;gap:34px;" dir="ltr">${social}</div>
       <a href="/" style="display:inline-block;"><img src="${esc(footLogo)}" alt="XeeTimes" style="height:62px;width:auto;display:block;"></a>
-      <div style="${EN}font-size:13px;color:#cfccc4;letter-spacing:.02em;line-height:2;" dir="ltr">
-        <a href="mailto:${esc(email)}" style="color:#cfccc4;">${esc(email)}</a>
-      </div>
       <div style="${EN}font-size:12px;color:#a29e96;letter-spacing:.02em;" dir="ltr">
         ${esc(copyright)} &nbsp;·&nbsp; <a href="/our-team" style="color:#cfccc4;">Our Team</a> &nbsp;·&nbsp; <a href="/wp-content/uploads/2021/01/Terms-Conditions-1.pdf" target="_blank" rel="noopener" style="color:#cfccc4;">Terms and Conditions</a> &nbsp;·&nbsp; <a href="/wp-content/uploads/2021/01/Xeetimes_Privacy_Policy.pdf" target="_blank" rel="noopener" style="color:#cfccc4;">Privacy Policy</a>
       </div>
@@ -1033,30 +1031,31 @@ export function categoryHtml(cp: CatPage, lang: Lang, ads: AdsMap = {}, hidden: 
 // Laid out like voice.mv/voice/our-team: a 4-up grid (2-up on phones) of round
 // portraits, each with the person's Dhivehi name and their role in English,
 // linking through to their author page.
-export type TeamMember = { id: string; name: string; name_dv: string | null; avatar: string | null; role: string };
-
-// There is no per-person job-title field on User, so the role enum is the only
-// title we have. Kept deliberately literal — inventing a hierarchy (CEO,
-// Editor-in-Chief) would put words in the newsroom's mouth. Add a `title` column
-// to User if real titles are wanted.
-const ROLE_TITLE: Record<string, string> = {
-  SUPER_ADMIN: 'Administrator',
-  EDITOR: 'Editor',
-  JOURNALIST: 'Journalist',
-  MODERATOR: 'Moderator',
+// `id: null` = someone on the masthead with no user account yet: rendered
+// unlinked, with the placeholder portrait. `title` is optional — only the people
+// the newsroom gave a title for carry one.
+export type TeamMember = {
+  id: string | null;
+  name: string;
+  name_dv: string | null;
+  avatar: string | null;
+  role: string;
+  title?: string | null;
 };
 
 export function teamHtml(members: TeamMember[], lang: Lang, ads: AdsMap = {}, hidden: string[] = [], site: Site = {}): string {
-  const heading = lang === 'en' ? 'Our Team' : 'ޒީ ޓައިމްސް ޓީމް';
+  const heading = 'XeeTimes Writers and Contributors';
   const cards = members.map((m) => {
     const name = (lang === 'en' ? m.name || m.name_dv : m.name_dv || m.name) || '';
-    const title = ROLE_TITLE[m.role] || 'Journalist';
-    return `
-      <a href="/author/${encodeURIComponent(m.id)}" class="xt-team-card" style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:26px 12px;">
-        <span class="xt-team-pic" style="display:block;transition:transform .2s ease;">${authorAvatar({ id: m.id, name: m.name, name_dv: m.name_dv, avatar: m.avatar }, name, 128)}</span>
+    const inner = `
+        <span class="xt-team-pic" style="display:block;transition:transform .2s ease;">${authorAvatar({ id: m.id || '', name: m.name, name_dv: m.name_dv, avatar: m.avatar }, name, 128)}</span>
         <span class="xt-hl" style="margin-top:18px;font-size:19px;font-weight:700;line-height:1.6;color:var(--ink);transition:color .2s;">${esc(name)}</span>
-        <span style="margin-top:7px;font-size:13px;color:var(--ink3);${EN}letter-spacing:.02em;" dir="ltr">${esc(title)}</span>
-      </a>`;
+        ${m.title ? `<span style="margin-top:7px;font-size:13px;color:var(--ink3);${EN}letter-spacing:.02em;" dir="ltr">${esc(m.title)}</span>` : ''}`;
+    const box = 'display:flex;flex-direction:column;align-items:center;text-align:center;padding:26px 12px;';
+    // Only people with an account have an author page to link to.
+    return m.id
+      ? `<a href="/author/${encodeURIComponent(m.id)}" class="xt-team-card" style="${box}">${inner}</a>`
+      : `<div class="xt-team-card" style="${box}">${inner}</div>`;
   }).join('');
 
   const body = members.length
