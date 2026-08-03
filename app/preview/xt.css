@@ -527,6 +527,14 @@ body:has(#xt-root) { background: var(--page); }
      The 26px column gap plus the email's line-height:2 left a big hole above
      and below the address. Desktop keeps the roomier spacing. */
   #xt-root .xt-foot-col { gap: 12px !important; }
+  /* The legal line carries a long link label ("XeeTimes Writers and
+     Contributors"). On a 390px phone the page lays out ~492px wide (a
+     PRE-EXISTING overflow, not caused by this line), which centres footer
+     content at x≈246 instead of 195 — everything sits ~51px right, so a block
+     wider than ~288px runs off the screen and gets clipped. 250px keeps every
+     line comfortably inside the visible area. Remove this cap once the
+     underlying page overflow is fixed. */
+  #xt-root .xt-foot-legal { max-width: 250px; margin: 0 auto; line-height: 1.95; }
   #xt-root .xt-foot-mail { line-height: 1.35 !important; }
   #xt-root footer { padding-top: 30px !important; padding-bottom: 24px !important; }
   /* Emoji reactions: all seven on a single line — smaller emoji to fit. */
