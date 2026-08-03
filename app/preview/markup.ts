@@ -54,6 +54,8 @@ export type HomeGroupCol = { name: string; slug: string; article: Art };
 export type HomeSection = { name: string; slug: string; accent: string; articles: Art[]; group?: HomeGroupCol[]; featured?: boolean };
 export type HomeData = {
   hero: Art | null;
+  /** Slides for the rotating hero (newest first). Falls back to `hero` if empty. */
+  heroes?: Art[];
   topStories: Art[];
   news: Art[];
   worldFeature: Art | null;
@@ -454,8 +456,11 @@ export function header(lang: Lang, sm = false, active = '', ads: AdsMap = {}, hi
       <div class="xt-wrap xt-navrow" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:0 22px;font-size:18px;min-height:68px;position:relative;">
         <a href="/" class="xt-navdark xt-navhome" style="color:#fff;padding:13px 16px;display:flex;align-items:center;" aria-label="Home">${ICON.home}</a>
         <span class="xt-desknav" style="display:flex;align-items:center;gap:16px;">${navLinks}</span>
-        <button class="xt-burger xt-mobonly" data-act="menu" aria-label="Menu"><span></span><span></span><span></span></button>
+        <!-- Phone bar: search (left) | logo (centre) | menu (right). The first two
+             are pinned absolutely by xt.css, leaving the logo centred in flow. -->
         <a href="/search" class="xt-navdark xt-mobonly" style="color:#fff;padding:11px 14px;align-items:center;" aria-label="Search">${ICON.search}</a>
+        <a href="/" class="xt-moblogo" aria-label="XeeTimes"><img src="${esc(site.logoWhite || '/xt-logo-white.png')}" alt="XeeTimes"></a>
+        <button class="xt-burger xt-mobonly" data-act="menu" aria-label="Menu"><span></span><span></span><span></span></button>
         <span class="xt-desknav" style="position:absolute;${lang === 'dv' ? 'left' : 'right'}:20px;top:50%;transform:translateY(-50%);display:flex;align-items:center;color:#fff;">
           <a href="/search" style="padding:8px 10px;display:flex;align-items:center;color:#fff;" aria-label="Search">${ICON.search}</a>
         </span>
@@ -516,6 +521,56 @@ function gridCard(a: Art, lang: Lang): string {
         <div style="color:var(--ink3);font-size:12px;margin-top:10px;${EN}text-align:right;" dir="ltr">${dvDate(a.publishedAt, lang)}</div>
       </div>
     </a>`;
+}
+
+// ---- Rotating lead (home hero + every category lead) -----------------------
+// Stacked slides that XtShell cross-fades on a timer. Callers supply their own
+// slide renderer, so each surface keeps its exact existing look — this only
+// stacks them and adds the dots/arrows.
+//
+// The chevrons are SVG, NOT '‹' / '›': those are bidi-MIRRORED by Unicode, so on
+// an RTL page they render flipped and point the wrong way. Each arrow is placed
+// physically (left / right) with the chevron for its own side; which way it
+// steps follows the reading direction — Dhivehi runs right-to-left, so the LEFT
+// arrow moves forward to the next (older) slide.
+function rotChrome(count: number, lang: Lang): string {
+  if (count < 2) return '';
+  const chev = (side: 'l' | 'r') =>
+    `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="${side === 'l' ? 'M15 18 9 12l6-6' : 'M9 18l6-6-6-6'}"/></svg>`;
+  const navBtn = (side: 'l' | 'r') => {
+    const step = (side === 'l') === (lang === 'dv') ? 1 : -1;
+    const label = step === 1 ? (lang === 'en' ? 'Next' : 'ދެން އޮތް') : (lang === 'en' ? 'Previous' : 'ކުރީގެ');
+    return `<button type="button" class="xt-rot-nav xt-rot-${side}" data-rot="${step}" aria-label="${label}">${chev(side)}</button>`;
+  };
+  const dots = Array.from({ length: count }, (_, i) =>
+    `<button type="button" class="xt-rot-dot${i ? '' : ' xt-rot-on'}" data-rot-to="${i}" aria-label="${i + 1}"></button>`).join('');
+  return `
+        <div class="xt-rot-dots">${dots}</div>
+        ${navBtn('l')}${navBtn('r')}`;
+}
+
+function rotBlock(slides: Art[], lang: Lang, boxStyle: string, slide: (a: Art, i: number) => string): string {
+  const multi = slides.length > 1;
+  return `
+      <div class="xt-rot"${multi ? ` data-xt-rot data-secs="${ROTATE_SECS}"` : ''} style="${boxStyle}">
+        ${slides.map(slide).join('')}
+        ${rotChrome(slides.length, lang)}
+      </div>`;
+}
+
+// The article that replaced the category side ad: photo + heading, filling the
+// same column and matching the lead's height (align-items:stretch on the row).
+function sideFeature(a: Art, lang: Lang): string {
+  return `
+      <a href="${link(a, lang)}" class="xt-lead xt-sidefeat" style="display:block;position:relative;overflow:hidden;min-height:300px;height:100%;background:var(--ph2);">
+        ${imgFill(a, lang, 750)}
+        <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,10,12,.86),rgba(10,10,12,.1) 52%,transparent 72%);pointer-events:none;"></div>
+        ${badgeHidden(a.category?.slug) ? '' : `<span style="position:absolute;${lang === 'dv' ? 'right' : 'left'}:14px;top:14px;background:var(--red);color:#fff;font-size:12px;font-weight:700;padding:4px 11px;">${esc(catName(a, lang))}</span>`}
+        <div style="position:absolute;right:0;bottom:0;left:0;padding:18px;">
+          <h3 class="xt-lead-hl" style="margin:0;color:#fff;font-size:19px;font-weight:700;line-height:1.55;transition:color .2s;">${esc(shortTitle(a, lang))}</h3>
+          <div style="color:#bdb9b1;font-size:12px;margin-top:9px;text-align:${lang === 'dv' ? 'right' : 'left'};${EN}" dir="ltr">${dvDate(a.publishedAt, lang)}</div>
+        </div>
+      </a>`;
 }
 
 // Section header (home) — title + "//" skew marks + a horizontal rule filling the
@@ -593,19 +648,24 @@ export function homeHtml(d: HomeData, lang: Lang): string {
 
   // Featured hero = big image (headline overlaid) + a side ad that fills the same
   // height, like the article page. Image is cover-fitted (never stretched).
-  const heroBlock = hero ? `
-    <section class="xt-g-hero" style="display:grid;grid-template-columns:minmax(0,1.5fr) 1fr;gap:26px;padding-bottom:26px;align-items:stretch;">
-      <a href="${link(hero, lang)}" class="xt-lead" style="display:block;position:relative;">
-        <div style="position:relative;overflow:hidden;width:100%;aspect-ratio:16/9;height:100%;min-height:340px;background:var(--ph2);">
-          ${imgFill(hero, lang, 1200, true)}
+  // The hero rotates through the newest few articles (`heroes`); each slide keeps
+  // the design the single hero had. Falls back to the one `hero` when the route
+  // doesn't supply a list.
+  const heroSlides = d.heroes?.length ? d.heroes : hero ? [hero] : [];
+  const heroSlide = (a: Art, i: number) => `
+        <a href="${link(a, lang)}" class="xt-lead xt-rot-slide" style="display:block;position:absolute;inset:0;${i ? 'opacity:0;visibility:hidden;' : ''}">
+          ${imgFill(a, lang, 1200, i === 0)}
           <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,10,12,.86),rgba(10,10,12,.14) 46%,transparent 70%);pointer-events:none;"></div>
-          ${badgeHidden(hero.category?.slug) ? '' : `<span style="position:absolute;${lang === 'dv' ? 'right' : 'left'}:18px;top:18px;background:var(--red);color:#fff;font-size:13px;font-weight:700;padding:5px 13px;">${esc(catName(hero, lang))}</span>`}
+          ${badgeHidden(a.category?.slug) ? '' : `<span style="position:absolute;${lang === 'dv' ? 'right' : 'left'}:18px;top:18px;background:var(--red);color:#fff;font-size:13px;font-weight:700;padding:5px 13px;">${esc(catName(a, lang))}</span>`}
           <div style="position:absolute;right:0;bottom:0;left:0;padding:26px;">
-            <h1 class="xt-lead-hl" style="margin:0;color:#fff;font-size:25px;font-weight:700;line-height:1.5;transition:color .2s;">${esc(shortTitle(hero, lang))}</h1>
-            <div style="color:#d8d5cf;font-size:13px;margin-top:10px;text-align:${lang === 'dv' ? 'right' : 'left'};${EN}" dir="ltr">${dvDate(hero.publishedAt, lang)}</div>
+            <h1 class="xt-lead-hl" style="margin:0;color:#fff;font-size:25px;font-weight:700;line-height:1.5;transition:color .2s;">${esc(shortTitle(a, lang))}</h1>
+            <div style="color:#d8d5cf;font-size:13px;margin-top:10px;text-align:${lang === 'dv' ? 'right' : 'left'};${EN}" dir="ltr">${dvDate(a.publishedAt, lang)}</div>
           </div>
-        </div>
-      </a>
+        </a>`;
+
+  const heroBlock = heroSlides.length ? `
+    <section class="xt-g-hero" style="display:grid;grid-template-columns:minmax(0,1.5fr) 1fr;gap:26px;padding-bottom:26px;align-items:stretch;">
+      ${rotBlock(heroSlides, lang, 'position:relative;overflow:hidden;width:100%;aspect-ratio:16/9;height:100%;min-height:340px;background:var(--ph2);', heroSlide)}
       ${fillAdColumn('HOME_BOX_1', d.ads, 'xt-hero-ad')}
     </section>` : '';
 
@@ -832,6 +892,10 @@ export type CatPage = {
   page?: number;
   children: { name: string; slug: string }[];
   lead: Art | null;
+  /** Slides the lead slot cycles through (newest first). */
+  leads?: Art[];
+  /** The article beside the lead, where the side ad used to be. */
+  sideFeature?: Art | null;
   mostRead: Art[];
   grid: Art[];
 };
@@ -840,8 +904,23 @@ export type CatPage = {
 // the lead + an 8-card grid; pages 2+ show an 8-card grid. These helpers keep the
 // route and the UI in sync.
 export const CAT_PER_PAGE = 8;
-export const catPageCount = (total: number): number =>
-  total <= CAT_PER_PAGE + 1 ? 1 : 1 + Math.ceil((total - (CAT_PER_PAGE + 1)) / CAT_PER_PAGE);
+
+// The lead slot rotates on EVERY section: it cycles the newest few articles
+// instead of showing one. Beside it sits a single featured article (photo +
+// heading) — that column used to hold an ad.
+export const CAT_LEAD_SLIDES = 5;
+export const CAT_SIDE_FEATURE = 1;
+export const HOME_HERO_SLIDES = 4;
+export const ROTATE_SECS = 5;
+// Articles the whole lead ROW consumes on page 1 (carousel + the side feature),
+// so pages 2+ start after them and nothing is shown twice.
+export const catLeadCount = (slug?: string | null): number => {
+  void slug;
+  return CAT_LEAD_SLIDES + CAT_SIDE_FEATURE;
+};
+
+export const catPageCount = (total: number, lead = 1): number =>
+  total <= CAT_PER_PAGE + lead ? 1 : 1 + Math.ceil((total - (CAT_PER_PAGE + lead)) / CAT_PER_PAGE);
 
 // Author pages are a uniform 10-per-page grid (matches the live site).
 export const AUTHOR_PER_PAGE = 10;
@@ -910,25 +989,28 @@ export function categoryHtml(cp: CatPage, lang: Lang, ads: AdsMap = {}, hidden: 
   // category (matches the live xeetimes.com, which shows a different creative on
   // each section). Falls back to the shared ARTICLE_SIDEBAR_1 box when unset.
   // Only page 1 has a lead (and this ad); pages 2+ are grid-only.
-  const catAdList = lead ? (ads['CATEGORY_SIDE'] || []).filter((a) => a.categorySlug === cp.slug) : [];
-  const sideAd = !lead ? '' : catAdList.length
-    ? fillAdColumn('CATEGORY_SIDE', { CATEGORY_SIDE: catAdList }, 'xt-seclead-ad')
-    : fillAdColumn('ARTICLE_SIDEBAR_1', ads, 'xt-seclead-ad');
-
-  const leadBlock = lead ? `
-    <section class="xt-g-seclead" style="display:grid;grid-template-columns:minmax(0,1.5fr) 1fr;gap:26px;padding-bottom:30px;align-items:stretch;">
-      <a href="${link(lead, lang)}" class="xt-lead" style="display:block;">
-        <div style="position:relative;overflow:hidden;width:100%;aspect-ratio:16/9;height:100%;min-height:300px;background:var(--ph2);">
-          ${imgFill(lead, lang, 1080, true)}
+  // The lead slot rotates through the newest few; the column beside it holds a
+  // featured article (photo + heading). That column used to be a CATEGORY_SIDE /
+  // ARTICLE_SIDEBAR_1 ad — those slots no longer render on category pages.
+  const slides = cp.leads?.length ? cp.leads : lead ? [lead] : [];
+  const leadSlide = (a: Art, i: number) => `
+        <a href="${link(a, lang)}" class="xt-lead xt-rot-slide" style="display:block;position:absolute;inset:0;${i ? 'opacity:0;visibility:hidden;' : ''}">
+          ${imgFill(a, lang, 1080, i === 0)}
           <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,10,12,.82),transparent 58%);"></div>
           <div style="position:absolute;right:0;bottom:0;left:0;padding:26px;">
             ${badgeHidden(cp.slug) ? '' : `<span style="display:inline-block;background:var(--red);color:#fff;font-size:12px;font-weight:700;padding:4px 11px;margin-bottom:12px;">${esc(cp.name)}</span>`}
-            <h2 class="xt-lead-hl" style="margin:0;color:#fff;font-size:25px;font-weight:700;line-height:1.55;transition:color .2s;">${esc(shortTitle(lead, lang))}</h2>
-            <div style="color:#bdb9b1;font-size:13px;margin-top:12px;text-align:${lang === 'dv' ? 'right' : 'left'};${EN}" dir="ltr">${dvDate(lead.publishedAt, lang)}</div>
+            <h2 class="xt-lead-hl" style="margin:0;color:#fff;font-size:25px;font-weight:700;line-height:1.55;transition:color .2s;">${esc(shortTitle(a, lang))}</h2>
+            <div style="color:#bdb9b1;font-size:13px;margin-top:12px;text-align:${lang === 'dv' ? 'right' : 'left'};${EN}" dir="ltr">${dvDate(a.publishedAt, lang)}</div>
           </div>
-        </div>
-      </a>
-      ${sideAd}
+        </a>`;
+
+  // With no article to feature (a thin section), the carousel takes the full
+  // width rather than leaving a gap where the ad used to be.
+  const feat = cp.sideFeature ?? null;
+  const leadBlock = slides.length ? `
+    <section class="xt-g-seclead" style="display:grid;grid-template-columns:${feat ? 'minmax(0,1.5fr) 1fr' : 'minmax(0,1fr)'};gap:26px;padding-bottom:30px;align-items:stretch;">
+      ${rotBlock(slides, lang, 'position:relative;overflow:hidden;width:100%;aspect-ratio:16/9;height:100%;min-height:300px;background:var(--ph2);', leadSlide)}
+      ${feat ? sideFeature(feat, lang) : ''}
     </section>` : '';
 
   const grid = cp.grid.length ? `
@@ -942,7 +1024,7 @@ export function categoryHtml(cp: CatPage, lang: Lang, ads: AdsMap = {}, hidden: 
     ${chips ? `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:22px;">${chips}</div>` : ''}
     ${leadBlock}
     ${grid}
-    ${pagination(catPageCount(cp.total), cp.page ?? 1)}
+    ${pagination(catPageCount(cp.total, catLeadCount(cp.slug)), cp.page ?? 1)}
   </main>
   ${footer(lang, site)}`;
 }

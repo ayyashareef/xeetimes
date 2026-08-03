@@ -343,6 +343,77 @@ export default function XtShell({
       schedule();
     });
 
+    // Rotating article lead (category carousel): stacked slides cross-fade on a
+    // timer, with dots and prev/next. Pauses on hover and while the tab is
+    // hidden, and any manual click restarts the clock so it never jumps
+    // immediately after you've chosen a slide.
+    const rotCleanups: (() => void)[] = [];
+    root.querySelectorAll<HTMLElement>('[data-xt-rot]').forEach((box) => {
+      const slides = Array.from(box.querySelectorAll<HTMLElement>('.xt-rot-slide'));
+      if (slides.length < 2) return;
+      const dots = Array.from(box.querySelectorAll<HTMLElement>('.xt-rot-dot'));
+      const secs = Math.max(2, parseInt(box.getAttribute('data-secs') || '5', 10) || 5);
+      let cur = 0;
+      let timer = 0;
+      let paused = false;
+
+      const show = (n: number) => {
+        const next = (n + slides.length) % slides.length;
+        if (next === cur) return;
+        slides.forEach((s, i) => {
+          const on = i === next;
+          s.style.opacity = on ? '1' : '0';
+          s.style.visibility = on ? 'visible' : 'hidden';
+          // Keep hidden slides out of the tab order — they're still real links.
+          if (on) s.removeAttribute('aria-hidden');
+          else s.setAttribute('aria-hidden', 'true');
+        });
+        dots.forEach((d, i) => d.classList.toggle('xt-rot-on', i === next));
+        cur = next;
+      };
+      const stop = () => { if (timer) { clearInterval(timer); timer = 0; } };
+      const start = () => {
+        stop();
+        if (paused) return;
+        timer = window.setInterval(() => show(cur + 1), secs * 1000);
+      };
+
+      const onBoxClick = (ev: Event) => {
+        const t = ev.target as HTMLElement;
+        const nav = t.closest<HTMLElement>('[data-rot]');
+        const dot = t.closest<HTMLElement>('[data-rot-to]');
+        if (!nav && !dot) return;
+        // The controls sit on top of the slide's <a>, so stop the navigation.
+        ev.preventDefault();
+        ev.stopPropagation();
+        if (nav) show(cur + (parseInt(nav.getAttribute('data-rot') || '1', 10) || 1));
+        else if (dot) show(parseInt(dot.getAttribute('data-rot-to') || '0', 10) || 0);
+        start();
+      };
+      const onEnter = () => { paused = true; stop(); };
+      const onLeave = () => { paused = false; start(); };
+
+      box.addEventListener('click', onBoxClick);
+      box.addEventListener('mouseenter', onEnter);
+      box.addEventListener('mouseleave', onLeave);
+      slides.slice(1).forEach((s) => s.setAttribute('aria-hidden', 'true'));
+      start();
+      rotCleanups.push(() => {
+        stop();
+        box.removeEventListener('click', onBoxClick);
+        box.removeEventListener('mouseenter', onEnter);
+        box.removeEventListener('mouseleave', onLeave);
+      });
+    });
+
+    // Don't cycle in a background tab (the slides would race through unseen).
+    const onVis = () => {
+      const hidden = document.visibilityState === 'hidden';
+      root.querySelectorAll<HTMLElement>('[data-xt-rot]').forEach((b) =>
+        b.dispatchEvent(new Event(hidden ? 'mouseenter' : 'mouseleave')));
+    };
+    document.addEventListener('visibilitychange', onVis);
+
     root.addEventListener('click', onClick);
     root.addEventListener('mouseover', onOver);
     root.addEventListener('mouseout', onOut);
@@ -350,6 +421,8 @@ export default function XtShell({
     document.addEventListener('keydown', onKey);
     return () => {
       rotTimers.forEach((t) => clearTimeout(t));
+      rotCleanups.forEach((fn) => fn());
+      document.removeEventListener('visibilitychange', onVis);
       root.removeEventListener('click', onClick);
       root.removeEventListener('mouseover', onOver);
       root.removeEventListener('mouseout', onOut);

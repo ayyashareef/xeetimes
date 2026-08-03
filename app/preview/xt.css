@@ -127,6 +127,46 @@ body:has(#xt-root) { background: var(--page); }
 #xt-root .xt-gcard:hover .xt-thumb img { transform: scale(1.06); }
 #xt-root .xt-lead:hover img { transform: scale(1.04); }
 #xt-root .xt-lead:hover .xt-lead-hl { color: var(--red); }
+
+/* ---- rotating article lead (category carousel; driven by XtShell) ----
+   Slides are stacked and cross-faded; the slide itself is styled exactly like
+   the static lead, so only the fade and these controls are new. */
+#xt-root .xt-rot-slide { transition: opacity .6s ease, visibility .6s ease; }
+/* Progress runs left-to-right regardless of the page direction: slide 1's dot is
+   the leftmost and the highlight travels rightward. `direction: ltr` is required
+   — without it the flex row inherits the page's RTL and slide 1 lands on the
+   right. Anchored to the image's left edge so dot 1 sits at the far left. */
+#xt-root .xt-rot-dots {
+  position: absolute; top: 16px; left: 18px;
+  display: flex; gap: 7px; z-index: 3; direction: ltr;
+}
+#xt-root .xt-rot-dot {
+  width: 9px; height: 9px; padding: 0; border: 0; cursor: pointer;
+  background: rgba(255, 255, 255, .45); transition: background .2s, transform .2s;
+}
+#xt-root .xt-rot-dot:hover { background: rgba(255, 255, 255, .8); }
+#xt-root .xt-rot-dot.xt-rot-on { background: var(--red); transform: scale(1.25); }
+#xt-root .xt-rot-nav {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 38px; height: 38px; padding: 0; border: 0; z-index: 3; cursor: pointer;
+  display: grid; place-items: center;
+  background: transparent; color: #fff;
+  /* At rest it's just the white chevron. A bare white glyph vanishes against a
+     bright photo, so keep a soft shadow on it; the red plate takes over on hover
+     and the shadow is no longer needed. */
+  filter: drop-shadow(0 1px 4px rgba(0, 0, 0, .75));
+  transition: background .2s, filter .2s;
+}
+#xt-root .xt-rot-nav:hover { background: var(--red); filter: none; }
+/* Physical sides on purpose — a logical property here would flip with the page
+   direction, and the chevron must always point at the edge it sits on. */
+#xt-root .xt-rot-l { left: 0; }
+#xt-root .xt-rot-r { right: 0; }
+/* Keep the click target the button itself, never the inner <svg>/<path>. */
+#xt-root .xt-rot-nav svg { pointer-events: none; }
+@media (prefers-reduced-motion: reduce) {
+  #xt-root .xt-rot-slide { transition: none; }
+}
 #xt-root .xt-sechead:hover h2 { color: var(--red); }
 #xt-root .xt-cat-tile:hover .xt-cat-ico { transform: scale(1.06); box-shadow: 0 10px 24px rgba(200,16,46,.28); }
 #xt-root .xt-cat-tile:hover span:last-child { color: var(--red); }
@@ -330,6 +370,11 @@ body:has(#xt-root) { background: var(--page); }
 #xt-root .xt-drawer { display: none; position: fixed; top: 0; bottom: 0; right: 0; z-index: 61; width: 300px; max-width: 85vw; flex-direction: column; background: var(--bg); box-shadow: -24px 0 70px rgba(0,0,0,.35); transform: translateX(106%); transition: transform .44s cubic-bezier(.4,0,.1,1); }
 #xt-root .xt-drawer-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--line); flex: none; }
 #xt-root .xt-dlogo-img { height: 42px; width: auto; display: block; }
+/* Logo inside the dark nav bar — phones only (the white logo row is hidden
+   there, so the header collapses to a single bar). Uses the WHITE logo variant:
+   the standard mark's "XEETIMES" wordmark is dark and disappears on the bar. */
+#xt-root .xt-moblogo { display: none; align-items: center; padding: 4px 8px; }
+#xt-root .xt-moblogo img { height: 40px; width: auto; display: block; }
 #xt-root .xt-drawer-close { background: transparent; width: 40px; height: 40px; border: 1px solid var(--line); display: grid; place-items: center; cursor: pointer; color: var(--ink); flex: none; }
 #xt-root .xt-drawer-nav { display: flex; flex-direction: column; padding: 12px; gap: 2px; flex: 1; overflow-y: auto; }
 /* flex-start (not space-between) so a caret stays next to its label instead of
@@ -378,8 +423,29 @@ body:has(#xt-root) { background: var(--page); }
   #xt-root .xt-mobonly { display: flex !important; }
   #xt-root .xt-backdrop { display: block; }
   #xt-root .xt-drawer { display: flex; }
-  /* Spread the three mobile icons across the bar: search | menu | home. */
-  #xt-root .xt-navrow { justify-content: space-between !important; gap: 0 !important; }
+  /* One compact bar on phones: search (left) | logo (centre) | menu (right).
+     The search and burger are pinned ABSOLUTELY to the bar's edges (the row is
+     already position:relative), leaving the logo as the only in-flow item so the
+     row's own justify-content:center centres it exactly. Flow layout put the
+     burger past the right edge, where #xt-root's overflow-x clipped it away —
+     taking it out of flow removes that failure mode entirely. */
+  #xt-root .xt-navrow { direction: ltr; gap: 0 !important; }
+  #xt-root .xt-navrow > a.xt-mobonly {
+    position: absolute; left: 8px; top: 50%; transform: translateY(-50%);
+  }
+  #xt-root .xt-navrow > .xt-burger {
+    position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  }
+  #xt-root .xt-moblogo { display: flex !important; }
+  /* The bar follows the reader down the page. Sticky works here because
+     #xt-root uses overflow-x:clip, which does NOT create a scroll container.
+     z-index stays under the drawer (61) and its backdrop (60) so an open menu
+     still covers the bar. */
+  #xt-root header { position: sticky; top: 0; z-index: 50; }
+  /* The logo now lives in the bar, so drop the separate white row above it... */
+  #xt-root .xt-logorow { display: none !important; }
+  /* ...and the home icon goes with it — the logo itself links home. Desktop keeps it. */
+  #xt-root .xt-navhome { display: none !important; }
 }
 @media (max-width: 760px) {
   #xt-root .xt-g-3 { grid-template-columns: repeat(2, 1fr) !important; }
@@ -426,3 +492,8 @@ body:has(#xt-root) { background: var(--page); }
   #xt-root [data-react-bar] { flex-wrap: nowrap !important; gap: 6px !important; }
   #xt-root [data-react-bar] .xt-react-i { font-size: 31px !important; }
 }
+
+
+
+
+

@@ -6,7 +6,7 @@ import { getHiddenCategorySlugs } from '@/lib/categories';
 import { getSiteSettings } from '@/lib/settings';
 import { SITE_URL, jsonLd, organizationJsonLd, webSiteJsonLd } from '@/lib/seo';
 import XtShell from '@/app/preview/XtShell';
-import { homeHtml, type Art, type Lang, type HomeSection } from '@/app/preview/markup';
+import { homeHtml, HOME_HERO_SLIDES, type Art, type Lang, type HomeSection } from '@/app/preview/markup';
 
 export const dynamic = 'force-dynamic';
 
@@ -134,14 +134,21 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ p
   const heroSlug = hero?.slug;
   const rest = recent.filter((a) => a.slug !== heroSlug);
 
+  // The hero rotates through the newest HOME_HERO_SLIDES articles. The extra
+  // slides come off the front of `rest`, and everything below shifts by the same
+  // amount so a slide never also appears in Top Stories or Latest.
+  const heroes = hero ? [hero, ...rest.slice(0, HOME_HERO_SLIDES - 1)] : [];
+  const afterHero = rest.slice(Math.max(0, heroes.length - 1));
+
   // The site is Dhivehi-only — there is no English news yet, so /en shows the
   // chrome (header/banner/footer) with an empty state instead of Dhivehi cards.
   const data = L === 'en'
     ? { hero: null, topStories: [], news: [], worldFeature: null, worldList: [], sections: [], ads, hidden, site }
     : {
         hero,
-        topStories: rest.slice(0, 3),
-        news: rest.slice(3, 11),
+        heroes,
+        topStories: afterHero.slice(0, 3),
+        news: afterHero.slice(3, 11),
         worldFeature: null,
         worldList: [],
         sections,
