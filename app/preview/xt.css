@@ -167,6 +167,13 @@ body:has(#xt-root) { background: var(--page); }
 @media (prefers-reduced-motion: reduce) {
   #xt-root .xt-rot-slide { transition: none; }
 }
+/* Our-team cards: lift the portrait and redden the name, like the other cards. */
+/* No staff photos are uploaded yet, so every portrait falls back to the initial
+   disc, which is near-black — 30+ of them read as a wall of dots. Soften just
+   this page's fallback to a neutral placeholder; a real photo covers it. */
+#xt-root .xt-team-pic > span { background: var(--bg3) !important; color: var(--ink2) !important; }
+#xt-root .xt-team-card:hover .xt-team-pic { transform: translateY(-4px); }
+#xt-root .xt-team-card:hover .xt-hl { color: var(--red); }
 #xt-root .xt-sechead:hover h2 { color: var(--red); }
 #xt-root .xt-cat-tile:hover .xt-cat-ico { transform: scale(1.06); box-shadow: 0 10px 24px rgba(200,16,46,.28); }
 #xt-root .xt-cat-tile:hover span:last-child { color: var(--red); }
@@ -417,6 +424,7 @@ body:has(#xt-root) { background: var(--page); }
   /* minmax(0,1fr) — a bare 1fr grows to the content's min-content and blows the
      column out past the viewport (the image overflowed, leaving a clipped strip). */
   #xt-root .xt-g-4 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  #xt-root .xt-g-team { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
   /* Hero / category-lead stack to one column; the side ad shows BELOW the image
      (full width) rather than being hidden. */
   #xt-root .xt-g-hero { grid-template-columns: minmax(0, 1fr) !important; }
@@ -477,6 +485,10 @@ body:has(#xt-root) { background: var(--page); }
 @media (max-width: 600px) {
   /* News cards stay 2-up on phones (not a single column). */
   #xt-root .xt-g-4, #xt-root .xt-g-3 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  /* Team grid drops 4-up -> 2-up, and the portraits shrink to suit. */
+  #xt-root .xt-g-team { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  #xt-root .xt-team-card { padding: 18px 6px !important; }
+  #xt-root .xt-team-card .xt-team-pic > span { width: 104px !important; height: 104px !important; }
   /* Featured photo/video section stacks (big card then small) on phones. */
   #xt-root .xt-g-feat { grid-template-columns: 1fr !important; }
   #xt-root .xt-gallery { grid-template-columns: minmax(0, 1fr) !important; }
