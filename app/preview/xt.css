@@ -196,6 +196,17 @@ body:has(#xt-root) { background: var(--page); }
 #xt-root a.xt-page:hover { background: var(--red) !important; color: #fff !important; border-color: var(--red) !important; }
 #xt-root .xt-social { transition: transform .15s ease, opacity .15s ease; opacity: .92; }
 #xt-root .xt-social:hover { transform: translateY(-3px); opacity: 1; color: var(--red) !important; }
+/* Footer social icons, desktop and phone alike. The per-icon sizes are NOT
+   uniform on purpose: each glyph fills its 24-unit viewBox differently (the
+   YouTube mark is short and wide, the Facebook disc fills its box), so a single
+   size would read as wildly different weights. These are the authored sizes
+   (22 / 24 / 26 / 28) scaled by ~0.82, which keeps them optically balanced.
+   The bare rule also covers the ICON.facebook fallback used for unknown names. */
+#xt-root .xt-social svg { width: 18px; height: 18px; }
+#xt-root .xt-social[aria-label="instagram"] svg { width: 20px; height: 20px; }
+#xt-root .xt-social[aria-label="viber"] svg,
+#xt-root .xt-social[aria-label="messenger"] svg { width: 21px; height: 21px; }
+#xt-root .xt-social[aria-label="youtube"] svg { width: 23px; height: 23px; }
 #xt-root .xt-more:hover { gap: 12px; }
 #xt-root .xt-seeall:hover { color: var(--red); }
 
