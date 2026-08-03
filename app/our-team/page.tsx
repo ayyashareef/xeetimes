@@ -37,7 +37,7 @@ const ROSTER: { id?: string; name?: string; nameDv?: string; title?: string; pho
   // No User record yet, so there is no avatar or Thaana name to inherit — both
   // are given here. Add `photo` once the file is in public/uploads/team/ and
   // they will render like everyone else.
-  { name: 'Professor Dr. Hassan Ugail', nameDv: 'ޕްރޮފެސަރ ޑރ. ޙަސަން އުޤައިލް' },
+  { name: 'Professor Dr. Hassan Ugail', nameDv: 'ޕްރޮފެސަރ ޑރ. ޙަސަން އުގެއިލް' },
   { id: 'usr_11' },                                     // Dr. Anara Naeem
   { name: 'Dr. Mohamed Shifan', nameDv: 'ޑރ. މުޙައްމަދު ޝިފާން' },
   { id: 'usr_6' },                                      // Mariyam Shaneeza
