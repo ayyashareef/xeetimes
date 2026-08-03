@@ -202,11 +202,11 @@ body:has(#xt-root) { background: var(--page); }
    size would read as wildly different weights. These are the authored sizes
    (22 / 24 / 26 / 28) scaled by ~0.82, which keeps them optically balanced.
    The bare rule also covers the ICON.facebook fallback used for unknown names. */
-#xt-root .xt-social svg { width: 18px; height: 18px; }
-#xt-root .xt-social[aria-label="instagram"] svg { width: 20px; height: 20px; }
+#xt-root .xt-social svg { width: 16px; height: 16px; }
+#xt-root .xt-social[aria-label="instagram"] svg { width: 17px; height: 17px; }
 #xt-root .xt-social[aria-label="viber"] svg,
-#xt-root .xt-social[aria-label="messenger"] svg { width: 21px; height: 21px; }
-#xt-root .xt-social[aria-label="youtube"] svg { width: 23px; height: 23px; }
+#xt-root .xt-social[aria-label="messenger"] svg { width: 18px; height: 18px; }
+#xt-root .xt-social[aria-label="youtube"] svg { width: 20px; height: 20px; }
 #xt-root .xt-more:hover { gap: 12px; }
 #xt-root .xt-seeall:hover { color: var(--red); }
 
@@ -452,7 +452,7 @@ body:has(#xt-root) { background: var(--page); }
   #xt-root .xt-navrow > a.xt-mobonly:hover { color: #fff !important; }
   #xt-root .xt-burger span { background: var(--ink); }
   /* Larger tap target / icon on phones (18px reads small on the light bar). */
-  #xt-root .xt-navrow > a.xt-mobonly svg { width: 27px; height: 27px; }
+  #xt-root .xt-navrow > a.xt-mobonly svg { width: 31px; height: 31px; }
   #xt-root .xt-navrow > a.xt-mobonly {
     position: absolute; left: 8px; top: 50%; transform: translateY(-50%);
   }
