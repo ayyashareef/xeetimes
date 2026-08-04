@@ -174,6 +174,10 @@ body:has(#xt-root) { background: var(--page); }
    characters) wraps to two lines on a phone at the standard 30px. Keep it on
    ONE line and let it scale down with the viewport instead; the clamp holds it
    at 30px from ~715px upward, so desktop is unchanged. */
+/* The team heading is English, so it reads from the left even though the page
+   is RTL. direction:ltr on the row puts the "//" marks first and the title
+   after them, both flush left. */
+#xt-root .xt-head-long-wrap { direction: ltr; }
 #xt-root .xt-head-long {
   white-space: nowrap;
   font-size: clamp(13px, 4.2vw, 30px) !important;

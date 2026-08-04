@@ -817,7 +817,7 @@ function commentsBlock(comments: Cmt[], lang: Lang, articleId: string): string {
 // `cls` lets a caller opt into a variant — see .xt-head-long, for headings that
 // are too wide to wrap on a phone.
 const secTitle = (name: string, cls = '') => `
-  <div style="display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--line);margin-bottom:26px;">
+  <div class="xt-sectitle${cls ? ` ${cls}-wrap` : ''}" style="display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--line);margin-bottom:26px;">
     <!-- Equal padding top and bottom centres the title between the header rule
          above and this block's own border-bottom. It used to rely on main's
          top padding for the space above, which is zero on phones. -->
@@ -1069,7 +1069,9 @@ export type TeamMember = {
 export function teamHtml(members: TeamMember[], lang: Lang, ads: AdsMap = {}, hidden: string[] = [], site: Site = {}): string {
   const heading = 'XeeTimes Writers and Contributors';
   const card = (m: TeamMember, size: number) => {
-    const name = (lang === 'en' ? m.name || m.name_dv : m.name_dv || m.name) || '';
+    // This page lists people by their ENGLISH name, matching the titles beside
+    // them. Bylines and author pages still prefer name_dv, so they stay Thaana.
+    const name = (m.name || m.name_dv) || '';
     const inner = `
         <span class="xt-team-pic" style="display:block;transition:transform .2s ease;">${authorAvatar({ id: m.id || '', name: m.name, name_dv: m.name_dv, avatar: m.avatar }, name, size)}</span>
         <span class="xt-hl" style="margin-top:18px;font-size:${m.lead ? 21 : 19}px;font-weight:700;line-height:1.6;color:var(--ink);transition:color .2s;">${esc(name)}</span>
