@@ -511,6 +511,14 @@ body:has(#xt-root) { background: var(--page); }
   #xt-root .xt-sec-photo .xt-g-4 > *:nth-child(n+3) { display: none !important; }
   /* Hero + category-lead images span the FULL viewport width (break out of main's 5px). */
   #xt-root .xt-g-hero, #xt-root .xt-g-seclead { margin-left: -5px !important; margin-right: -5px !important; }
+  /* The lead box is aspect-ratio:16/9 AND min-height:300px. On a phone 16/9 is
+     only ~219px tall, so the min-height wins and the box goes to 390x300 (1.30).
+     The photos are 1640x924 (1.775), so object-fit:cover then scales to fill the
+     HEIGHT -- 533px wide inside 390px -- and crops ~70px off each side, taking
+     the XeeTimes watermark in the bottom corner with it. Letting the aspect
+     ratio govern keeps the whole frame visible. */
+  #xt-root .xt-rot { min-height: 0 !important; }
+  #xt-root .xt-sidefeat { min-height: 0 !important; aspect-ratio: 16 / 9; }
   /* ...but the stacked side AD keeps a small side gutter (image stays full-width). */
   #xt-root .xt-hero-ad, #xt-root .xt-seclead-ad { padding-left: 10px !important; padding-right: 10px !important; }
   /* Top banner ad spans the full viewport width on phones (no side gutter); the
@@ -548,6 +556,11 @@ body:has(#xt-root) { background: var(--page); }
   #xt-root [data-react-bar] { flex-wrap: nowrap !important; gap: 6px !important; }
   #xt-root [data-react-bar] .xt-react-i { font-size: 31px !important; }
 }
+
+
+
+
+
 
 
 
