@@ -78,6 +78,9 @@
   --ph2: #ddd8cd;
   --phink: rgba(20, 18, 12, .16);
   --chip: rgba(0, 0, 0, .5);
+  /* Article byline (author name + date). A cool slate, deliberately outside the
+     warm grey ramp above — the newsroom picked it for this one element. */
+  --byline: #5a6270;
   --en: var(--font-archivo), 'Archivo', sans-serif;
 }
 
