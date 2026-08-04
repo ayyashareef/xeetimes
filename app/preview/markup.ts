@@ -78,7 +78,7 @@ const STR = {
     commentPh: 'ކޮމެންޓް ލިޔުއްވާ...', namePh: 'ނަން', postComment: 'ފޮނުވާ',
     noComments: 'މި ޚަބަރަށް ކޮމެންޓެއް ނެތް. ފުރަތަމަ ކޮމެންޓް ކޮށްލައްވާ.',
     noResults: (q: string) => `"${q}" އާ ގުޅޭ ޚަބަރެއް ނުފެނުނު.`,
-    searchPrompt: 'ހޯއްދަވާ ބަސް ލިޔުއްވާ.', noCat: 'މި ބަޔަށް ޚަބަރެއް ނެތް.', news: 'ޚަބަރު',
+    searchPrompt: 'ހޯއްދަވާ ބަސް ލިޔުއްވާ.', noCat: 'މި ބަޔަކު އާރޓިކަލް އެއް ނެތް', news: 'ޚަބަރު',
     loadMore: 'އިތުރު ޚަބަރު', min: 'މިނެޓް', morePhotos: 'އިތުރު ފޮޓޯ',
   },
   en: {
@@ -493,11 +493,16 @@ export function footer(lang: Lang, site: Site = {}): string {
   <footer style="background:var(--footer);color:#8f8b84;margin-top:40px;padding:40px 26px 34px;">
     <div class="xt-wrap xt-foot-col" style="display:flex;flex-direction:column;align-items:center;gap:26px;text-align:center;">
       <div style="display:flex;align-items:center;gap:34px;" dir="ltr">${social}</div>
-      <a href="/" style="display:inline-block;"><img src="${esc(footLogo)}" alt="XeeTimes" style="height:62px;width:auto;display:block;"></a>
-      <!-- Team link + legal text share a wrapper so the gap between THEM is 3px,
-           independent of the column gap that spaces the logo/social blocks. -->
+      <!-- Logo, team link and legal text share a wrapper on a 3px gap, so the
+           space above the team link matches the space below it. The column gap
+           outside only separates this block from the social row. -->
       <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
-        <a href="/our-team" class="xt-foot-team" style="${EN}font-size:12px;font-weight:700;color:#e4e1da;letter-spacing:.02em;" dir="ltr">XeeTimes Writers and Contributors</a>
+        <a href="/" style="display:inline-block;"><img src="${esc(footLogo)}" alt="XeeTimes" style="height:62px;width:auto;display:block;"></a>
+        <!-- +6px on top: the logo is an image whose ink reaches its box edge,
+             while the text below has ~6px of leading inside its line box. Equal
+             CSS gaps would therefore LOOK unequal (10px vs 16px); this evens
+             out what the eye actually sees. -->
+        <a href="/our-team" class="xt-foot-team" style="${EN}font-size:12px;font-weight:700;color:#e4e1da;letter-spacing:.02em;margin-top:6px;" dir="ltr">XeeTimes Writers and Contributors</a>
         <div class="xt-foot-legal" style="${EN}font-size:12px;color:#a29e96;letter-spacing:.02em;" dir="ltr">
           ${esc(copyright)} &nbsp;·&nbsp; <a href="/wp-content/uploads/2021/01/Terms-Conditions-1.pdf" target="_blank" rel="noopener" style="color:#cfccc4;">Terms and Conditions</a> &nbsp;·&nbsp; <a href="/wp-content/uploads/2021/01/Xeetimes_Privacy_Policy.pdf" target="_blank" rel="noopener" style="color:#cfccc4;">Privacy Policy</a>
         </div>
