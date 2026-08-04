@@ -568,7 +568,8 @@ function sideFeature(a: Art, lang: Lang): string {
       <a href="${link(a, lang)}" class="xt-lead xt-sidefeat" style="display:block;position:relative;overflow:hidden;min-height:300px;height:100%;background:var(--ph2);">
         ${imgFill(a, lang, 750)}
         <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,10,12,.86),rgba(10,10,12,.1) 52%,transparent 72%);pointer-events:none;"></div>
-        ${badgeHidden(a.category?.slug) ? '' : `<span style="position:absolute;${lang === 'dv' ? 'right' : 'left'}:14px;top:14px;background:var(--red);color:#fff;font-size:12px;font-weight:700;padding:4px 11px;">${esc(catName(a, lang))}</span>`}
+        <!-- No category chip here: on a section page every article is already in
+             that section, so the badge only repeats the heading. -->
         <div style="position:absolute;right:0;bottom:0;left:0;padding:18px;">
           <h3 class="xt-lead-hl" style="margin:0;color:#fff;font-size:19px;font-weight:700;line-height:1.55;transition:color .2s;">${esc(shortTitle(a, lang))}</h3>
           <div style="color:#bdb9b1;font-size:12px;margin-top:9px;text-align:${lang === 'dv' ? 'right' : 'left'};${EN}" dir="ltr">${dvDate(a.publishedAt, lang)}</div>
