@@ -29,6 +29,10 @@ model User {
   username  String?  @unique
   password  String
   role      Role     @default(JOURNALIST)
+  // Job title shown on /our-team ("Writer", "Former Deputy Editor", ...).
+  // Separate from `role`, which grants permissions: a title is a label the
+  // newsroom controls freely, and "Former Writer" should not imply access.
+  title     String?
   avatar    String?
   bio_dv    String?
   bio_en    String?

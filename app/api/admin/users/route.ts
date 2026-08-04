@@ -19,8 +19,8 @@ export async function GET() {
 
   const users = await db.user.findMany({
     select: canManage
-      ? { id: true, name: true, name_dv: true, email: true, username: true, role: true, isActive: true, createdAt: true, avatar: true }
-      : { id: true, name: true, name_dv: true, role: true, avatar: true },
+      ? { id: true, name: true, name_dv: true, email: true, username: true, role: true, title: true, isActive: true, createdAt: true, avatar: true }
+      : { id: true, name: true, name_dv: true, role: true, title: true, avatar: true },
     orderBy: { createdAt: 'desc' },
   });
 
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'No permission' }, { status: 403 });
   }
 
-  const { name, name_dv, email, username, password, role, isActive, avatar } = await request.json();
+  const { name, name_dv, email, username, password, role, title, isActive, avatar } = await request.json();
 
   const existing = await db.user.findUnique({ where: { email } });
   if (existing) return NextResponse.json({ error: 'Email already exists' }, { status: 400 });
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
   const hashedPassword = await bcrypt.hash(password, 12);
 
   const user = await db.user.create({
-    data: { name, name_dv, email, username: cleanUsername, password: hashedPassword, role, isActive: isActive ?? true, avatar: avatar || null },
+    data: { name, name_dv, email, username: cleanUsername, password: hashedPassword, role, title: title || null, isActive: isActive ?? true, avatar: avatar || null },
     select: { id: true, name: true, email: true, role: true, isActive: true },
   });
 
@@ -67,9 +67,10 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: 'No permission' }, { status: 403 });
   }
 
-  const { id, name, name_dv, email, username, password, role, isActive, avatar } = await request.json();
+  const { id, name, name_dv, email, username, password, role, title, isActive, avatar } = await request.json();
 
   const data: Record<string, unknown> = { name, name_dv, email, role, isActive };
+  if (typeof title === 'string') data.title = title.trim() || null;
   if (typeof avatar === 'string') data.avatar = avatar || null;
   if (typeof username === 'string') {
     const cleanUsername = username.trim() || null;

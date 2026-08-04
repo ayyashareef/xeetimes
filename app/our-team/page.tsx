@@ -25,11 +25,10 @@ export async function generateMetadata(): Promise<Metadata> {
 // any more — it only fixes the ORDER (and the chief editor's title) for the
 // people the newsroom listed. Anyone active but not in ROSTER is appended after
 // them, so a newly created account shows up without a code change.
-// `photo` overrides the account's avatar, and is the ONLY way to give a picture
-// to someone with no account — drop the file in public/uploads/team/ and point
-// at it here.
-const ROSTER: { id?: string; name?: string; nameDv?: string; title?: string; photo?: string; lead?: boolean }[] = [
-  { id: 'usr_5', title: 'Founder and Chief Editor', lead: true },  // Zeena Zahir
+// Titles are NOT here — they live on the User record and are edited in
+// admin -> Users -> Title, so the newsroom can change them without a deploy.
+const ROSTER: { id: string; lead?: boolean }[] = [
+  { id: 'usr_5', lead: true },                          // Zeena Zahir
   { id: 'usr_42' },                                     // Dr. Aminath Shafiya Adam
   { id: 'cmsef2sj10002bsmxxr37ifdb' },                  // Professor Dr. Hassan Ugail
   { id: 'usr_11' },                                     // Dr. Anara Naeem
@@ -43,6 +42,7 @@ const ROSTER: { id?: string; name?: string; nameDv?: string; title?: string; pho
   { id: 'usr_19' },                                     // Ahmed Thasneef Rasheed
   { id: 'usr_24' },                                     // Mamdhoodha Abdulla
   { id: 'usr_21' },                                     // Dhimna Fakir
+  { id: 'usr_12' },                                     // Zamath Ahmed Waheed
   { id: 'usr_18' },                                     // Azfa Rasheed
   { id: 'usr_29' },                                     // Mohamed Eeman
   { id: 'usr_35' },                                     // Anjum Ismail Mohamed
@@ -62,7 +62,7 @@ export default async function OurTeamPage() {
 
   const users = await db.user.findMany({
     where: { isActive: true },
-    select: { id: true, name: true, name_dv: true, avatar: true, role: true },
+    select: { id: true, name: true, name_dv: true, avatar: true, role: true, title: true },
   });
 
   // Accounts that are not people: the house byline (the masthead itself) and the
@@ -84,18 +84,16 @@ export default async function OurTeamPage() {
       byRoster(a.id) - byRoster(b.id) ||
       (roleRank[a.role] ?? 9) - (roleRank[b.role] ?? 9) ||
       (a.name_dv || a.name).localeCompare(b.name_dv || b.name))
-    .map((u) => {
-      const r = ROSTER.find((x) => x.id === u.id);
-      return {
-        id: u.id,
-        name: u.name,
-        name_dv: u.name_dv,
-        avatar: r?.photo ?? u.avatar,
-        role: u.role,
-        title: r?.title ?? 'Contributor',
-        lead: r?.lead,
-      };
-    });
+    .map((u) => ({
+      id: u.id,
+      name: u.name,
+      name_dv: u.name_dv,
+      avatar: u.avatar,
+      role: u.role,
+      // Falls back to Contributor so a new account is never left blank.
+      title: u.title?.trim() || 'Contributor',
+      lead: ROSTER.find((x) => x.id === u.id)?.lead,
+    }));
 
   const [ads, hidden, site] = await Promise.all([getActiveAds(), getHiddenCategorySlugs(), getSiteSettings()]);
   return <XtShell html={teamHtml(members, L, ads, hidden, site)} dir="rtl" />;

@@ -8,6 +8,7 @@ interface User {
   id: string;
   name: string;
   name_dv: string | null;
+  title?: string | null;
   email: string;
   username?: string | null;
   role: string;
@@ -23,7 +24,7 @@ export default function UsersPage() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<User | null>(null);
-  const [form, setForm] = useState({ name: '', name_dv: '', email: '', username: '', password: '', role: 'JOURNALIST', isActive: true, avatar: '' });
+  const [form, setForm] = useState({ name: '', name_dv: '', email: '', username: '', password: '', role: 'JOURNALIST', title: '', isActive: true, avatar: '' });
 
   const fetchUsers = async () => {
     const res = await fetch('/api/admin/users');
@@ -48,7 +49,7 @@ export default function UsersPage() {
       toast.success(editing ? 'User updated' : 'User created');
       setEditing(null);
       setShowForm(false);
-      setForm({ name: '', name_dv: '', email: '', username: '', password: '', role: 'JOURNALIST', isActive: true, avatar: '' });
+      setForm({ name: '', name_dv: '', email: '', username: '', password: '', role: 'JOURNALIST', title: '', isActive: true, avatar: '' });
       fetchUsers();
     } else {
       const data = await res.json();
@@ -87,7 +88,7 @@ export default function UsersPage() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Users</h1>
         <button
-          onClick={() => { setEditing(null); setForm({ name: '', name_dv: '', email: '', username: '', password: '', role: 'JOURNALIST', isActive: true, avatar: '' }); setShowForm(true); }}
+          onClick={() => { setEditing(null); setForm({ name: '', name_dv: '', email: '', username: '', password: '', role: 'JOURNALIST', title: '', isActive: true, avatar: '' }); setShowForm(true); }}
           className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition text-sm font-medium"
         >
           <Plus className="w-4 h-4" /> New User
@@ -147,6 +148,13 @@ export default function UsersPage() {
                   {ROLES.map(r => <option key={r} value={r}>{r.replace('_', ' ')}</option>)}
                 </select>
               </div>
+              {/* Role grants permissions; Title is only the label on /our-team. */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Title <span className="text-gray-400 font-normal">(shown on Our Team)</span></label>
+                <input type="text" value={form.title} onChange={(e) => setForm(f => ({ ...f, title: e.target.value }))}
+                  placeholder="e.g. Writer, Contributor, Former Deputy Editor"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20" />
+              </div>
             </div>
             <label className="flex items-center gap-2">
               <input type="checkbox" checked={form.isActive} onChange={(e) => setForm(f => ({ ...f, isActive: e.target.checked }))} className="w-4 h-4 rounded" />
@@ -200,7 +208,7 @@ export default function UsersPage() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-1">
-                      <button onClick={() => { setEditing(user); setForm({ name: user.name, name_dv: user.name_dv || '', email: user.email, username: user.username || '', password: '', role: user.role, isActive: user.isActive, avatar: user.avatar || '' }); setShowForm(true); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                      <button onClick={() => { setEditing(user); setForm({ name: user.name, name_dv: user.name_dv || '', email: user.email, username: user.username || '', password: '', role: user.role, title: user.title || '', isActive: user.isActive, avatar: user.avatar || '' }); setShowForm(true); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                         className="p-1.5 text-gray-400 hover:text-primary rounded"><Edit2 className="w-4 h-4" /></button>
                       <button onClick={() => handleDelete(user.id)} className="p-1.5 text-gray-400 hover:text-red-600 rounded"><Trash2 className="w-4 h-4" /></button>
                     </div>
