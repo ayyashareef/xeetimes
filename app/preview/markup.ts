@@ -811,11 +811,13 @@ function commentsBlock(comments: Cmt[], lang: Lang, articleId: string): string {
     ${comments.length ? `<div style="margin-bottom:26px;">${list}</div>` : ''}`;
 }
 
-const secTitle = (name: string) => `
+// `cls` lets a caller opt into a variant — see .xt-head-long, for headings that
+// are too wide to wrap on a phone.
+const secTitle = (name: string, cls = '') => `
   <div style="display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--line);margin-bottom:26px;">
-    <div style="display:flex;align-items:center;gap:11px;padding-bottom:12px;">
+    <div style="display:flex;align-items:center;gap:11px;padding-bottom:12px;min-width:0;">
       <span class="xt-skew"><span></span><span></span></span>
-      <h1 class="xt-secname" style="margin:0;font-size:30px;font-weight:700;color:var(--ink);">${esc(name)}</h1>
+      <h1 class="xt-secname${cls ? ` ${cls}` : ''}" style="margin:0;font-size:30px;font-weight:700;color:var(--ink);">${esc(name)}</h1>
     </div>
   </div>`;
 
@@ -1088,7 +1090,7 @@ export function teamHtml(members: TeamMember[], lang: Lang, ads: AdsMap = {}, hi
 
   return `${header(lang, false, '', ads, hidden, site)}
   <main class="xt-wrap" style="padding:14px 26px 10px;">
-    ${secTitle(heading)}
+    ${secTitle(heading, 'xt-head-long')}
     ${body}
   </main>
   ${footer(lang, site)}`;

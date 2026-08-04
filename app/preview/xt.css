@@ -167,6 +167,14 @@ body:has(#xt-root) { background: var(--page); }
 @media (prefers-reduced-motion: reduce) {
   #xt-root .xt-rot-slide { transition: none; }
 }
+/* A long Latin section heading ("XeeTimes Writers and Contributors" — 33
+   characters) wraps to two lines on a phone at the standard 30px. Keep it on
+   ONE line and let it scale down with the viewport instead; the clamp holds it
+   at 30px from ~715px upward, so desktop is unchanged. */
+#xt-root .xt-head-long {
+  white-space: nowrap;
+  font-size: clamp(13px, 4.2vw, 30px) !important;
+}
 /* Our-team cards: lift the portrait and redden the name, like the other cards. */
 /* No staff photos are uploaded yet, so every portrait falls back to the initial
    disc, which is near-black — 30+ of them read as a wall of dots. Soften just
@@ -518,7 +526,17 @@ body:has(#xt-root) { background: var(--page); }
      the XeeTimes watermark in the bottom corner with it. Letting the aspect
      ratio govern keeps the whole frame visible. */
   #xt-root .xt-rot { min-height: 0 !important; }
-  #xt-root .xt-sidefeat { min-height: 0 !important; aspect-ratio: 16 / 9; }
+  /* Phones show ONE main article: the featured article that sits beside the
+     lead on desktop is hidden, so the carousel is the only large block. */
+  #xt-root .xt-sidefeat { display: none !important; }
+  /* ...and the lead gets taller than 16/9, which is only ~219px on a 390px
+     screen. A taller box crops 16:9 photos at the sides, so anchor the image
+     bottom-left — that is where the XeeTimes watermark sits, and it keeps the
+     crop off it. */
+  #xt-root .xt-rot { aspect-ratio: 4 / 3 !important; }
+  #xt-root .xt-rot .xt-rot-slide img { object-position: left bottom; }
+  /* No white gap between the header and the first article. */
+  #xt-root main { padding-top: 0 !important; }
   /* ...but the stacked side AD keeps a small side gutter (image stays full-width). */
   #xt-root .xt-hero-ad, #xt-root .xt-seclead-ad { padding-left: 10px !important; padding-right: 10px !important; }
   /* Top banner ad spans the full viewport width on phones (no side gutter); the
