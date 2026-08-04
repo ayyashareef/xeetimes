@@ -449,7 +449,10 @@ export function header(lang: Lang, sm = false, active = '', ads: AdsMap = {}, hi
     <div style="max-width:1120px;margin:0 auto;">${adBand('HOMEPAGE_BANNER', ads, true)}</div>
   </div>
   <header>
-    <div class="xt-wrap xt-logorow" style="display:flex;align-items:center;justify-content:center;padding:10px 26px 20px;">
+    <!-- Equal padding top and bottom so the logo sits the same distance from the
+         ad above it and the nav bar below. Was 10/20, which read lopsided.
+         15/15 keeps the header's overall height unchanged. -->
+    <div class="xt-wrap xt-logorow" style="display:flex;align-items:center;justify-content:center;padding:15px 26px;">
       <a href="/"><img class="xt-logo-img" src="${esc(logoSrc)}" alt="XeeTimes"></a>
     </div>
     <nav style="background:var(--nav);">
