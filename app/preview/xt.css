@@ -177,6 +177,13 @@ body:has(#xt-root) { background: var(--page); }
 #xt-root .xt-head-long {
   white-space: nowrap;
   font-size: clamp(13px, 4.2vw, 30px) !important;
+  /* Optically centre it between the header rule and this block's border-bottom.
+     The string has no descenders, so its ink sits high in the line box and equal
+     padding still measured 18px above / 28px below. Nudged down half that
+     difference, in em so it holds as the clamp resizes the text. Scoped to this
+     heading — the Thaana section titles have different ink distribution. */
+  position: relative;
+  top: 0.22em;
 }
 /* Our-team cards: lift the portrait and redden the name, like the other cards. */
 /* No staff photos are uploaded yet, so every portrait falls back to the initial

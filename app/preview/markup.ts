@@ -818,7 +818,10 @@ function commentsBlock(comments: Cmt[], lang: Lang, articleId: string): string {
 // are too wide to wrap on a phone.
 const secTitle = (name: string, cls = '') => `
   <div style="display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--line);margin-bottom:26px;">
-    <div style="display:flex;align-items:center;gap:11px;padding-bottom:12px;min-width:0;">
+    <!-- Equal padding top and bottom centres the title between the header rule
+         above and this block's own border-bottom. It used to rely on main's
+         top padding for the space above, which is zero on phones. -->
+    <div style="display:flex;align-items:center;gap:11px;padding:12px 0;min-width:0;">
       <span class="xt-skew"><span></span><span></span></span>
       <h1 class="xt-secname${cls ? ` ${cls}` : ''}" style="margin:0;font-size:30px;font-weight:700;color:var(--ink);">${esc(name)}</h1>
     </div>
