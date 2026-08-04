@@ -60,30 +60,23 @@ const ROSTER: { id: string; lead?: boolean }[] = [
 export default async function OurTeamPage() {
   const L = 'dv' as Lang;
 
+  const order = new Map(ROSTER.map((r, i) => [r.id, i] as const));
+
+  // ROSTER decides who appears — it is the masthead, and it stays limited to the
+  // people the newsroom listed. `isActive` can still drop someone (deactivate
+  // them in admin and they disappear), but an account being active is no longer
+  // enough on its own: that pulled in old WordPress author records and the
+  // company accounts. Add an id to ROSTER to put someone on the page.
   const users = await db.user.findMany({
-    where: { isActive: true },
+    where: { isActive: true, id: { in: [...order.keys()] } },
     select: { id: true, name: true, name_dv: true, avatar: true, role: true, title: true },
   });
 
-  // Accounts that are not people: the house byline (the masthead itself) and the
-  // built-in admin logins. They are active because they must be able to sign in,
-  // but they have no place on a page of writers.
-  const SYSTEM_LOGINS = new Set(['Admin', 'Administrator']);
-  const isNotAPerson = (u: { name: string; name_dv: string | null }) =>
-    SYSTEM_LOGINS.has((u.name || '').trim()) ||
-    /ޓައިމްސް|xeetimes/i.test(`${u.name || ''} ${u.name_dv || ''}`);
-
-  const order = new Map(ROSTER.map((r, i) => [r.id, i] as const));
   const byRoster = (id: string) => order.get(id) ?? Number.MAX_SAFE_INTEGER;
-  const roleRank: Record<string, number> = { SUPER_ADMIN: 0, EDITOR: 1, CONTRIBUTOR: 2, JOURNALIST: 3, MODERATOR: 4 };
 
   // Everyone except the chief editor is a Contributor unless given a title.
   const members: TeamMember[] = users
-    .filter((u) => !isNotAPerson(u))
-    .sort((a, b) =>
-      byRoster(a.id) - byRoster(b.id) ||
-      (roleRank[a.role] ?? 9) - (roleRank[b.role] ?? 9) ||
-      (a.name_dv || a.name).localeCompare(b.name_dv || b.name))
+    .sort((a, b) => byRoster(a.id) - byRoster(b.id))
     .map((u) => ({
       id: u.id,
       name: u.name,
