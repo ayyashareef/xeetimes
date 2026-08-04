@@ -184,6 +184,10 @@ body:has(#xt-root) { background: var(--page); }
    glyphs render in the upper part of their line box). Reset on mobile, where
    it sits among plain icons instead. */
 #xt-root .xt-navhome { transform: translateY(-4px); }
+/* Desktop nav search icon. Sized here rather than on ICON.search, which is
+   shared with the search form's button and the phone bar. .xt-desknav is
+   display:none below 860px, so this only ever applies on desktop. */
+#xt-root .xt-navrow .xt-desknav a[aria-label="Search"] svg { width: 24px; height: 24px; }
 #xt-root .xt-nav-item { position: relative; }
 #xt-root .xt-nav-item::after { content: ""; position: absolute; right: 0; bottom: -2px; height: 3px; width: 0; background: var(--red); transition: width .22s ease; }
 #xt-root .xt-nav-item:hover::after { width: 100%; }
@@ -201,6 +205,9 @@ body:has(#xt-root) { background: var(--page); }
 #xt-root .xt-react.xt-react-on { transform: scale(1.12); }
 #xt-root .xt-page { transition: background .15s, color .15s; }
 #xt-root a.xt-page:hover { background: var(--red) !important; color: #fff !important; border-color: var(--red) !important; }
+/* Footer team link — its own line under the logo, above the legal text. */
+#xt-root .xt-foot-team { transition: color .2s ease; }
+#xt-root .xt-foot-team:hover { color: var(--red) !important; }
 #xt-root .xt-social { transition: transform .15s ease, opacity .15s ease; opacity: .92; }
 #xt-root .xt-social:hover { transform: translateY(-3px); opacity: 1; color: var(--red) !important; }
 /* Footer social icons, desktop and phone alike. The per-icon sizes are NOT

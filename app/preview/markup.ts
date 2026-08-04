@@ -494,8 +494,9 @@ export function footer(lang: Lang, site: Site = {}): string {
     <div class="xt-wrap xt-foot-col" style="display:flex;flex-direction:column;align-items:center;gap:26px;text-align:center;">
       <div style="display:flex;align-items:center;gap:34px;" dir="ltr">${social}</div>
       <a href="/" style="display:inline-block;"><img src="${esc(footLogo)}" alt="XeeTimes" style="height:62px;width:auto;display:block;"></a>
+      <a href="/our-team" class="xt-foot-team" style="${EN}font-size:15px;font-weight:700;color:#e4e1da;letter-spacing:.02em;" dir="ltr">XeeTimes Writers and Contributors</a>
       <div class="xt-foot-legal" style="${EN}font-size:12px;color:#a29e96;letter-spacing:.02em;" dir="ltr">
-        ${esc(copyright)} &nbsp;·&nbsp; <a href="/our-team" style="color:#cfccc4;">XeeTimes Writers and Contributors</a> &nbsp;·&nbsp; <a href="/wp-content/uploads/2021/01/Terms-Conditions-1.pdf" target="_blank" rel="noopener" style="color:#cfccc4;">Terms and Conditions</a> &nbsp;·&nbsp; <a href="/wp-content/uploads/2021/01/Xeetimes_Privacy_Policy.pdf" target="_blank" rel="noopener" style="color:#cfccc4;">Privacy Policy</a>
+        ${esc(copyright)} &nbsp;·&nbsp; <a href="/wp-content/uploads/2021/01/Terms-Conditions-1.pdf" target="_blank" rel="noopener" style="color:#cfccc4;">Terms and Conditions</a> &nbsp;·&nbsp; <a href="/wp-content/uploads/2021/01/Xeetimes_Privacy_Policy.pdf" target="_blank" rel="noopener" style="color:#cfccc4;">Privacy Policy</a>
       </div>
     </div>
   </footer>`;
