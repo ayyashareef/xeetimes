@@ -10,15 +10,16 @@ type Permission =
   | 'category:manage' | 'tag:manage' | 'media:manage'
   | 'user:manage' | 'settings:manage' | 'comment:moderate' | 'audit:view' | 'ad:manage';
 
-type Role = 'SUPER_ADMIN' | 'EDITOR' | 'JOURNALIST' | 'MODERATOR';
+type Role = 'SUPER_ADMIN' | 'EDITOR' | 'JOURNALIST' | 'MODERATOR' | 'CONTRIBUTOR';
 
-const ALL_ROLES: Role[] = ['SUPER_ADMIN', 'EDITOR', 'JOURNALIST', 'MODERATOR'];
+const ALL_ROLES: Role[] = ['SUPER_ADMIN', 'EDITOR', 'JOURNALIST', 'MODERATOR', 'CONTRIBUTOR'];
 
 const ROLE_LABELS: Record<Role, string> = {
   SUPER_ADMIN: 'Super Admin',
   EDITOR: 'Editor',
   JOURNALIST: 'Journalist',
   MODERATOR: 'Moderator',
+  CONTRIBUTOR: 'Contributor',
 };
 
 const ROLE_COLORS: Record<Role, string> = {
@@ -26,6 +27,7 @@ const ROLE_COLORS: Record<Role, string> = {
   EDITOR: 'bg-blue-100 text-blue-700 border-blue-200',
   JOURNALIST: 'bg-green-100 text-green-700 border-green-200',
   MODERATOR: 'bg-purple-100 text-purple-700 border-purple-200',
+  CONTRIBUTOR: 'bg-amber-100 text-amber-700 border-amber-200',
 };
 
 const PERMISSION_LABELS: Record<Permission, string> = {
@@ -85,12 +87,14 @@ export default function RolesPage() {
     EDITOR: [],
     JOURNALIST: [],
     MODERATOR: [],
+    CONTRIBUTOR: [],
   });
   const [originalPermissions, setOriginalPermissions] = useState<Record<Role, Permission[]>>({
     SUPER_ADMIN: [],
     EDITOR: [],
     JOURNALIST: [],
     MODERATOR: [],
+    CONTRIBUTOR: [],
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

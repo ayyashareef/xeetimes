@@ -16,7 +16,7 @@ interface User {
   createdAt: string;
 }
 
-const ROLES = ['SUPER_ADMIN', 'EDITOR', 'JOURNALIST', 'MODERATOR'];
+const ROLES = ['SUPER_ADMIN', 'EDITOR', 'JOURNALIST', 'MODERATOR', 'CONTRIBUTOR'];
 
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -79,6 +79,7 @@ export default function UsersPage() {
     EDITOR: 'bg-blue-100 text-blue-700',
     JOURNALIST: 'bg-green-100 text-green-700',
     MODERATOR: 'bg-purple-100 text-purple-700',
+    CONTRIBUTOR: 'bg-amber-100 text-amber-700',
   };
 
   return (

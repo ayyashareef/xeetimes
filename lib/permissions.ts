@@ -86,7 +86,7 @@ export const PERMISSION_GROUPS: { label: string; permissions: Permission[] }[] =
   },
 ];
 
-export const ALL_ROLES: Role[] = ['SUPER_ADMIN', 'EDITOR', 'JOURNALIST', 'MODERATOR'];
+export const ALL_ROLES: Role[] = ['SUPER_ADMIN', 'EDITOR', 'JOURNALIST', 'MODERATOR', 'CONTRIBUTOR'];
 
 export const defaultRolePermissions: Record<Role, Permission[]> = {
   SUPER_ADMIN: [...ALL_PERMISSIONS],
@@ -114,6 +114,13 @@ export const defaultRolePermissions: Record<Role, Permission[]> = {
   MODERATOR: [
     'comment:moderate',
   ],
+  // Outside writers. Deliberately the narrowest set: they can draft and edit
+  // their own pieces, nothing else — no publishing, no media or tag management.
+  // Widen it in admin -> Roles if the newsroom wants to.
+  CONTRIBUTOR: [
+    'article:create',
+    'article:edit_own',
+  ],
 };
 
 /**
@@ -133,6 +140,7 @@ export async function getRolePermissions(): Promise<Record<Role, Permission[]>> 
         EDITOR: (stored.EDITOR as Permission[]) ?? defaultRolePermissions.EDITOR,
         JOURNALIST: (stored.JOURNALIST as Permission[]) ?? defaultRolePermissions.JOURNALIST,
         MODERATOR: (stored.MODERATOR as Permission[]) ?? defaultRolePermissions.MODERATOR,
+        CONTRIBUTOR: (stored.CONTRIBUTOR as Permission[]) ?? defaultRolePermissions.CONTRIBUTOR,
       };
       return result;
     }

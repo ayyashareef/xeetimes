@@ -16,6 +16,9 @@ enum Role {
   EDITOR
   JOURNALIST
   MODERATOR
+  // Outside writers (doctors, academics) who carry a byline and appear on
+  // /our-team but are not newsroom staff. Least-privileged role.
+  CONTRIBUTOR
 }
 
 model User {
