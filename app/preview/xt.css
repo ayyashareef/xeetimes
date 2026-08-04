@@ -517,8 +517,10 @@ body:has(#xt-root) { background: var(--page); }
   /* Photo section: just one row (2 cards) on phones; desktop keeps all 4.
      !important because the cards carry an inline display:block. */
   #xt-root .xt-sec-photo .xt-g-4 > *:nth-child(n+3) { display: none !important; }
-  /* Hero + category-lead images span the FULL viewport width (break out of main's 5px). */
-  #xt-root .xt-g-hero, #xt-root .xt-g-seclead { margin-left: -5px !important; margin-right: -5px !important; }
+  /* Hero + category-lead sit INSET on phones rather than full-bleed, matching
+     the 12px gutter the article page uses. main already contributes 5px, so
+     +7px here lands the image 12px off each edge. */
+  #xt-root .xt-g-hero, #xt-root .xt-g-seclead { margin-left: 7px !important; margin-right: 7px !important; }
   /* The lead box is aspect-ratio:16/9 AND min-height:300px. On a phone 16/9 is
      only ~219px tall, so the min-height wins and the box goes to 390x300 (1.30).
      The photos are 1640x924 (1.775), so object-fit:cover then scales to fill the
@@ -538,7 +540,9 @@ body:has(#xt-root) { background: var(--page); }
   /* No white gap between the header and the first article. */
   #xt-root main { padding-top: 0 !important; }
   /* ...but the stacked side AD keeps a small side gutter (image stays full-width). */
-  #xt-root .xt-hero-ad, #xt-root .xt-seclead-ad { padding-left: 10px !important; padding-right: 10px !important; }
+  /* No extra inset: the row itself is now inset 12px, so the stacked ad lines
+     up with the image above it. */
+  #xt-root .xt-hero-ad, #xt-root .xt-seclead-ad { padding-left: 0 !important; padding-right: 0 !important; }
   /* Top banner ad spans the full viewport width on phones (no side gutter); the
      "Advertisement" label keeps a small inset so it isn't flush to the edge. */
   /* No bottom padding: the space under the banner comes entirely from the
