@@ -6,7 +6,7 @@ import { getHiddenCategorySlugs } from '@/lib/categories';
 import { getSiteSettings } from '@/lib/settings';
 import { SITE_URL } from '@/lib/seo';
 import XtShell from '@/app/preview/XtShell';
-import { categoryHtml, sectionLabel, catPageCount, catLeadCount, CAT_PER_PAGE, CAT_LEAD_SLIDES, type Art, type CatPage, type Lang } from '@/app/preview/markup';
+import { categoryHtml, sectionLabel, catPageCount, CAT_PER_PAGE, CAT_LEAD_SLIDES, type Art, type CatPage, type Lang } from '@/app/preview/markup';
 
 export const dynamic = 'force-dynamic';
 
@@ -73,13 +73,13 @@ export default async function CategoryPage({
   // secondary (alt) one — WordPress allowed multiple categories per post.
   const catWhere = { status: 'PUBLISHED' as const, OR: [{ category: { slug } }, { altCategories: { some: { slug } } }] };
   const total = await db.article.count({ where: catWhere });
-  // Page 1: the lead ROW (rotating carousel + one featured article beside it) and
-  // an 8-card grid. Pages 2+: an 8-card grid. Page 1 takes the extra articles the
-  // row needs and pages 2+ skip past them, so nothing is shown twice.
-  const leadN = catLeadCount(slug);
-  const page = Math.min(rawPage, Math.max(1, catPageCount(total, leadN)));
-  const skip = page === 1 ? 0 : (CAT_PER_PAGE + leadN) + (page - 2) * CAT_PER_PAGE;
-  const take = page === 1 ? CAT_PER_PAGE + leadN : CAT_PER_PAGE;
+  // The lead row (carousel + the featured article beside it) is a SHOWCASE of the
+  // newest articles, not a slice taken out of the list: the same articles appear
+  // again in the grid below, so nothing is only reachable via the carousel.
+  // Pagination therefore counts the grid alone — a plain 8 per page.
+  const page = Math.min(rawPage, Math.max(1, catPageCount(total)));
+  const skip = (page - 1) * CAT_PER_PAGE;
+  const take = CAT_PER_PAGE;
   const articles = (await db.article.findMany({
       where: catWhere,
       orderBy: { publishedAt: 'desc' },
@@ -123,7 +123,8 @@ export default async function CategoryPage({
     leads: enEmpty || page > 1 ? [] : articles.slice(0, CAT_LEAD_SLIDES),
     sideFeature: enEmpty || page > 1 ? null : (articles[CAT_LEAD_SLIDES] ?? null),
     mostRead: [],
-    grid: enEmpty ? [] : (page === 1 ? articles.slice(leadN) : articles),
+    // Full page of articles — including the ones showcased in the lead row above.
+    grid: enEmpty ? [] : articles,
   };
 
   const [ads, hidden, site] = await Promise.all([getActiveAds(), getHiddenCategorySlugs(), getSiteSettings()]);

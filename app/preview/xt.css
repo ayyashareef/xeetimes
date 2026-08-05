@@ -189,11 +189,20 @@ body:has(#xt-root) { background: var(--page); }
   position: relative;
   top: 0.22em;
 }
+/* Article byline in MV Waheed. The @font-face was declared but unused until
+   now. The date keeps the Latin stack after Waheed so its numerals fall back
+   cleanly if the face has no digits; both stacks end in Faruma, never Boli. */
+#xt-root .xt-byline-name { font-family: 'Waheed', 'Faruma', sans-serif; }
+#xt-root .xt-byline-date { font-family: 'Waheed', var(--font-archivo), 'Archivo', 'Faruma', sans-serif; letter-spacing: .02em; }
 /* Our-team cards: lift the portrait and redden the name, like the other cards. */
 /* No staff photos are uploaded yet, so every portrait falls back to the initial
    disc, which is near-black — 30+ of them read as a wall of dots. Soften just
    this page's fallback to a neutral placeholder; a real photo covers it. */
 #xt-root .xt-team-pic > span { background: var(--bg3) !important; color: var(--ink2) !important; }
+/* Portrait headshots: show the whole photo inside the circle instead of
+   cropping it. White fills the gap, which suits studio shots on a light
+   background — the default stays `cover` for photographic portraits. */
+#xt-root .xt-team-pic.xt-fit-contain img { object-fit: contain !important; background: #fff; }
 #xt-root .xt-team-card:hover .xt-team-pic { transform: translateY(-4px); }
 #xt-root .xt-team-card:hover .xt-hl { color: var(--red); }
 #xt-root .xt-sechead:hover h2 { color: var(--red); }
@@ -290,10 +299,12 @@ body:has(#xt-root) { background: var(--page); }
 /* ---- Vertical share rail (article) ---- */
 #xt-root .xt-share-rail { display: flex; gap: 9px; }
 /* Desktop: a sticky vertical rail beside the article. */
-#xt-root .xt-share-desk { flex-direction: column; width: 44px; flex: none; position: sticky; top: 20px; }
+#xt-root .xt-share-desk { flex-direction: column; width: 38px; flex: none; position: sticky; top: 20px; }
 /* Mobile-only: a horizontal row under the byline (hidden on desktop). */
 #xt-root .xt-share-mob { display: none; flex-direction: row; flex-wrap: wrap; justify-content: space-between; width: 100%; margin: 2px 0 24px; }
-#xt-root .xt-share { width: 44px; height: 44px; display: grid; place-items: center; color: #fff; cursor: pointer; }
+/* Round share buttons, a touch smaller on desktop (was a 44px square). */
+#xt-root .xt-share { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; color: #fff; cursor: pointer; }
+#xt-root .xt-share svg { width: 17px; height: 17px; }
 #xt-root .xt-ad-rail { display: flex; flex-direction: column; gap: 18px; }
 
 /* ---- Comments ---- */
@@ -421,7 +432,7 @@ body:has(#xt-root) { background: var(--page); }
    so the header collapses to a single bar). Uses the STANDARD mark, whose
    "XEETIMES" wordmark is black — the phone bar is page-coloured, not dark. */
 #xt-root .xt-moblogo { display: none; align-items: center; padding: 4px 8px; }
-#xt-root .xt-moblogo img { height: 40px; width: auto; display: block; }
+#xt-root .xt-moblogo img { height: 47px; width: auto; display: block; }
 #xt-root .xt-drawer-close { background: transparent; width: 40px; height: 40px; border: 1px solid var(--line); display: grid; place-items: center; cursor: pointer; color: var(--ink); flex: none; }
 #xt-root .xt-drawer-nav { display: flex; flex-direction: column; padding: 12px; gap: 2px; flex: 1; overflow-y: auto; }
 /* flex-start (not space-between) so a caret stays next to its label instead of
@@ -489,7 +500,7 @@ body:has(#xt-root) { background: var(--page); }
   #xt-root .xt-navrow > a.xt-mobonly:hover { color: #fff !important; }
   #xt-root .xt-burger span { background: var(--ink); }
   /* Larger tap target / icon on phones (18px reads small on the light bar). */
-  #xt-root .xt-navrow > a.xt-mobonly svg { width: 31px; height: 31px; }
+  #xt-root .xt-navrow > a.xt-mobonly svg { width: 25px; height: 25px; }
   #xt-root .xt-navrow > a.xt-mobonly {
     position: absolute; left: 8px; top: 50%; transform: translateY(-50%);
   }

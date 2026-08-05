@@ -860,7 +860,7 @@ export function articleHtml(a: Art, related: Art[], comments: Cmt[], lang: Lang,
               const u = authorUrl(lang, a.author ?? null);
               // Byline name and date share one colour (--byline, a cool slate)
               // rather than the near-black name + warm grey date they used to be.
-              const inner = `${authorAvatar(a.author ?? null, an, 44)}<div><div style="font-weight:700;font-size:15px;line-height:1.25;color:var(--byline);">${esc(an)}</div><div style="color:var(--byline);font-size:12px;line-height:1.2;margin-top:5px;text-align:${lang === 'dv' ? 'right' : 'left'};${EN}" dir="ltr">${dvDate(a.publishedAt, lang)}</div></div>`;
+              const inner = `${authorAvatar(a.author ?? null, an, 44)}<div><div class="xt-byline-name" style="font-weight:700;font-size:15px;line-height:1.25;color:var(--byline);">${esc(an)}</div><div class="xt-byline-date" style="color:var(--byline);font-size:12px;line-height:1.2;margin-top:5px;text-align:${lang === 'dv' ? 'right' : 'left'};" dir="ltr">${dvDate(a.publishedAt, lang)}</div></div>`;
               return u ? `<a href="${u}" style="display:flex;align-items:center;gap:12px;" title="${esc(an)}">${inner}</a>` : `<div style="display:flex;align-items:center;gap:12px;">${inner}</div>`;
             })()}
           </div>
@@ -1043,7 +1043,7 @@ export function categoryHtml(cp: CatPage, lang: Lang, ads: AdsMap = {}, hidden: 
     ${chips ? `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:22px;">${chips}</div>` : ''}
     ${leadBlock}
     ${grid}
-    ${pagination(catPageCount(cp.total, catLeadCount(cp.slug)), cp.page ?? 1)}
+    ${pagination(catPageCount(cp.total), cp.page ?? 1)}
   </main>
   ${footer(lang, site)}`;
 }
@@ -1064,6 +1064,8 @@ export type TeamMember = {
   title?: string | null;
   /** The chief editor: rendered alone and larger above the rest. */
   lead?: boolean;
+  /** 'contain' shows a portrait photo whole instead of cropping it to the circle. */
+  fit?: 'contain';
 };
 
 export function teamHtml(members: TeamMember[], lang: Lang, ads: AdsMap = {}, hidden: string[] = [], site: Site = {}): string {
@@ -1073,7 +1075,7 @@ export function teamHtml(members: TeamMember[], lang: Lang, ads: AdsMap = {}, hi
     // them. Bylines and author pages still prefer name_dv, so they stay Thaana.
     const name = (m.name || m.name_dv) || '';
     const inner = `
-        <span class="xt-team-pic" style="display:block;transition:transform .2s ease;">${authorAvatar({ id: m.id || '', name: m.name, name_dv: m.name_dv, avatar: m.avatar }, name, size)}</span>
+        <span class="xt-team-pic${m.fit === 'contain' ? ' xt-fit-contain' : ''}" style="display:block;transition:transform .2s ease;">${authorAvatar({ id: m.id || '', name: m.name, name_dv: m.name_dv, avatar: m.avatar }, name, size)}</span>
         <span class="xt-hl" style="margin-top:18px;font-size:${m.lead ? 21 : 19}px;font-weight:700;line-height:1.6;color:var(--ink);transition:color .2s;">${esc(name)}</span>
         ${m.title ? `<span style="margin-top:7px;font-size:13px;color:var(--ink3);${EN}letter-spacing:.02em;" dir="ltr">${esc(m.title)}</span>` : ''}`;
     const box = 'display:flex;flex-direction:column;align-items:center;text-align:center;padding:26px 12px;';

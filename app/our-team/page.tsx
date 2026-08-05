@@ -27,10 +27,12 @@ export async function generateMetadata(): Promise<Metadata> {
 // them, so a newly created account shows up without a code change.
 // Titles are NOT here — they live on the User record and are edited in
 // admin -> Users -> Title, so the newsroom can change them without a deploy.
-const ROSTER: { id: string; lead?: boolean }[] = [
+const ROSTER: { id: string; lead?: boolean; fit?: 'contain' }[] = [
   { id: 'usr_5', lead: true },                          // Zeena Zahir
   { id: 'usr_42' },                                     // Dr. Aminath Shafiya Adam
-  { id: 'cmsef2sj10002bsmxxr37ifdb' },                  // Professor Dr. Hassan Ugail
+  // His headshot is portrait (270x374); cropping it to the circle cut ~28%
+  // off the top and bottom, so it is contained rather than cropped.
+  { id: 'cmsef2sj10002bsmxxr37ifdb', fit: 'contain' },  // Professor Dr. Hassan Ugail
   { id: 'usr_11' },                                     // Dr. Anara Naeem
   { id: 'cmsef964c0007bsmxvvgc7ok2' },                  // Dr. Mohamed Shifan
   { id: 'usr_6' },                                      // Mariyam Shaneeza
@@ -86,6 +88,7 @@ export default async function OurTeamPage() {
       // Falls back to Contributor so a new account is never left blank.
       title: u.title?.trim() || 'Contributor',
       lead: ROSTER.find((x) => x.id === u.id)?.lead,
+      fit: ROSTER.find((x) => x.id === u.id)?.fit,
     }));
 
   const [ads, hidden, site] = await Promise.all([getActiveAds(), getHiddenCategorySlugs(), getSiteSettings()]);
