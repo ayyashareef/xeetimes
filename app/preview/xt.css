@@ -308,11 +308,23 @@ body:has(#xt-root) { background: var(--page); }
 #xt-root .xt-ad-rail { display: flex; flex-direction: column; gap: 18px; }
 
 /* ---- Comments ---- */
-#xt-root .xt-comment { display: flex; gap: 14px; padding: 18px 0; border-bottom: 1px solid var(--line2); }
-#xt-root .xt-comment .av {
-  flex: none; width: 42px; height: 42px; border-radius: 50%;
-  background: var(--ink); display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 16px;
+/* Comments, laid out like the old site: no avatar disc, the commenter's name on
+   the reading edge and the date at the opposite end of the same row. */
+#xt-root .xt-comment { padding: 18px 0; border-bottom: 1px solid var(--line2); }
+#xt-root .xt-comment-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 12px; margin-bottom: 10px;
 }
+/* The old submit button was a green pill. justify-content:flex-start on its row
+   puts it on the reading edge — the right in Dhivehi, as before. */
+#xt-root .xt-cpost {
+  background: #4caf50; color: #fff; border: 0; cursor: pointer;
+  padding: 13px 40px; border-radius: 30px;
+  font-family: 'Ammu', 'Faruma', sans-serif; font-size: 16px; font-weight: 700;
+  transition: background .2s ease;
+}
+#xt-root .xt-cpost:hover { background: #3d9440; }
+#xt-root .xt-comment-list { border-top: 1px solid var(--line2); }
 
 /* ---- Section head skew marks (design "//") ---- */
 #xt-root .xt-skew { display: inline-flex; gap: 4px; }

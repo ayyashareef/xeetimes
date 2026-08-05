@@ -30,9 +30,7 @@ export async function generateMetadata(): Promise<Metadata> {
 const ROSTER: { id: string; lead?: boolean; fit?: 'contain' }[] = [
   { id: 'usr_5', lead: true },                          // Zeena Zahir
   { id: 'usr_42' },                                     // Dr. Aminath Shafiya Adam
-  // His headshot is portrait (270x374); cropping it to the circle cut ~28%
-  // off the top and bottom, so it is contained rather than cropped.
-  { id: 'cmsef2sj10002bsmxxr37ifdb', fit: 'contain' },  // Professor Dr. Hassan Ugail
+  { id: 'cmsef2sj10002bsmxxr37ifdb' },                  // Professor Dr. Hassan Ugail
   { id: 'usr_11' },                                     // Dr. Anara Naeem
   { id: 'cmsef964c0007bsmxvvgc7ok2' },                  // Dr. Mohamed Shifan
   { id: 'usr_6' },                                      // Mariyam Shaneeza

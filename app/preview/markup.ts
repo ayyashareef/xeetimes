@@ -788,30 +788,38 @@ function reactionBar(articleId: string, counts: number[]): string {
 
 function commentsBlock(comments: Cmt[], lang: Lang, articleId: string): string {
   const s = STR[lang];
+  // Laid out like the old xeetimes.com: a heading, then the comments THEMSELVES,
+  // and the form last — readers see the discussion before the box. Each comment
+  // is name on the reading edge with the date opposite it, then the text; no
+  // avatar disc, which the old design didn't have.
+  const heading = lang === 'en' ? "Readers' comments" : 'ކިޔުންތެރިންގެ ހިޔާލު';
   const list = comments.length
     ? comments.map((c) => `
         <div class="xt-comment">
-          <div class="av">${esc(initial(c.authorName || 'A'))}</div>
-          <div style="flex:1;min-width:0;">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;"><span style="font-weight:700;font-size:15px;color:var(--ink);">${esc(c.authorName || 'Anonymous')}</span><span style="font-size:12px;color:var(--ink3);${EN}" dir="ltr">${dvDate(c.createdAt, lang)}</span></div>
-            <p style="margin:0;font-size:16px;line-height:1.9;color:var(--ink2);">${esc(stripTags(c.content)).slice(0, 1200)}</p>
+          <div class="xt-comment-head">
+            <span style="font-weight:700;font-size:15px;color:var(--ink);">${esc(c.authorName || 'Anonymous')}</span>
+            <span style="font-size:12px;color:var(--ink3);${EN}" dir="ltr">${dvDate(c.createdAt, lang)}</span>
           </div>
+          <p style="margin:0;font-size:16px;line-height:1.9;color:var(--ink2);">${esc(stripTags(c.content)).slice(0, 1200)}</p>
         </div>`).join('')
     : `<p style="color:var(--ink3);font-size:15px;padding:14px 0;">${esc(s.noComments)}</p>`;
+  const label = 'display:block;font-weight:700;font-size:14px;margin-bottom:8px;color:var(--ink);';
+  const field = "width:100%;border:1px solid var(--line);padding:12px 14px;font-family:'MVTypewriter','Faruma',sans-serif;font-size:15px;background:#fff;color:var(--ink);box-sizing:border-box;";
   return `
-    <div class="xt-cform" data-article="${esc(articleId)}" style="margin-bottom:20px;">
-      <label style="display:block;font-weight:700;font-size:14px;margin-bottom:8px;color:var(--ink);">${esc(s.namePh)}</label>
-      <input class="xt-cname${lang === 'dv' ? ' xt-thaana' : ''}" dir="${lang === 'dv' ? 'rtl' : 'ltr'}" style="width:100%;border:1px solid var(--line);padding:12px 14px;font-family:'MVTypewriter','Faruma',sans-serif;font-size:15px;margin-bottom:18px;background:#fff;color:var(--ink);box-sizing:border-box;">
-      <label style="display:block;font-weight:700;font-size:14px;margin-bottom:8px;color:var(--ink);">${esc(s.comments)}</label>
-      <textarea class="xt-ctext${lang === 'dv' ? ' xt-thaana' : ''}" dir="${lang === 'dv' ? 'rtl' : 'ltr'}" rows="4" placeholder="${esc(s.commentPh)}" style="width:100%;border:1px solid var(--line);padding:12px 14px;font-family:'MVTypewriter','Faruma',sans-serif;font-size:15px;margin-bottom:16px;background:#fff;color:var(--ink);resize:vertical;box-sizing:border-box;"></textarea>
+    <h2 class="xt-comments-title" style="margin:30px 0 6px;font-size:22px;font-weight:700;color:var(--ink);">${esc(heading)}</h2>
+    <div class="xt-comment-list">${list}</div>
+    <div class="xt-cform" data-article="${esc(articleId)}" style="margin:22px 0 20px;">
+      <label style="${label}">${esc(s.namePh)}</label>
+      <input class="xt-cname${lang === 'dv' ? ' xt-thaana' : ''}" dir="${lang === 'dv' ? 'rtl' : 'ltr'}" style="${field}margin-bottom:18px;">
+      <label style="${label}">${esc(s.comments)}</label>
+      <textarea class="xt-ctext${lang === 'dv' ? ' xt-thaana' : ''}" dir="${lang === 'dv' ? 'rtl' : 'ltr'}" rows="6" placeholder="${esc(s.commentPh)}" style="${field}margin-bottom:16px;resize:vertical;"></textarea>
       ${TS_KEY ? `<div class="cf-turnstile" data-sitekey="${esc(TS_KEY)}" style="margin-bottom:14px;"></div>` : ''}
       <div style="display:flex;justify-content:flex-start;">
-        <button type="button" data-act="comment" style="background:#1f8a4c;color:#fff;border:none;padding:11px 30px;font-family:'Ammu','Faruma',sans-serif;font-size:16px;font-weight:700;cursor:pointer;">${esc(s.postComment)}</button>
+        <button type="button" class="xt-cpost" data-act="comment">${esc(s.postComment)}</button>
       </div>
-      <div style="margin-top:12px;"><a href="/comment-guideline" style="font-size:14px;color:var(--ink3);text-decoration:none;">ކޮމެންޓް ކުރުމުގެ ގައިޑްލައިން</a></div>
+      <div style="margin-top:14px;"><a href="/comment-guideline" style="font-size:14px;color:var(--ink3);text-decoration:none;">ކޮމެންޓް ކުރުމުގެ ގައިޑްލައިން</a></div>
       <p class="xt-cmsg" style="margin:12px 0 0;font-size:14px;color:var(--ink3);display:none;"></p>
-    </div>
-    ${comments.length ? `<div style="margin-bottom:26px;">${list}</div>` : ''}`;
+    </div>`;
 }
 
 // `cls` lets a caller opt into a variant — see .xt-head-long, for headings that
