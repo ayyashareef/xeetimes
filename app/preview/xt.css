@@ -330,6 +330,26 @@ body:has(#xt-root) { background: var(--page); }
    !important is required, not sloppy: gridCard sets aspect-ratio:16/9 inline,
    and an inline declaration outranks any selector without it. */
 #xt-root .xt-g-rel .xt-thumb { aspect-ratio: 3 / 2 !important; }
+/* Card height. The related cards were ~100px taller than the old site's, and
+   none of it was the picture: the shared 16px/1.6 headline wraps to five or six
+   lines in a 154px column, and a CSS grid makes every card as tall as the
+   longest one. Smaller, tighter type gets it to three lines, and the clamp is
+   what actually fixes the height — without it one long headline still sets the
+   height of the whole row. */
+#xt-root .xt-g-rel .xt-gcard-body { padding: 10px 12px 10px !important; }
+#xt-root .xt-g-rel .xt-hl {
+  font-size: 13.5px !important;
+  line-height: 1.45 !important;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+/* The date line measured 26px for 12px text. It mixes Latin digits with a
+   Thaana month, and the Thaana face's default line box is enormous — so the
+   line-height has to be stated, not left to `normal`. That alone was 10px of
+   the card's excess height. */
+#xt-root .xt-g-rel .xt-gcard-date { margin-top: 6px !important; line-height: 1.35 !important; }
 #xt-root .xt-thumb img { transition: transform .5s ease; }
 #xt-root .xt-navdark { transition: background .18s, color .18s; }
 #xt-root .xt-navdark:hover { background: var(--red); color: #fff !important; }
