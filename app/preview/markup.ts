@@ -926,7 +926,7 @@ export function articleHtml(a: Art, related: Art[], comments: Cmt[], lang: Lang,
               const u = authorUrl(lang, a.author ?? null);
               // Byline name and date share one colour (--byline, a cool slate)
               // rather than the near-black name + warm grey date they used to be.
-              const inner = `${authorAvatar(a.author ?? null, an, 44)}<div><div class="xt-byline-name" style="font-weight:700;font-size:15px;line-height:1.25;color:var(--byline);">${esc(an)}</div><div class="xt-byline-date" style="color:var(--byline);font-size:12px;line-height:1.2;margin-top:5px;text-align:${lang === 'dv' ? 'right' : 'left'};" dir="ltr">${dvDate(a.publishedAt, lang)}</div></div>`;
+              const inner = `${authorAvatar(a.author ?? null, an, 44)}<div><div class="xt-byline-name" style="font-weight:700;font-size:15px;line-height:1.25;color:var(--byline);">${esc(an)}</div><div class="xt-byline-date" style="color:var(--byline);font-size:12px;line-height:1.2;margin-top:9px;text-align:${lang === 'dv' ? 'right' : 'left'};" dir="ltr">${dvDate(a.publishedAt, lang)}</div></div>`;
               return u ? `<a href="${u}" style="display:flex;align-items:center;gap:12px;" title="${esc(an)}">${inner}</a>` : `<div style="display:flex;align-items:center;gap:12px;">${inner}</div>`;
             })()}
           </div>
