@@ -717,6 +717,10 @@ body:has(#xt-root) { background: var(--page); }
   #xt-root .xt-team-card .xt-team-pic > span { width: 104px !important; height: 104px !important; }
   /* Featured photo/video section stacks (big card then small) on phones. */
   #xt-root .xt-g-feat { grid-template-columns: 1fr !important; }
+  /* Phone: the featured section shows its lead card only. On desktop the small
+     card sits beside the lead in the 2fr/1fr grid; once that stacks it just
+     repeats the section underneath, so it is dropped rather than stacked. */
+  #xt-root .xt-g-feat > :nth-child(n+2) { display: none !important; }
   #xt-root .xt-gallery { grid-template-columns: minmax(0, 1fr) !important; }
   /* Tight phone gutters: 5px on the page edges. Sections keep their inline
      (zero) side padding, so cards sit at just main's 5px. Article body keeps a
