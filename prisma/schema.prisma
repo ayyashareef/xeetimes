@@ -187,10 +187,31 @@ model Comment {
   replies   Comment[] @relation("CommentReplies")
   userId    String?
   user      User?    @relation(fields: [userId], references: [id])
+  votes     CommentVote[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([articleId, isApproved])
+}
+
+/// One like/dislike per browser per comment. Mirrors Reaction: the visitor is
+/// identified by a long-lived cookie, and the unique constraint is what stops
+/// repeat voting rather than any client-side guard.
+model CommentVote {
+  id        String          @id @default(cuid())
+  commentId String
+  comment   Comment         @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  type      CommentVoteType
+  sessionId String
+  createdAt DateTime        @default(now())
+
+  @@unique([commentId, sessionId])
+  @@index([commentId])
+}
+
+enum CommentVoteType {
+  LIKE
+  DISLIKE
 }
 
 // ==================== REACTIONS ====================

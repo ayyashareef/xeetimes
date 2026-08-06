@@ -36,7 +36,7 @@ export type Art = {
   tags?: { name_dv: string; name_en?: string; slug: string }[];
 };
 
-export type Cmt = { authorName: string; content: string; createdAt: Date | null };
+export type Cmt = { id?: string; authorName: string; content: string; createdAt: Date | null; likes?: number; dislikes?: number };
 
 // Public site settings (Admin → Settings) threaded into the chrome.
 export type Site = {
@@ -140,6 +140,8 @@ const EN = "font-family:var(--font-archivo),'Archivo','MV Utheemu','Faruma',sans
 
 const ICON: Record<string, string> = {
   home: '<svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V21h14V9.5"></path><path d="M9.5 21v-6h5v6"></path></svg>',
+  thumbUp: '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M2 21h3V9H2v12zm19.7-9.7c.2-.3.3-.6.3-1V9c0-1.1-.9-2-2-2h-5.2l.8-3.8v-.3c0-.4-.2-.8-.4-1.1L14.2 1 7.6 7.6c-.4.4-.6.9-.6 1.4V19c0 1.1.9 2 2 2h9c.8 0 1.5-.5 1.8-1.2l3-7c.1-.2.1-.4.1-.5z"/></svg>',
+  thumbDown: '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M22 3h-3v12h3V3zM2.3 12.7c-.2.3-.3.6-.3 1V15c0 1.1.9 2 2 2h5.2l-.8 3.8v.3c0 .4.2.8.4 1.1l.9.8 6.6-6.6c.4-.4.6-.9.6-1.4V5c0-1.1-.9-2-2-2H6c-.8 0-1.5.5-1.8 1.2l-3 7c-.1.2-.1.4-.1.5z"/></svg>',
   search: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.5" y2="16.5"></line></svg>',
   print: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>',
   mail: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>',
@@ -801,6 +803,15 @@ function commentsBlock(comments: Cmt[], lang: Lang, articleId: string): string {
             <span style="font-size:12px;color:var(--ink3);${EN}" dir="ltr">${dvDate(c.createdAt, lang)}</span>
           </div>
           <p style="margin:0;font-size:16px;line-height:1.9;color:var(--ink2);">${esc(stripTags(c.content)).slice(0, 1200)}</p>
+          ${c.id ? `
+          <div class="xt-cvotes" data-comment="${esc(c.id)}">
+            <button type="button" class="xt-cvote" data-cvote="LIKE" aria-label="${lang === 'en' ? 'Like' : 'ލައިކް'}">
+              ${ICON.thumbUp}<span class="xt-cvote-n">${c.likes || 0}</span>
+            </button>
+            <button type="button" class="xt-cvote" data-cvote="DISLIKE" aria-label="${lang === 'en' ? 'Dislike' : 'ޑިސްލައިކް'}">
+              ${ICON.thumbDown}<span class="xt-cvote-n">${c.dislikes || 0}</span>
+            </button>
+          </div>` : ''}
         </div>`).join('')
     : `<p style="color:var(--ink3);font-size:15px;padding:14px 0;">${esc(s.noComments)}</p>`;
   const label = 'display:block;font-weight:700;font-size:14px;margin-bottom:8px;color:var(--ink);';
@@ -843,7 +854,7 @@ export function articleHtml(a: Art, related: Art[], comments: Cmt[], lang: Lang,
   // up the same height as the image.
   const heroImg = `
     <figure style="margin:0;height:100%;">
-      <div style="position:relative;overflow:hidden;width:100%;aspect-ratio:16/9;height:100%;min-height:260px;background:var(--ph2);">
+      <div class="xt-arthero" style="position:relative;overflow:hidden;width:100%;aspect-ratio:16/9;height:100%;min-height:260px;background:var(--ph2);">
         ${imgFill(a, lang, 1080, true)}
         ${badgeHidden(a.category?.slug) ? '' : `<span style="position:absolute;${lang === 'dv' ? 'right' : 'left'}:18px;top:18px;background:var(--red);color:#fff;font-size:13px;font-weight:700;padding:5px 13px;">${esc(catName(a, lang))}</span>`}
       </div>

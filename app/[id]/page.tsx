@@ -151,7 +151,20 @@ export default async function ArticlePage({
     where: { articleId: article.id, isApproved: true },
     orderBy: { createdAt: 'desc' },
     take: 50,
-    select: { authorName: true, content: true, createdAt: true },
+    select: {
+      id: true,
+      authorName: true,
+      content: true,
+      createdAt: true,
+      votes: { select: { type: true } },
+    },
+  })).map((c) => ({
+    id: c.id,
+    authorName: c.authorName,
+    content: c.content,
+    createdAt: c.createdAt,
+    likes: c.votes.filter((v) => v.type === 'LIKE').length,
+    dislikes: c.votes.filter((v) => v.type === 'DISLIKE').length,
   })) as Cmt[];
 
   const relSelect = {

@@ -198,6 +198,39 @@ export default function XtShell({
         return;
       }
 
+      // Comment like / dislike -> POST to /api/comments/vote. The server owns the
+      // counts (one vote per browser via the shared reaction cookie), so we just
+      // paint whatever it returns rather than guessing locally.
+      const cvote = target.closest<HTMLElement>('[data-cvote]');
+      if (cvote && root.contains(cvote)) {
+        e.preventDefault();
+        const box = cvote.closest<HTMLElement>('[data-comment]');
+        const commentId = box?.getAttribute('data-comment');
+        const type = cvote.getAttribute('data-cvote');
+        if (!commentId || !type || cvote.hasAttribute('data-busy')) return;
+        cvote.setAttribute('data-busy', '1');
+        fetch('/api/comments/vote', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ commentId, type }),
+        })
+          .then((r) => r.json())
+          .then((d) => {
+            if (!d || !d.success || !box) return;
+            const set = (t: string, n: number) => {
+              const b = box.querySelector<HTMLElement>(`[data-cvote="${t}"]`);
+              const c = b?.querySelector<HTMLElement>('.xt-cvote-n');
+              if (c) c.textContent = String(n);
+              b?.classList.toggle('xt-cvote-on', d.mine === t);
+            };
+            set('LIKE', d.likes ?? 0);
+            set('DISLIKE', d.dislikes ?? 0);
+          })
+          .catch(() => {})
+          .finally(() => cvote.removeAttribute('data-busy'));
+        return;
+      }
+
       // "Load more news" (kept for completeness; appends into #xt-more-grid).
       const more = target.closest<HTMLElement>('[data-loadmore]');
       if (more && root.contains(more)) {
