@@ -562,6 +562,13 @@ function rotChrome(count: number, lang: Lang): string {
         ${navBtn('l')}${navBtn('r')}`;
 }
 
+// A XeeTimes mark overlaid in the lead's corner. The photos carry a baked-in
+// watermark there, but a phone crops the sides away — this element cannot be
+// cropped, so the photo is free to be centred. Shown on phones only (see
+// .xt-lead-logo in xt.css); desktop is uncropped and shows the baked one.
+const leadLogo = (site: Site) =>
+  `<img class="xt-lead-logo" src="${esc(site.logoWhite || '/xt-logo-white.png')}" alt="" aria-hidden="true">`;
+
 function rotBlock(slides: Art[], lang: Lang, boxStyle: string, slide: (a: Art, i: number) => string): string {
   const multi = slides.length > 1;
   return `
@@ -670,6 +677,7 @@ export function homeHtml(d: HomeData, lang: Lang): string {
         <a href="${link(a, lang)}" class="xt-lead xt-rot-slide" style="display:block;position:absolute;inset:0;${i ? 'opacity:0;visibility:hidden;' : ''}">
           ${imgFill(a, lang, 1200, i === 0)}
           <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,10,12,.86),rgba(10,10,12,.14) 46%,transparent 70%);pointer-events:none;"></div>
+          ${leadLogo(site)}
           ${badgeHidden(a.category?.slug) ? '' : `<span style="position:absolute;${lang === 'dv' ? 'right' : 'left'}:18px;top:18px;background:var(--red);color:#fff;font-size:13px;font-weight:700;padding:5px 13px;">${esc(catName(a, lang))}</span>`}
           <div style="position:absolute;right:0;bottom:0;left:0;padding:26px;">
             <h1 class="xt-lead-hl" style="margin:0;color:#fff;font-size:25px;font-weight:700;line-height:1.5;transition:color .2s;">${esc(shortTitle(a, lang))}</h1>
@@ -1035,6 +1043,7 @@ export function categoryHtml(cp: CatPage, lang: Lang, ads: AdsMap = {}, hidden: 
         <a href="${link(a, lang)}" class="xt-lead xt-rot-slide" style="display:block;position:absolute;inset:0;${i ? 'opacity:0;visibility:hidden;' : ''}">
           ${imgFill(a, lang, 1080, i === 0)}
           <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,10,12,.82),transparent 58%);"></div>
+          ${leadLogo(site)}
           <div style="position:absolute;right:0;bottom:0;left:0;padding:26px;">
             ${badgeHidden(cp.slug) ? '' : `<span style="display:inline-block;background:var(--red);color:#fff;font-size:12px;font-weight:700;padding:4px 11px;margin-bottom:12px;">${esc(cp.name)}</span>`}
             <h2 class="xt-lead-hl" style="margin:0;color:#fff;font-size:25px;font-weight:700;line-height:1.55;transition:color .2s;">${esc(shortTitle(a, lang))}</h2>

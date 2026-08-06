@@ -131,6 +131,24 @@ body:has(#xt-root) { background: var(--page); }
 #xt-root .xt-lead:hover img { transform: scale(1.04); }
 #xt-root .xt-lead:hover .xt-lead-hl { color: var(--red); }
 
+/* Overlaid XeeTimes mark in the lead's bottom-left corner, matching where the
+   photos carry their baked-in one. Hidden by default; the phone block turns it
+   on (see the note there). No z-index on purpose: it sits after the gradient but
+   before the headline in the markup, so plain DOM order puts it above the
+   gradient and below the text — a z-index would lift it over the headline.
+   pointer-events:none so it never swallows a tap meant for the slide's link. */
+#xt-root .xt-lead-logo {
+  display: none;
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  width: 62px;
+  height: auto;
+  pointer-events: none;
+  opacity: .95;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, .55));
+}
+
 /* ---- rotating article lead (category carousel; driven by XtShell) ----
    Slides are stacked and cross-faded; the slide itself is styled exactly like
    the static lead, so only the fade and these controls are new. */
@@ -603,12 +621,14 @@ body:has(#xt-root) { background: var(--page); }
      lead had: on a phone 16/9 is ~219px, so min-height wins, the box turns
      portrait and cover crops the sides, taking the corner watermark with it. */
   #xt-root .xt-arthero { min-height: 0 !important; }
-  /* Crop anchored near the left so the XeeTimes watermark stays in frame. The
-     8/9 box removes ~half the width of a 16:9 photo; the mark sits 5-14% in
-     from the left, so the visible window has to start before 10%. A centred
-     crop looks better but cuts the mark off — the two cannot both be had at
-     this ratio. Widen the box toward 16/10 to get centred framing AND the mark. */
-  #xt-root .xt-rot .xt-rot-slide img { object-position: 8% center; }
+  /* Centred crop. The 8/9 box drops ~half the width of a 16:9 photo, so the
+     baked-in watermark falls outside this window — the mark is drawn as an
+     overlay instead (.xt-lead-logo), and an element cannot be cropped, which is
+     what frees the photo itself to be centred. */
+  #xt-root .xt-rot .xt-rot-slide img { object-position: center; }
+  /* Phones only: desktop shows the photo uncropped, so its baked-in watermark is
+     already visible there and a second mark would double up. */
+  #xt-root .xt-lead-logo { display: block; }
   /* No white gap between the header and the first article. */
   #xt-root main { padding-top: 0 !important; }
   /* ...but the stacked side AD keeps a small side gutter (image stays full-width). */
