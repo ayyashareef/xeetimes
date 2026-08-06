@@ -133,9 +133,10 @@ body:has(#xt-root) { background: var(--page); }
 
 /* Overlaid XeeTimes mark in the lead's bottom-left corner, matching where the
    photos carry their baked-in one. Hidden by default; the phone block turns it
-   on (see the note there). No z-index on purpose: it sits after the gradient but
-   before the headline in the markup, so plain DOM order puts it above the
-   gradient and below the text — a z-index would lift it over the headline.
+   on (see the note there). No z-index on purpose: it sits BEFORE the gradient in
+   the markup, so plain DOM order puts it under the overlay — the dark band
+   dims it exactly the way it dims a watermark baked into the photo, which is
+   the point. A z-index here would lift it out and make it read as a sticker.
    pointer-events:none so it never swallows a tap meant for the slide's link. */
 #xt-root .xt-lead-logo {
   display: none;
@@ -145,10 +146,8 @@ body:has(#xt-root) { background: var(--page); }
   width: 50px;
   height: auto;
   pointer-events: none;
-  /* Full strength on purpose. It already paints over the gradient, but even a
-     5% veil made it read as sitting UNDER the dark band it lands in. The shadow
-     stays — it is what separates the mark from a bright photo. */
-  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, .55));
+  /* No shadow: the gradient is now on top of the mark, so a shadow under it
+     would be dimmed along with it and only muddy the edges. */
 }
 
 /* ---- rotating article lead (category carousel; driven by XtShell) ----

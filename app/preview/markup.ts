@@ -636,8 +636,8 @@ function featuredSectionHtml(s: HomeSection, lang: Lang, site: Site): string {
     <a href="${link(big, lang)}" class="xt-lead" style="display:block;">
       <div class="xt-featlead" style="position:relative;overflow:hidden;width:100%;aspect-ratio:741/400;background:var(--ph2);">
         ${imgFill(big, lang, 1080, true)}
-        <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,10,12,.82),transparent 58%);"></div>
         ${leadLogo(site)}
+        <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,10,12,.82),transparent 58%);"></div>
         <div style="position:absolute;right:0;bottom:0;left:0;padding:24px;">
           <h2 class="xt-lead-hl" style="margin:0;color:#fff;font-size:24px;font-weight:700;line-height:1.55;transition:color .2s;">${esc(shortTitle(big, lang))}</h2>
           <div style="color:#bdb9b1;font-size:13px;margin-top:10px;text-align:${lang === 'dv' ? 'right' : 'left'};${EN}" dir="ltr">${dvDate(big.publishedAt, lang)}</div>
@@ -677,8 +677,8 @@ export function homeHtml(d: HomeData, lang: Lang): string {
   const heroSlide = (a: Art, i: number) => `
         <a href="${link(a, lang)}" class="xt-lead xt-rot-slide" style="display:block;position:absolute;inset:0;${i ? 'opacity:0;visibility:hidden;' : ''}">
           ${imgFill(a, lang, 1200, i === 0)}
-          <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,10,12,.86),rgba(10,10,12,.14) 46%,transparent 70%);pointer-events:none;"></div>
           ${leadLogo(site)}
+          <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,10,12,.86),rgba(10,10,12,.14) 46%,transparent 70%);pointer-events:none;"></div>
           ${badgeHidden(a.category?.slug) ? '' : `<span style="position:absolute;${lang === 'dv' ? 'right' : 'left'}:18px;top:18px;background:var(--red);color:#fff;font-size:13px;font-weight:700;padding:5px 13px;">${esc(catName(a, lang))}</span>`}
           <div style="position:absolute;right:0;bottom:0;left:0;padding:26px;">
             <h1 class="xt-lead-hl" style="margin:0;color:#fff;font-size:25px;font-weight:700;line-height:1.5;transition:color .2s;">${esc(shortTitle(a, lang))}</h1>
@@ -1043,8 +1043,8 @@ export function categoryHtml(cp: CatPage, lang: Lang, ads: AdsMap = {}, hidden: 
   const leadSlide = (a: Art, i: number) => `
         <a href="${link(a, lang)}" class="xt-lead xt-rot-slide" style="display:block;position:absolute;inset:0;${i ? 'opacity:0;visibility:hidden;' : ''}">
           ${imgFill(a, lang, 1080, i === 0)}
-          <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,10,12,.82),transparent 58%);"></div>
           ${leadLogo(site)}
+          <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,10,12,.82),transparent 58%);"></div>
           <div style="position:absolute;right:0;bottom:0;left:0;padding:26px;">
             ${badgeHidden(cp.slug) ? '' : `<span style="display:inline-block;background:var(--red);color:#fff;font-size:12px;font-weight:700;padding:4px 11px;margin-bottom:12px;">${esc(cp.name)}</span>`}
             <h2 class="xt-lead-hl" style="margin:0;color:#fff;font-size:25px;font-weight:700;line-height:1.55;transition:color .2s;">${esc(shortTitle(a, lang))}</h2>
