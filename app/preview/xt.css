@@ -172,14 +172,21 @@ body:has(#xt-root) { background: var(--page); }
 #xt-root .xt-vc-stage {
   position: relative;
   height: calc(var(--vcW) * 9 / 16 + 14px);
+  /* The browser keeps vertical panning; horizontal is ours. This is what lets
+     the drag listeners stay passive — no preventDefault, no scroll jank. */
+  touch-action: pan-y;
 }
+/* While a finger is down the strip follows it: --drag is the live pixel offset,
+   set on the stage so every slide inherits it, and transitions are off so the
+   movement is 1:1 rather than chasing. */
+#xt-root .xt-vc-stage.xt-vc-dragging .xt-vc-slide { transition: none; }
 #xt-root .xt-vc-slide {
   position: absolute;
   top: 50%;
   left: 50%;
   width: var(--vcW);
   /* --o (steps from centre) and --k (scale) are written by the driver. */
-  transform: translate(-50%, -50%) translateX(calc(var(--o, 0) * var(--vcStep))) scale(var(--k, 1));
+  transform: translate(-50%, -50%) translateX(calc(var(--o, 0) * var(--vcStep) + var(--drag, 0px))) scale(var(--k, 1));
   transition: transform .45s cubic-bezier(.4, 0, .2, 1), opacity .45s ease;
   display: block;
 }

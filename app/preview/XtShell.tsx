@@ -499,21 +499,79 @@ export default function XtShell({
       const onEnter = () => { paused = true; stop(); };
       const onLeave = () => { paused = false; start(); };
 
+      // Drag: the strip follows the finger and snaps to the nearest card on
+      // release. The step is measured from the live geometry — the gap between
+      // the centred card and its neighbour — rather than parsed out of
+      // --vcStep, which is a raw token (78vw) at every breakpoint.
+      const stage = box.querySelector<HTMLElement>('.xt-vc-stage');
+      const stepPx = () => {
+        const a = slides[cur].getBoundingClientRect();
+        const b = slides[(cur + 1) % n].getBoundingClientRect();
+        const gap = Math.abs(b.left + b.width / 2 - (a.left + a.width / 2));
+        // Falls back if the neighbour is stacked on top (a 2-slide ring).
+        return gap > 20 ? gap : a.width * 1.06;
+      };
+
       let x0 = 0;
-      const onTouchStart = (ev: TouchEvent) => { x0 = ev.changedTouches[0].clientX; };
-      const onTouchEnd = (ev: TouchEvent) => {
-        const dx = ev.changedTouches[0].clientX - x0;
-        if (Math.abs(dx) < 40) return;
-        // Dragging left pulls the strip left, which brings the next card in.
-        show(cur + (dx < 0 ? 1 : -1));
+      let y0 = 0;
+      let dx = 0;
+      let dragging = false;
+      let moved = false;
+
+      const setDrag = (px: number) => stage?.style.setProperty('--drag', `${px}px`);
+      const endDrag = () => {
+        stage?.classList.remove('xt-vc-dragging');
+        setDrag(0);
+        dragging = false;
+      };
+
+      const onTouchStart = (ev: TouchEvent) => {
+        x0 = ev.changedTouches[0].clientX;
+        y0 = ev.changedTouches[0].clientY;
+        dx = 0;
+        dragging = false;
+        moved = false;
+        paused = true;
+        stop();
+      };
+      const onTouchMove = (ev: TouchEvent) => {
+        const t = ev.changedTouches[0];
+        dx = t.clientX - x0;
+        // Wait until the gesture has declared itself horizontal, so a vertical
+        // flick down the page never drags the strip sideways with it.
+        if (!dragging) {
+          if (Math.abs(dx) < 8 || Math.abs(dx) <= Math.abs(t.clientY - y0)) return;
+          dragging = true;
+          stage?.classList.add('xt-vc-dragging');
+        }
+        moved = true;
+        setDrag(dx);
+      };
+      const onTouchEnd = () => {
+        paused = false;
+        if (!dragging) { start(); return; }
+        // Snap to whichever card the drag landed nearest. Dragging left pulls
+        // the strip left, which brings the next card in.
+        const steps = Math.round(-dx / stepPx());
+        endDrag();
+        show(cur + steps);
         start();
+        // A drag that ends on a card would otherwise fire its click and
+        // navigate; swallow exactly one click if the finger actually moved.
+        if (moved) {
+          const swallow = (e: Event) => { e.preventDefault(); e.stopPropagation(); };
+          box.addEventListener('click', swallow, { capture: true, once: true });
+          window.setTimeout(() => box.removeEventListener('click', swallow, true), 400);
+        }
       };
 
       box.addEventListener('click', onClick);
       box.addEventListener('mouseenter', onEnter);
       box.addEventListener('mouseleave', onLeave);
       box.addEventListener('touchstart', onTouchStart, { passive: true });
+      box.addEventListener('touchmove', onTouchMove, { passive: true });
       box.addEventListener('touchend', onTouchEnd, { passive: true });
+      box.addEventListener('touchcancel', onTouchEnd, { passive: true });
       layout();
       start();
       rotCleanups.push(() => {
@@ -522,7 +580,9 @@ export default function XtShell({
         box.removeEventListener('mouseenter', onEnter);
         box.removeEventListener('mouseleave', onLeave);
         box.removeEventListener('touchstart', onTouchStart);
+        box.removeEventListener('touchmove', onTouchMove);
         box.removeEventListener('touchend', onTouchEnd);
+        box.removeEventListener('touchcancel', onTouchEnd);
       });
     });
 
