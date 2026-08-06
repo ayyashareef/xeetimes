@@ -68,10 +68,10 @@ const SECTION_DEFS: { slug: string; accent: string }[] = [
 // The "Others" (އެހެނިހެން) group — one latest card each, shown as columns under
 // a single header, like the live home.
 const OTHERS_SLUGS = ['talent', 'badhige', 'history', 'haadhisaa'];
-// Photo is a "featured" layout (1 big lead card + 1 small), so 2 articles are
-// enough. Video is the coverflow band, which needs a full ring of slides.
+// Photo is a "featured" layout: one big lead plus two stacked cards filling the
+// column beside it. Video is the coverflow band, which needs a full ring.
 const TAIL_DEFS: { slug: string; accent: string; take: number; carousel?: boolean }[] = [
-  { slug: 'photo', accent: 'var(--red)', take: 2 },
+  { slug: 'photo', accent: 'var(--red)', take: 3 },
   { slug: 'video', accent: 'var(--red)', take: VC_SLIDES, carousel: true },
 ];
 

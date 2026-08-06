@@ -350,6 +350,16 @@ body:has(#xt-root) { background: var(--page); }
    line-height has to be stated, not left to `normal`. That alone was 10px of
    the card's excess height. */
 #xt-root .xt-g-rel .xt-gcard-date { margin-top: 6px !important; line-height: 1.35 !important; }
+/* Featured side cards: two stacked to the lead's height, headline overlaid.
+   Clamped to two lines — the box is half a row tall, and an unclamped Thaana
+   headline would climb over most of the photo it is sitting on. */
+#xt-root .xt-featside-hl {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+#xt-root .xt-featside:hover .xt-featside-hl { color: var(--red); }
 #xt-root .xt-thumb img { transition: transform .5s ease; }
 #xt-root .xt-navdark { transition: background .18s, color .18s; }
 #xt-root .xt-navdark:hover { background: var(--red); color: #fff !important; }
@@ -717,9 +727,9 @@ body:has(#xt-root) { background: var(--page); }
   #xt-root .xt-team-card .xt-team-pic > span { width: 104px !important; height: 104px !important; }
   /* Featured photo/video section stacks (big card then small) on phones. */
   #xt-root .xt-g-feat { grid-template-columns: 1fr !important; }
-  /* Phone: the featured section shows its lead card only. On desktop the small
-     card sits beside the lead in the 2fr/1fr grid; once that stacks it just
-     repeats the section underneath, so it is dropped rather than stacked. */
+  /* Phone: the featured section shows its lead card only. On desktop the side
+     column sits beside the lead; once the grid stacks it just repeats the
+     section underneath, so it is dropped rather than stacked. */
   #xt-root .xt-g-feat > :nth-child(n+2) { display: none !important; }
   #xt-root .xt-gallery { grid-template-columns: minmax(0, 1fr) !important; }
   /* Tight phone gutters: 5px on the page edges. Sections keep their inline

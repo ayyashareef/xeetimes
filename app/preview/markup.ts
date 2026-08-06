@@ -665,7 +665,6 @@ function videoCarouselHtml(s: HomeSection, lang: Lang): string {
 function featuredSectionHtml(s: HomeSection, lang: Lang, site: Site): string {
   const big = s.articles[0];
   if (!big) return '';
-  const small = s.articles[1];
   const bigCard = `
     <a href="${link(big, lang)}" class="xt-lead" style="display:block;">
       <div class="xt-featlead" style="position:relative;overflow:hidden;width:100%;aspect-ratio:741/400;background:var(--ph2);">
@@ -678,12 +677,26 @@ function featuredSectionHtml(s: HomeSection, lang: Lang, site: Site): string {
         </div>
       </div>
     </a>`;
+  // The side column stacks two cards to the lead's full height. A thumb-plus-
+  // text card cannot fit twice here — at this column width its 16/9 thumb alone
+  // is taller than half the row — so these overlay the headline on the image,
+  // the same treatment the lead uses.
+  const sideCard = (a: Art) => `
+    <a href="${link(a, lang)}" class="xt-lead xt-featside" style="display:block;position:relative;overflow:hidden;background:var(--ph2);min-height:0;">
+      ${imgFill(a, lang, 640)}
+      <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,10,12,.86),transparent 62%);"></div>
+      <div style="position:absolute;right:0;bottom:0;left:0;padding:14px 16px;">
+        <h3 class="xt-hl xt-featside-hl" style="margin:0;color:#fff;font-size:15px;font-weight:700;line-height:1.55;">${esc(shortTitle(a, lang))}</h3>
+        <div style="color:#bdb9b1;font-size:12px;margin-top:6px;line-height:1.35;${EN}text-align:${lang === 'dv' ? 'right' : 'left'};" dir="ltr">${dvDate(a.publishedAt, lang)}</div>
+      </div>
+    </a>`;
+  const sides = s.articles.slice(1, 3);
   return `
     <section class="xt-sec-${esc(s.slug)}" style="padding:24px 0;">
       ${homeSectionHead(s.name, catUrl(s.slug, lang), lang)}
-      <div class="xt-g-feat" style="display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:20px;align-items:start;">
+      <div class="xt-g-feat" style="display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:20px;align-items:stretch;">
         ${bigCard}
-        ${small ? gridCard(small, lang) : ''}
+        ${sides.length ? `<div class="xt-featside-col" style="display:grid;grid-template-rows:repeat(${sides.length},minmax(0,1fr));gap:20px;min-height:0;">${sides.map(sideCard).join('')}</div>` : ''}
       </div>
     </section>`;
 }
