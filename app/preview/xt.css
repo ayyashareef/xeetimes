@@ -301,7 +301,9 @@ body:has(#xt-root) { background: var(--page); }
 /* Desktop: a sticky vertical rail beside the article. */
 #xt-root .xt-share-desk { flex-direction: column; width: 38px; flex: none; position: sticky; top: 20px; }
 /* Mobile-only: a horizontal row under the byline (hidden on desktop). */
-#xt-root .xt-share-mob { display: none; flex-direction: row; flex-wrap: wrap; justify-content: space-between; width: 100%; margin: 2px 0 24px; }
+/* Grouped at the reading edge with a small gap, rather than stretched across
+   the full width — space-between spread six icons edge to edge. */
+#xt-root .xt-share-mob { display: none; flex-direction: row; flex-wrap: wrap; justify-content: flex-start; gap: 8px; width: 100%; margin: 2px 0 24px; }
 /* Round share buttons, a touch smaller on desktop (was a 44px square). */
 #xt-root .xt-share { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; color: #fff; cursor: pointer; }
 #xt-root .xt-share svg { width: 17px; height: 17px; }
