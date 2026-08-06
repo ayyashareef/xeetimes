@@ -6,7 +6,7 @@ import { getHiddenCategorySlugs } from '@/lib/categories';
 import { getSiteSettings } from '@/lib/settings';
 import { SITE_URL, jsonLd, organizationJsonLd, webSiteJsonLd } from '@/lib/seo';
 import XtShell from '@/app/preview/XtShell';
-import { homeHtml, HOME_HERO_SLIDES, type Art, type Lang, type HomeSection } from '@/app/preview/markup';
+import { homeHtml, HOME_HERO_SLIDES, VC_SLIDES, type Art, type Lang, type HomeSection } from '@/app/preview/markup';
 
 export const dynamic = 'force-dynamic';
 
@@ -68,11 +68,11 @@ const SECTION_DEFS: { slug: string; accent: string }[] = [
 // The "Others" (އެހެނިހެން) group — one latest card each, shown as columns under
 // a single header, like the live home.
 const OTHERS_SLUGS = ['talent', 'badhige', 'history', 'haadhisaa'];
-// Photo + video: a "featured" layout (1 big lead card + 1 small), so only 2
-// articles each are needed.
-const TAIL_DEFS: { slug: string; accent: string; take: number }[] = [
+// Photo is a "featured" layout (1 big lead card + 1 small), so 2 articles are
+// enough. Video is the coverflow band, which needs a full ring of slides.
+const TAIL_DEFS: { slug: string; accent: string; take: number; carousel?: boolean }[] = [
   { slug: 'photo', accent: 'var(--red)', take: 2 },
-  { slug: 'video', accent: 'var(--red)', take: 2 },
+  { slug: 'video', accent: 'var(--red)', take: VC_SLIDES, carousel: true },
 ];
 
 export default async function Home({ searchParams }: { searchParams: Promise<{ p?: string; page_id?: string; feed?: string }> }) {
@@ -122,7 +122,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ p
   const tailSections = TAIL_DEFS.map((def, i) => {
     const articles = tailArts[i];
     if (!articles.length) return null;
-    return { name: nameOf(articles[0].category), slug: def.slug, accent: def.accent, articles, featured: true };
+    return { name: nameOf(articles[0].category), slug: def.slug, accent: def.accent, articles, featured: true, carousel: def.carousel };
   }).filter((s): s is NonNullable<typeof s> => s !== null);
   const sections: HomeSection[] = [
     ...mainSections,

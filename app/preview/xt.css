@@ -150,6 +150,81 @@ body:has(#xt-root) { background: var(--page); }
      would be dimmed along with it and only muddy the edges. */
 }
 
+/* ---- video carousel (dark coverflow band; driven by XtShell) ----
+   Rendered outside main.xt-wrap, so its width is the viewport's own content
+   width — the scrollbar is already excluded — and overflow:hidden can clip the
+   strip without the band itself ever pushing the page sideways. A 100vw band
+   inside the wrap would have overflowed by exactly the scrollbar's width. */
+#xt-root .xt-vcband {
+  background: var(--nav);
+  overflow: hidden;
+  margin: 34px 0 0;
+  padding: 30px 0 34px;
+}
+#xt-root .xt-vc-head { display: flex; align-items: center; gap: 14px; margin-bottom: 26px; }
+#xt-root .xt-vc-head h2 { margin: 0; font-size: 28px; font-weight: 700; color: #fff; white-space: nowrap; transition: color .2s; }
+#xt-root .xt-vc-head .xt-sechead { display: inline-flex; }
+#xt-root .xt-vc-rule { flex: 1; height: 1px; min-width: 20px; background: rgba(255, 255, 255, .16); }
+
+/* --vcW is the centre card's width; --vcStep the gap between card centres.
+   Every other measurement is derived, so one value resizes the whole band. */
+#xt-root .xt-vc { --vcW: 420px; --vcStep: 445px; }
+#xt-root .xt-vc-stage {
+  position: relative;
+  height: calc(var(--vcW) * 9 / 16 + 14px);
+}
+#xt-root .xt-vc-slide {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--vcW);
+  /* --o (steps from centre) and --k (scale) are written by the driver. */
+  transform: translate(-50%, -50%) translateX(calc(var(--o, 0) * var(--vcStep))) scale(var(--k, 1));
+  transition: transform .45s cubic-bezier(.4, 0, .2, 1), opacity .45s ease;
+  display: block;
+}
+#xt-root .xt-vc-pic {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #000;
+}
+#xt-root .xt-vc-pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Outline, not border: it sits outside the box, so the card keeps its exact
+   16/9 and the scale transform carries the ring with it. */
+#xt-root .xt-vc-slide.xt-vc-on .xt-vc-pic { outline: 3px solid var(--red); }
+#xt-root .xt-vc-play {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  display: grid; place-items: center; pointer-events: none;
+  transition: transform .2s ease;
+}
+#xt-root .xt-vc-slide:hover .xt-vc-play { transform: translate(-50%, -50%) scale(1.08); }
+#xt-root .xt-vc-cap {
+  position: absolute; right: 0; bottom: 0; left: 0;
+  padding: 34px 16px 14px;
+  background: linear-gradient(0deg, rgba(8, 8, 10, .88), transparent);
+  pointer-events: none;
+}
+#xt-root .xt-vc-cap .xt-hl {
+  display: block; color: #fff; font-size: 17px; line-height: 1.6;
+  /* Two lines maximum — a long Thaana headline would otherwise climb over the
+     play button on the narrow side cards. */
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+#xt-root .xt-vc-dots { display: flex; justify-content: center; gap: 8px; margin-top: 26px; direction: ltr; }
+#xt-root .xt-vc-dot {
+  width: 9px; height: 9px; padding: 0; border: 0; cursor: pointer;
+  border-radius: 9px; background: rgba(255, 255, 255, .3);
+  transition: width .25s ease, background .25s ease;
+}
+#xt-root .xt-vc-dot:hover { background: rgba(255, 255, 255, .6); }
+#xt-root .xt-vc-dot.xt-vc-dot-on { width: 28px; background: var(--red); }
+@media (prefers-reduced-motion: reduce) {
+  #xt-root .xt-vc-slide { transition: none; }
+}
+
 /* ---- rotating article lead (category carousel; driven by XtShell) ----
    Slides are stacked and cross-faded; the slide itself is styled exactly like
    the static lead, so only the fade and these controls are new. */
@@ -507,6 +582,8 @@ body:has(#xt-root) { background: var(--page); }
   #xt-root .xt-ad-rail { position: static; flex-direction: row; flex-wrap: wrap; }
 }
 @media (max-width: 1000px) {
+  #xt-root .xt-vc { --vcW: 330px; --vcStep: 352px; }
+  #xt-root .xt-vc-head h2 { font-size: 24px; }
   /* minmax(0,1fr) — a bare 1fr grows to the content's min-content and blows the
      column out past the viewport (the image overflowed, leaving a clipped strip). */
   #xt-root .xt-g-4 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
@@ -569,6 +646,14 @@ body:has(#xt-root) { background: var(--page); }
   #xt-root .xt-g-side { grid-template-columns: 1fr !important; }
 }
 @media (max-width: 600px) {
+  /* One card fills the screen with its neighbours just peeking in. */
+  #xt-root .xt-vc { --vcW: 78vw; --vcStep: 82vw; }
+  #xt-root .xt-vcband { margin: 20px 0 0; padding: 22px 0 26px; }
+  #xt-root .xt-vc-head { padding-left: 12px !important; padding-right: 12px !important; margin-bottom: 18px; }
+  #xt-root .xt-vc-head h2 { font-size: 21px; }
+  #xt-root .xt-vc-cap .xt-hl { font-size: 15px; }
+  #xt-root .xt-vc-play svg { width: 50px; height: 50px; }
+  #xt-root .xt-vc-dots { margin-top: 18px; }
   /* News cards stay 2-up on phones (not a single column). */
   #xt-root .xt-g-4, #xt-root .xt-g-3 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
   /* Team grid drops 4-up -> 2-up, and the portraits shrink to suit. */

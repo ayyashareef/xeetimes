@@ -51,7 +51,7 @@ export type Site = {
 };
 
 export type HomeGroupCol = { name: string; slug: string; article: Art };
-export type HomeSection = { name: string; slug: string; accent: string; articles: Art[]; group?: HomeGroupCol[]; featured?: boolean };
+export type HomeSection = { name: string; slug: string; accent: string; articles: Art[]; group?: HomeGroupCol[]; featured?: boolean; carousel?: boolean };
 export type HomeData = {
   hero: Art | null;
   /** Slides for the rotating hero (newest first). Falls back to `hero` if empty. */
@@ -140,6 +140,7 @@ const EN = "font-family:var(--font-archivo),'Archivo','MV Utheemu','Faruma',sans
 
 const ICON: Record<string, string> = {
   home: '<svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V21h14V9.5"></path><path d="M9.5 21v-6h5v6"></path></svg>',
+  play: '<svg width="64" height="64" viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="30" fill="rgba(255,255,255,.22)" stroke="rgba(255,255,255,.85)" stroke-width="2.5"/><path d="M26 21.5 44 32 26 42.5Z" fill="#fff"/></svg>',
   thumbUp: '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M2 21h3V9H2v12zm19.7-9.7c.2-.3.3-.6.3-1V9c0-1.1-.9-2-2-2h-5.2l.8-3.8v-.3c0-.4-.2-.8-.4-1.1L14.2 1 7.6 7.6c-.4.4-.6.9-.6 1.4V19c0 1.1.9 2 2 2h9c.8 0 1.5-.5 1.8-1.2l3-7c.1-.2.1-.4.1-.5z"/></svg>',
   thumbDown: '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M22 3h-3v12h3V3zM2.3 12.7c-.2.3-.3.6-.3 1V15c0 1.1.9 2 2 2h5.2l-.8 3.8v.3c0 .4.2.8.4 1.1l.9.8 6.6-6.6c.4-.4.6-.9.6-1.4V5c0-1.1-.9-2-2-2H6c-.8 0-1.5.5-1.8 1.2l-3 7c-.1.2-.1.4-.1.5z"/></svg>',
   search: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.5" y2="16.5"></line></svg>',
@@ -626,6 +627,39 @@ function othersGroupHtml(s: HomeSection, lang: Lang): string {
     </section>`;
 }
 
+// Video carousel — a full-bleed dark band with a coverflow of video cards: the
+// centre one full size and outlined in red, its neighbours scaled back and
+// dimmed, the rest fading off the edges. Driven by [data-xt-vc] in XtShell,
+// which sets --o (how many steps from centre) and --k (scale) per slide; the
+// markup only has to declare the slides in order.
+export const VC_SLIDES = 8;
+function videoCarouselHtml(s: HomeSection, lang: Lang): string {
+  const arts = s.articles.slice(0, VC_SLIDES);
+  if (arts.length < 2) return featuredSectionHtml(s, lang, {});
+  const slide = (a: Art, i: number) => `
+        <a href="${link(a, lang)}" class="xt-vc-slide${i === 0 ? ' xt-vc-on' : ''}" style="--o:${-i};"${i ? ' aria-hidden="true"' : ''}>
+          <span class="xt-vc-pic">
+            ${a.featuredImage ? imgFill(a, lang, 720, i === 0) : `<span class="xt-img" style="position:absolute;inset:0;"><span>${esc(lang === 'en' ? 'Video' : 'ވީޑިއޯ')}</span></span>`}
+            <span class="xt-vc-play">${ICON.play}</span>
+            <span class="xt-vc-cap"><span class="xt-hl">${esc(shortTitle(a, lang))}</span></span>
+          </span>
+        </a>`;
+  const dots = arts.map((_, i) =>
+    `<button type="button" class="xt-vc-dot${i === 0 ? ' xt-vc-dot-on' : ''}" data-vc-to="${i}" aria-label="${i + 1}"></button>`).join('');
+  return `
+    <section class="xt-vcband">
+      <div class="xt-wrap xt-vc-head">
+        <span class="xt-skew"><span></span><span></span></span>
+        <a href="${esc(catUrl(s.slug, lang))}" class="xt-sechead"><h2>${esc(s.name)}</h2></a>
+        <span class="xt-vc-rule"></span>
+      </div>
+      <div class="xt-wrap xt-vc" data-xt-vc data-secs="${ROTATE_SECS}">
+        <div class="xt-vc-stage">${arts.map(slide).join('')}</div>
+        <div class="xt-vc-dots">${dots}</div>
+      </div>
+    </section>`;
+}
+
 // A "featured" home section (photo / video): one big lead card (right, ~2/3,
 // headline overlaid on the image) + one smaller card (left), like the live home.
 function featuredSectionHtml(s: HomeSection, lang: Lang, site: Site): string {
@@ -711,7 +745,9 @@ export function homeHtml(d: HomeData, lang: Lang): string {
       const ad = `<div style="margin:16px 0;">${adBand('HOME_AFTER_BADHIGE', d.ads)}</div>`;
       return othersGroupHtml(s, lang) + ad;
     }
-    // Photo / video: a big featured card + one small card.
+    // The video band is rendered outside <main> (see below), not here.
+    if (s.carousel) return '';
+    // Photo: a big featured card + one small.
     if (s.featured) return featuredSectionHtml(s, lang, site);
     if (!s.articles.length) return '';
     const block = `
@@ -729,6 +765,9 @@ export function homeHtml(d: HomeData, lang: Lang): string {
     return block + ad;
   }).join('');
 
+  // Full-bleed, so it hangs off the end of the wrap rather than inside it.
+  const videoBand = d.sections.filter((s) => s.carousel).map((s) => videoCarouselHtml(s, lang)).join('');
+
   return `
   ${header(lang, false, '', d.ads, d.hidden || [], site)}
   <main class="xt-wrap" style="padding:12px 0 10px;">
@@ -737,6 +776,7 @@ export function homeHtml(d: HomeData, lang: Lang): string {
     ${midAd}
     ${sections}
   </main>
+  ${videoBand}
   ${footer(lang, site)}`;
 }
 

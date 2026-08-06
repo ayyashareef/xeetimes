@@ -439,10 +439,97 @@ export default function XtShell({
       });
     });
 
+    // Video carousel (dark coverflow band). Slides sit on a ring: each one's
+    // offset is the SHORTEST signed distance to the centre, so the strip wraps
+    // in whichever direction is nearer instead of unwinding all the way back.
+    // Higher index sits further left, matching the RTL reading order.
+    root.querySelectorAll<HTMLElement>('[data-xt-vc]').forEach((box) => {
+      const slides = Array.from(box.querySelectorAll<HTMLElement>('.xt-vc-slide'));
+      if (slides.length < 2) return;
+      const dots = Array.from(box.querySelectorAll<HTMLElement>('.xt-vc-dot'));
+      const n = slides.length;
+      const secs = Math.max(2, parseInt(box.getAttribute('data-secs') || '5', 10) || 5);
+      let cur = 0;
+      let timer = 0;
+      let paused = false;
+
+      const layout = () => {
+        slides.forEach((el, i) => {
+          let d = i - cur;
+          if (d > n / 2) d -= n;
+          if (d < -n / 2) d += n;
+          const far = Math.abs(d);
+          el.style.setProperty('--o', String(-d));
+          el.style.setProperty('--k', far === 0 ? '1' : far === 1 ? '.86' : '.74');
+          el.style.opacity = far === 0 ? '1' : far === 1 ? '.55' : far === 2 ? '.26' : '0';
+          el.style.zIndex = String(20 - far);
+          // Anything past the second ring is invisible — keep it untappable.
+          el.style.pointerEvents = far > 2 ? 'none' : 'auto';
+          el.classList.toggle('xt-vc-on', far === 0);
+          if (far === 0) el.removeAttribute('aria-hidden');
+          else el.setAttribute('aria-hidden', 'true');
+        });
+        dots.forEach((d, i) => d.classList.toggle('xt-vc-dot-on', i === cur));
+      };
+      const show = (i: number) => { cur = ((i % n) + n) % n; layout(); };
+      const stop = () => { if (timer) { clearInterval(timer); timer = 0; } };
+      const start = () => { stop(); if (!paused) timer = window.setInterval(() => show(cur + 1), secs * 1000); };
+
+      const onClick = (ev: Event) => {
+        const t = ev.target as HTMLElement;
+        const dot = t.closest<HTMLElement>('[data-vc-to]');
+        if (dot) {
+          ev.preventDefault();
+          ev.stopPropagation();
+          show(parseInt(dot.getAttribute('data-vc-to') || '0', 10) || 0);
+          start();
+          return;
+        }
+        // A tap on a card that isn't centred brings it to the centre rather
+        // than opening it — on a coverflow the off-centre cards are targets you
+        // can only half see, so navigating from one is almost never intended.
+        const slide = t.closest<HTMLElement>('.xt-vc-slide');
+        if (slide && !slide.classList.contains('xt-vc-on')) {
+          ev.preventDefault();
+          ev.stopPropagation();
+          show(slides.indexOf(slide));
+          start();
+        }
+      };
+      const onEnter = () => { paused = true; stop(); };
+      const onLeave = () => { paused = false; start(); };
+
+      let x0 = 0;
+      const onTouchStart = (ev: TouchEvent) => { x0 = ev.changedTouches[0].clientX; };
+      const onTouchEnd = (ev: TouchEvent) => {
+        const dx = ev.changedTouches[0].clientX - x0;
+        if (Math.abs(dx) < 40) return;
+        // Dragging left pulls the strip left, which brings the next card in.
+        show(cur + (dx < 0 ? 1 : -1));
+        start();
+      };
+
+      box.addEventListener('click', onClick);
+      box.addEventListener('mouseenter', onEnter);
+      box.addEventListener('mouseleave', onLeave);
+      box.addEventListener('touchstart', onTouchStart, { passive: true });
+      box.addEventListener('touchend', onTouchEnd, { passive: true });
+      layout();
+      start();
+      rotCleanups.push(() => {
+        stop();
+        box.removeEventListener('click', onClick);
+        box.removeEventListener('mouseenter', onEnter);
+        box.removeEventListener('mouseleave', onLeave);
+        box.removeEventListener('touchstart', onTouchStart);
+        box.removeEventListener('touchend', onTouchEnd);
+      });
+    });
+
     // Don't cycle in a background tab (the slides would race through unseen).
     const onVis = () => {
       const hidden = document.visibilityState === 'hidden';
-      root.querySelectorAll<HTMLElement>('[data-xt-rot]').forEach((b) =>
+      root.querySelectorAll<HTMLElement>('[data-xt-rot],[data-xt-vc]').forEach((b) =>
         b.dispatchEvent(new Event(hidden ? 'mouseenter' : 'mouseleave')));
     };
     document.addEventListener('visibilitychange', onVis);
