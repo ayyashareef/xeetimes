@@ -1072,13 +1072,13 @@ export function categoryHtml(cp: CatPage, lang: Lang, ads: AdsMap = {}, hidden: 
       const name = esc(lang === 'en' ? c.en : c.dv);
       return `<a href="${catUrl(c.slug, lang)}" class="xt-cat-tile" style="text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:16px;width:150px;">
         <span class="xt-cat-ico" style="width:132px;height:132px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s;">${ico}</span>
-        <span style="font-family:'Ammu','Faruma',sans-serif;font-size:20px;font-weight:700;color:var(--ink);text-align:center;transition:color .2s;">${name}</span>
+        <span class="xt-cat-lbl" style="font-family:'Ammu','Faruma',sans-serif;font-size:20px;font-weight:700;color:var(--ink);text-align:center;transition:color .2s;">${name}</span>
       </a>`;
     }).join('');
     return `${header(lang, false, cp.name, ads, hidden, site)}
     <main class="xt-wrap" style="padding:14px 26px 40px;">
       ${secTitle(cp.name)}
-      <section style="display:flex;flex-wrap:wrap;justify-content:center;gap:38px 48px;padding:36px 0 12px;">${tiles}</section>
+      <section class="xt-cat-tiles" style="display:flex;flex-wrap:wrap;justify-content:center;gap:38px 48px;padding:36px 0 12px;">${tiles}</section>
     </main>
     ${footer(lang, site)}`;
   }
