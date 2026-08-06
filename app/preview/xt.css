@@ -624,6 +624,25 @@ body:has(#xt-root) { background: var(--page); }
    being pushed to the far edge. */
 #xt-root .xt-dlink { display: flex; align-items: center; justify-content: flex-start; gap: 7px; padding: 14px 16px; font-size: 18px; font-weight: 500; text-decoration: none; font-family: 'Ammu','Faruma',sans-serif; transition: background .15s; }
 #xt-root .xt-dlink:hover { background: var(--bg0); }
+/* The drawer's support link is not a category, so it is set apart from the list
+   above it by a rule and given the accent colour rather than sitting in the run
+   of section names as if it were one more section. */
+#xt-root .xt-dlink-support {
+  /* dir="ltr" on the anchor makes its flex-start the LEFT edge, which left the
+     label hanging opposite every Dhivehi item above it. flex-end puts it back
+     on the drawer's reading edge without giving up the correct text direction. */
+  justify-content: flex-end;
+  margin-top: 10px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+  color: var(--red);
+  font-family: var(--en);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+}
+
 :root[data-xt-menu="open"] #xt-root .xt-backdrop { opacity: 1; pointer-events: auto; }
 :root[data-xt-menu="open"] #xt-root .xt-drawer { transform: none; }
 :root[data-xt-menu="open"] #xt-root .xt-burger span:nth-child(1) { transform: translateY(7px) rotate(45deg); }

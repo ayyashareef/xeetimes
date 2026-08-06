@@ -444,7 +444,9 @@ export function header(lang: Lang, sm = false, active = '', ads: AdsMap = {}, hi
       <a href="/"><img class="xt-dlogo-img" src="${esc(logoSrc)}" alt="XeeTimes"></a>
       <button class="xt-drawer-close" data-act="menu-close" aria-label="Close menu"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg></button>
     </div>
-    <nav class="xt-drawer-nav">${drawerLinks}</nav>
+    <nav class="xt-drawer-nav">${drawerLinks}
+      <a href="/support-our-work" class="xt-dlink xt-dlink-support" dir="ltr">Support Our Work</a>
+    </nav>
   </aside>`;
 
   return `
@@ -509,6 +511,7 @@ export function footer(lang: Lang, site: Site = {}): string {
              CSS gaps would therefore LOOK unequal (10px vs 16px); this evens
              out what the eye actually sees. -->
         <a href="/our-team" class="xt-foot-team" style="${EN}font-size:12px;font-weight:700;color:#e4e1da;letter-spacing:.02em;margin-top:6px;" dir="ltr">XeeTimes Writers and Contributors</a>
+        <a href="/support-our-work" class="xt-foot-team" style="${EN}font-size:12px;font-weight:700;color:#e4e1da;letter-spacing:.02em;" dir="ltr">Support Our Work</a>
         <div class="xt-foot-legal" style="${EN}font-size:12px;color:#a29e96;letter-spacing:.02em;" dir="ltr">
           ${esc(copyright)} &nbsp;·&nbsp; <a href="/wp-content/uploads/2021/01/Terms-Conditions-1.pdf" target="_blank" rel="noopener" style="color:#cfccc4;">Terms and Conditions</a> &nbsp;·&nbsp; <a href="/wp-content/uploads/2021/01/Xeetimes_Privacy_Policy.pdf" target="_blank" rel="noopener" style="color:#cfccc4;">Privacy Policy</a>
         </div>
