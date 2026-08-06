@@ -677,10 +677,10 @@ function featuredSectionHtml(s: HomeSection, lang: Lang, site: Site): string {
         </div>
       </div>
     </a>`;
-  // The side column stacks two cards to the lead's full height. A thumb-plus-
-  // text card cannot fit twice here — at this column width its 16/9 thumb alone
-  // is taller than half the row — so these overlay the headline on the image,
-  // the same treatment the lead uses.
+  // One card beside the lead, stretched to the lead's full height rather than
+  // sized by its own content — which is what left a ~200px gap under it. It
+  // overlays the headline on the image, the same treatment the lead uses; a
+  // thumb-plus-text card cannot fill a box this tall without a stretched thumb.
   const sideCard = (a: Art) => `
     <a href="${link(a, lang)}" class="xt-lead xt-featside" style="display:block;position:relative;overflow:hidden;background:var(--ph2);min-height:0;">
       ${imgFill(a, lang, 640)}
@@ -690,7 +690,7 @@ function featuredSectionHtml(s: HomeSection, lang: Lang, site: Site): string {
         <div style="color:#bdb9b1;font-size:12px;margin-top:6px;line-height:1.35;${EN}text-align:${lang === 'dv' ? 'right' : 'left'};" dir="ltr">${dvDate(a.publishedAt, lang)}</div>
       </div>
     </a>`;
-  const sides = s.articles.slice(1, 3);
+  const sides = s.articles.slice(1, 2);
   return `
     <section class="xt-sec-${esc(s.slug)}" style="padding:24px 0;">
       ${homeSectionHead(s.name, catUrl(s.slug, lang), lang)}
