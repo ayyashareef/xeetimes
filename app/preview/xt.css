@@ -176,17 +176,31 @@ body:has(#xt-root) { background: var(--page); }
      the drag listeners stay passive — no preventDefault, no scroll jank. */
   touch-action: pan-y;
 }
-/* While a finger is down the strip follows it: --drag is the live pixel offset,
-   set on the stage so every slide inherits it, and transitions are off so the
-   movement is 1:1 rather than chasing. */
-#xt-root .xt-vc-stage.xt-vc-dragging .xt-vc-slide { transition: none; }
+/* The whole strip rides on one element, and a drag moves THIS rather than the
+   slides. Translating a single transform is a compositor job; driving a custom
+   property that all eight slides inherit restyles every one of them per frame,
+   which is what made the drag stutter. */
+#xt-root .xt-vc-track {
+  position: absolute;
+  inset: 0;
+  transform: translate3d(0, 0, 0);
+  transition: transform .45s cubic-bezier(.4, 0, .2, 1);
+}
+#xt-root .xt-vc-stage.xt-vc-dragging .xt-vc-track {
+  transition: none;
+  will-change: transform;
+}
+/* A mouse drag must not kick off the browser's own image/link dragging. */
+#xt-root .xt-vc-slide, #xt-root .xt-vc-slide img { -webkit-user-drag: none; user-select: none; }
+#xt-root .xt-vc-stage { cursor: grab; }
+#xt-root .xt-vc-stage.xt-vc-dragging { cursor: grabbing; }
 #xt-root .xt-vc-slide {
   position: absolute;
   top: 50%;
   left: 50%;
   width: var(--vcW);
   /* --o (steps from centre) and --k (scale) are written by the driver. */
-  transform: translate(-50%, -50%) translateX(calc(var(--o, 0) * var(--vcStep) + var(--drag, 0px))) scale(var(--k, 1));
+  transform: translate(-50%, -50%) translateX(calc(var(--o, 0) * var(--vcStep))) scale(var(--k, 1));
   transition: transform .45s cubic-bezier(.4, 0, .2, 1), opacity .45s ease;
   display: block;
 }
@@ -229,7 +243,7 @@ body:has(#xt-root) { background: var(--page); }
 #xt-root .xt-vc-dot:hover { background: rgba(255, 255, 255, .6); }
 #xt-root .xt-vc-dot.xt-vc-dot-on { width: 28px; background: var(--red); }
 @media (prefers-reduced-motion: reduce) {
-  #xt-root .xt-vc-slide { transition: none; }
+  #xt-root .xt-vc-slide, #xt-root .xt-vc-track { transition: none; }
 }
 
 /* ---- rotating article lead (category carousel; driven by XtShell) ----

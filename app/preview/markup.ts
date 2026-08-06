@@ -654,7 +654,7 @@ function videoCarouselHtml(s: HomeSection, lang: Lang): string {
         <span class="xt-vc-rule"></span>
       </div>
       <div class="xt-wrap xt-vc" data-xt-vc data-secs="${ROTATE_SECS}">
-        <div class="xt-vc-stage">${arts.map(slide).join('')}</div>
+        <div class="xt-vc-stage"><div class="xt-vc-track">${arts.map(slide).join('')}</div></div>
         <div class="xt-vc-dots">${dots}</div>
       </div>
     </section>`;

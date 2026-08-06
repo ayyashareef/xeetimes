@@ -499,79 +499,123 @@ export default function XtShell({
       const onEnter = () => { paused = true; stop(); };
       const onLeave = () => { paused = false; start(); };
 
-      // Drag: the strip follows the finger and snaps to the nearest card on
-      // release. The step is measured from the live geometry — the gap between
-      // the centred card and its neighbour — rather than parsed out of
-      // --vcStep, which is a raw token (78vw) at every breakpoint.
+      // Drag. The strip follows the pointer and snaps to the nearest card on
+      // release. Pointer events cover mouse and touch with one path, so the
+      // band drags on a desktop too.
+      //
+      // The drag moves the TRACK, never the slides: one composited transform
+      // per frame instead of eight restyles. Updates are coalesced into a
+      // single rAF so a 120Hz digitiser can't outrun the compositor.
       const stage = box.querySelector<HTMLElement>('.xt-vc-stage');
+      const track = box.querySelector<HTMLElement>('.xt-vc-track');
+      // Measured from live geometry — the gap between the centred card's centre
+      // and its neighbour's. --vcStep can't be read instead: it is a raw token
+      // (78vw on phones) that getComputedStyle hands back unresolved. Both cards
+      // ride the same track, so the gap holds mid-drag.
       const stepPx = () => {
         const a = slides[cur].getBoundingClientRect();
         const b = slides[(cur + 1) % n].getBoundingClientRect();
         const gap = Math.abs(b.left + b.width / 2 - (a.left + a.width / 2));
-        // Falls back if the neighbour is stacked on top (a 2-slide ring).
-        return gap > 20 ? gap : a.width * 1.06;
+        return gap > 20 ? gap : a.width * 1.06; // 2-slide ring: neighbours stack
       };
 
       let x0 = 0;
       let y0 = 0;
       let dx = 0;
+      let vx = 0;          // px/ms, for flick detection
+      let tPrev = 0;
+      let xPrev = 0;
+      let down = false;
       let dragging = false;
-      let moved = false;
+      let raf = 0;
 
-      const setDrag = (px: number) => stage?.style.setProperty('--drag', `${px}px`);
-      const endDrag = () => {
-        stage?.classList.remove('xt-vc-dragging');
-        setDrag(0);
+      const paint = () => { raf = 0; if (track) track.style.transform = `translate3d(${dx}px,0,0)`; };
+      const queue = () => { if (!raf) raf = requestAnimationFrame(paint); };
+
+      const onDown = (ev: PointerEvent) => {
+        // Left button / touch / pen only.
+        if (ev.pointerType === 'mouse' && ev.button !== 0) return;
+        down = true;
         dragging = false;
-      };
-
-      const onTouchStart = (ev: TouchEvent) => {
-        x0 = ev.changedTouches[0].clientX;
-        y0 = ev.changedTouches[0].clientY;
+        x0 = xPrev = ev.clientX;
+        y0 = ev.clientY;
+        tPrev = ev.timeStamp;
         dx = 0;
-        dragging = false;
-        moved = false;
+        vx = 0;
         paused = true;
         stop();
       };
-      const onTouchMove = (ev: TouchEvent) => {
-        const t = ev.changedTouches[0];
-        dx = t.clientX - x0;
-        // Wait until the gesture has declared itself horizontal, so a vertical
-        // flick down the page never drags the strip sideways with it.
+      const onMove = (ev: PointerEvent) => {
+        if (!down) return;
+        dx = ev.clientX - x0;
         if (!dragging) {
-          if (Math.abs(dx) < 8 || Math.abs(dx) <= Math.abs(t.clientY - y0)) return;
+          // Claim the gesture only once it is clearly horizontal, so a flick
+          // down the page never drags the strip sideways with it.
+          if (Math.abs(dx) < 6 || Math.abs(dx) <= Math.abs(ev.clientY - y0)) return;
           dragging = true;
           stage?.classList.add('xt-vc-dragging');
+          // Keep receiving moves even if the pointer leaves the band.
+          try { stage?.setPointerCapture(ev.pointerId); } catch { /* not captureable */ }
         }
-        moved = true;
-        setDrag(dx);
+        const dt = ev.timeStamp - tPrev;
+        if (dt > 0) vx = (ev.clientX - xPrev) / dt;
+        tPrev = ev.timeStamp;
+        xPrev = ev.clientX;
+        queue();
       };
-      const onTouchEnd = () => {
+      const onUp = (ev: PointerEvent) => {
+        if (!down) return;
+        down = false;
         paused = false;
         if (!dragging) { start(); return; }
-        // Snap to whichever card the drag landed nearest. Dragging left pulls
-        // the strip left, which brings the next card in.
-        const steps = Math.round(-dx / stepPx());
-        endDrag();
+        if (raf) { cancelAnimationFrame(raf); raf = 0; }
+        try { stage?.releasePointerCapture(ev.pointerId); } catch { /* already gone */ }
+
+        const step = stepPx();
+        // A fast flick should advance even if it covered little ground, so
+        // velocity counts for a card's worth of travel on top of the distance.
+        const thrown = Math.abs(vx) > 0.45 ? Math.sign(vx) * step * 0.6 : 0;
+        // Snap to whichever card the drag left nearest the centre. Index grows
+        // leftward, so dragging RIGHT carries a higher index in: +dx -> +steps.
+        // Negating this is what made the strip snap away from the card you had
+        // just pulled into place.
+        const steps = Math.round((dx + thrown) / step);
+
+        stage?.classList.remove('xt-vc-dragging');
+        // Force the restored transition into the "before" style, otherwise the
+        // class removal and the transform reset coalesce into one style change
+        // and the snap jumps instead of animating.
+        void stage?.offsetWidth;
+        if (track) track.style.transform = 'translate3d(0,0,0)';
         show(cur + steps);
         start();
-        // A drag that ends on a card would otherwise fire its click and
-        // navigate; swallow exactly one click if the finger actually moved.
-        if (moved) {
-          const swallow = (e: Event) => { e.preventDefault(); e.stopPropagation(); };
-          box.addEventListener('click', swallow, { capture: true, once: true });
-          window.setTimeout(() => box.removeEventListener('click', swallow, true), 400);
-        }
+
+        // A drag that ends on a card would fire that card's click and navigate.
+        const swallow = (e: Event) => { e.preventDefault(); e.stopPropagation(); };
+        box.addEventListener('click', swallow, { capture: true, once: true });
+        window.setTimeout(() => box.removeEventListener('click', swallow, true), 400);
       };
+      const onCancel = () => {
+        if (!down) return;
+        down = false;
+        dragging = false;
+        paused = false;
+        if (raf) { cancelAnimationFrame(raf); raf = 0; }
+        stage?.classList.remove('xt-vc-dragging');
+        if (track) track.style.transform = 'translate3d(0,0,0)';
+        start();
+      };
+      // Native image/link dragging would hijack a mouse drag before we see it.
+      const onDragStart = (ev: Event) => ev.preventDefault();
 
       box.addEventListener('click', onClick);
       box.addEventListener('mouseenter', onEnter);
       box.addEventListener('mouseleave', onLeave);
-      box.addEventListener('touchstart', onTouchStart, { passive: true });
-      box.addEventListener('touchmove', onTouchMove, { passive: true });
-      box.addEventListener('touchend', onTouchEnd, { passive: true });
-      box.addEventListener('touchcancel', onTouchEnd, { passive: true });
+      box.addEventListener('pointerdown', onDown, { passive: true });
+      box.addEventListener('pointermove', onMove, { passive: true });
+      box.addEventListener('pointerup', onUp, { passive: true });
+      box.addEventListener('pointercancel', onCancel, { passive: true });
+      box.addEventListener('dragstart', onDragStart);
       layout();
       start();
       rotCleanups.push(() => {
@@ -579,10 +623,12 @@ export default function XtShell({
         box.removeEventListener('click', onClick);
         box.removeEventListener('mouseenter', onEnter);
         box.removeEventListener('mouseleave', onLeave);
-        box.removeEventListener('touchstart', onTouchStart);
-        box.removeEventListener('touchmove', onTouchMove);
-        box.removeEventListener('touchend', onTouchEnd);
-        box.removeEventListener('touchcancel', onTouchEnd);
+        if (raf) cancelAnimationFrame(raf);
+        box.removeEventListener('pointerdown', onDown);
+        box.removeEventListener('pointermove', onMove);
+        box.removeEventListener('pointerup', onUp);
+        box.removeEventListener('pointercancel', onCancel);
+        box.removeEventListener('dragstart', onDragStart);
       });
     });
 
