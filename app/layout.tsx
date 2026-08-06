@@ -31,9 +31,14 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Light-only design: pin the theme attribute before first paint (no flash, no
-  // localStorage read — there is no public dark mode).
-  const themeScript = `document.documentElement.setAttribute('data-xt-theme','light');`;
+  // Runs before first paint, so the page never flashes light then swaps to dark.
+  // A saved choice wins; otherwise the OS preference decides. Wrapped in
+  // try/catch because localStorage throws outright in some privacy modes, and a
+  // throw here would leave the document with no theme at all.
+  const themeScript = `(function(){try{var t=localStorage.getItem('xt-theme');` +
+    `if(t!=='dark'&&t!=='light'){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}` +
+    `document.documentElement.setAttribute('data-xt-theme',t);}` +
+    `catch(e){document.documentElement.setAttribute('data-xt-theme','light');}})();`;
   return (
     <html lang="en" className={archivo.variable} suppressHydrationWarning>
       <head>

@@ -265,6 +265,15 @@ export default function XtShell({
       } else if (act.dataset.act === 'menu-close') {
         e.preventDefault();
         setMenu(false);
+      } else if (act.dataset.act === 'theme') {
+        e.preventDefault();
+        // Flip the attribute the whole palette hangs off, then remember it. The
+        // choice is stored explicitly so it survives the OS preference changing
+        // later — a reader who picked light does not want dusk to undo it.
+        const el = document.documentElement;
+        const next = el.getAttribute('data-xt-theme') === 'dark' ? 'light' : 'dark';
+        el.setAttribute('data-xt-theme', next);
+        try { localStorage.setItem('xt-theme', next); } catch { /* private mode */ }
       } else if (act.dataset.act === 'comment') {
         e.preventDefault();
         const form = act.closest<HTMLElement>('.xt-cform');

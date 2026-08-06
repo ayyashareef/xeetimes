@@ -84,6 +84,52 @@
   --en: var(--font-archivo), 'Archivo', sans-serif;
 }
 
+/* Dark palette. Only the tokens are restated — every rule below reads through
+   them, so the whole public site flips on one attribute. It is a warm near-black
+   rather than pure #000: the design's greys are warm, and a neutral black under
+   them reads as a colour cast. --red lightens a little because the light-mode
+   crimson is too dense to sit on a dark ground. */
+:root[data-xt-theme="dark"] {
+  --page: #0c0c0e;
+  --bg: #141417;
+  --bg0: #1a1a1e;
+  --bg2: #1c1c21;
+  --bg3: #2a2a30;
+  --line: #2c2c33;
+  --line2: #26262c;
+  --ink: #f2f0ec;
+  --ink2: #a8a49c;
+  --ink3: #7d7a73;
+  --red: #e8354f;
+  --red2: #c8102e;
+  --blue: #e8354f;
+  --nav: #08080a;
+  --footer: #08080a;
+  --ph1: #24242a;
+  --ph2: #2e2e35;
+  --phink: rgba(255, 255, 255, .18);
+  --chip: rgba(0, 0, 0, .62);
+  --byline: #97a1b2;
+  /* Long-form reading surfaces. Body copy is deliberately not --ink: pure
+     near-white at 20px+ over a long article glares. */
+  --body-ink: #d4d1cb;
+  --card-ink: #b9b6b0;
+  --quote-bg: #1d1d22;
+  --quote-ink: #c2bfb8;
+  --shell: #1c1c21;
+  color-scheme: dark;
+}
+/* The same names in light mode, so every rule can use them unconditionally. */
+:root,
+:root[data-xt-theme="light"] {
+  --body-ink: #26262b;
+  --card-ink: #54595f;
+  --quote-bg: #f7f4ee;
+  --quote-ink: #4a4842;
+  --shell: #ffffff;
+  color-scheme: light;
+}
+
 /* The centred card sits on a warm grey page. */
 body:has(#xt-root) { background: var(--page); }
 
@@ -317,7 +363,7 @@ body:has(#xt-root) { background: var(--page); }
 /* Portrait headshots: show the whole photo inside the circle instead of
    cropping it. White fills the gap, which suits studio shots on a light
    background — the default stays `cover` for photographic portraits. */
-#xt-root .xt-team-pic.xt-fit-contain img { object-fit: contain !important; background: #fff; }
+#xt-root .xt-team-pic.xt-fit-contain img { object-fit: contain !important; background: var(--shell); }
 #xt-root .xt-team-card:hover .xt-team-pic { transform: translateY(-4px); }
 #xt-root .xt-team-card:hover .xt-hl { color: var(--red); }
 #xt-root .xt-sechead:hover h2 { color: var(--red); }
@@ -445,7 +491,7 @@ body:has(#xt-root) { background: var(--page); }
    design's dashed cream box with the Dhivehi "އިޝްތިހާރު" label. */
 #xt-root .xt-ad { position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
 #xt-root .xt-ad:not(:has(img)) {
-  border: 1px dashed #d6d0c4; background: #fff; color: #b0aa9f;
+  border: 1px dashed var(--line); background: var(--bg2); color: var(--ink3);
 }
 #xt-root .xt-ad:not(:has(img))::before {
   content: "އިޝްތިހާރު"; font-family: 'MVTypewriter', 'Faruma', sans-serif;
@@ -533,8 +579,8 @@ body:has(#xt-root) { background: var(--page); }
 }
 /* Most WP articles store the body as bare text (no <p> wrapper), so the size
    must live on the container — not only on <p> — or it never applies. */
-#xt-root .xt-article-body { font-size: 22px; line-height: 1.9; color: #26262b; }
-#xt-root .xt-article-body p { margin: 0 0 22px; font-size: 22px; line-height: 1.9; color: #26262b; text-align: start; }
+#xt-root .xt-article-body { font-size: 22px; line-height: 1.9; color: var(--body-ink); }
+#xt-root .xt-article-body p { margin: 0 0 22px; font-size: 22px; line-height: 1.9; color: var(--body-ink); text-align: start; }
 #xt-root .xt-article-body h2 { margin: 34px 0 18px; font-size: 35px; font-weight: 700; line-height: 1.5; font-family: 'Ammu','Faruma',sans-serif; }
 #xt-root .xt-article-body h3 { margin: 28px 0 14px; font-size: 32px; font-weight: 700; line-height: 1.5; font-family: 'Ammu','Faruma',sans-serif; }
 #xt-root .xt-article-body img { max-width: 100%; height: auto; margin: 12px auto 22px; display: block; }
@@ -552,10 +598,10 @@ body:has(#xt-root) { background: var(--page); }
 #xt-root .xt-article-body li { margin: 0 0 12px; font-size: 25px; line-height: 1.9; }
 /* Note callout — the design's right-red-border cream box. */
 #xt-root .xt-article-body blockquote {
-  border-right: 4px solid var(--red); background: #f7f4ee; padding: 16px 18px;
-  margin: 26px 0; font-size: 15px; line-height: 1.9; color: #4a4842;
+  border-right: 4px solid var(--red); background: var(--quote-bg); padding: 16px 18px;
+  margin: 26px 0; font-size: 15px; line-height: 1.9; color: var(--quote-ink);
 }
-#xt-root .xt-article-body blockquote p { margin: 0; font-size: 15px; line-height: 1.9; color: #4a4842; text-align: right; }
+#xt-root .xt-article-body blockquote p { margin: 0; font-size: 15px; line-height: 1.9; color: var(--quote-ink); text-align: right; }
 #xt-root .xt-article-body blockquote .xt-quote-body { margin: 0; }
 #xt-root .xt-article-body blockquote .xt-quote-author { display: block; margin-top: 12px; font-style: normal; font-weight: 700; font-size: 14px; color: var(--red); font-family: 'Ammu','Faruma',sans-serif; }
 
@@ -627,6 +673,46 @@ body:has(#xt-root) { background: var(--page); }
 /* In-flow mobile copies of the two article side ads — desktop uses the hero-row
    ad + sidebar instead, so hide these until the mobile breakpoint. */
 #xt-root .xt-artad1-mob, #xt-root .xt-artad2-mob { display: none !important; }
+/* Theme toggle. Both glyphs are in the DOM; CSS picks the one for the current
+   theme, so the button is correct on first paint and never flickers the wrong
+   icon while JS boots. Light shows the moon (what you'd switch TO). */
+/* Light/dark logo pair: only one of the two is ever displayed. */
+#xt-root .xt-logo-d { display: none; }
+:root[data-xt-theme="dark"] #xt-root .xt-logo-l { display: none; }
+:root[data-xt-theme="dark"] #xt-root .xt-logo-d { display: block; }
+#xt-root .xt-theme {
+  background: transparent;
+  border: 0;
+  padding: 8px 10px;
+  cursor: pointer;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  transition: color .18s ease, opacity .18s ease;
+}
+#xt-root .xt-theme:hover { color: var(--red); }
+/* .xt-mobonly's display:none loses to .xt-theme's display:flex — same
+   specificity, and .xt-theme is written later — so the phone instance needs the
+   two classes together to outrank it. Without this both toggles show at once. */
+#xt-root .xt-theme.xt-mobonly { display: none; }
+#xt-root .xt-theme svg { pointer-events: none; }
+#xt-root .xt-theme .xt-theme-sun { display: none; }
+:root[data-xt-theme="dark"] #xt-root .xt-theme .xt-theme-moon { display: none; }
+:root[data-xt-theme="dark"] #xt-root .xt-theme .xt-theme-sun { display: inline-flex; }
+/* On phones the bar is the page colour, not the dark nav, so the icon has to be
+   ink rather than white — same reason the search glyph and burger are. */
+@media (max-width: 860px) {
+  #xt-root .xt-theme.xt-mobonly { display: flex; }
+  #xt-root .xt-navrow > .xt-theme {
+    position: absolute;
+    right: 52px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--ink);
+  }
+}
 #xt-root .xt-burger { flex-direction: column; gap: 5px; width: 40px; height: 40px; align-items: center; justify-content: center; cursor: pointer; background: transparent; border: none; flex: none; padding: 0; }
 #xt-root .xt-burger span { display: block; width: 19px; height: 2px; background: #fff; transition: transform .32s cubic-bezier(.4,0,.1,1), opacity .2s ease; }
 #xt-root .xt-backdrop { display: none; position: fixed; inset: 0; z-index: 60; background: rgba(0,0,0,.5); border: none; padding: 0; opacity: 0; pointer-events: none; transition: opacity .38s ease; }

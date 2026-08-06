@@ -140,6 +140,8 @@ const EN = "font-family:var(--font-archivo),'Archivo','MV Utheemu','Faruma',sans
 
 const ICON: Record<string, string> = {
   home: '<svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V21h14V9.5"></path><path d="M9.5 21v-6h5v6"></path></svg>',
+  moon: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
+  sun: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
   play: '<svg width="64" height="64" viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="30" fill="rgba(255,255,255,.22)" stroke="rgba(255,255,255,.85)" stroke-width="2.5"/><path d="M26 21.5 44 32 26 42.5Z" fill="#fff"/></svg>',
   thumbUp: '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M2 21h3V9H2v12zm19.7-9.7c.2-.3.3-.6.3-1V9c0-1.1-.9-2-2-2h-5.2l.8-3.8v-.3c0-.4-.2-.8-.4-1.1L14.2 1 7.6 7.6c-.4.4-.6.9-.6 1.4V19c0 1.1.9 2 2 2h9c.8 0 1.5-.5 1.8-1.2l3-7c.1-.2.1-.4.1-.5z"/></svg>',
   thumbDown: '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M22 3h-3v12h3V3zM2.3 12.7c-.2.3-.3.6-.3 1V15c0 1.1.9 2 2 2h5.2l-.8 3.8v.3c0 .4.2.8.4 1.1l.9.8 6.6-6.6c.4-.4.6-.9.6-1.4V5c0-1.1-.9-2-2-2H6c-.8 0-1.5.5-1.8 1.2l-3 7c-.1.2-.1.4-.1.5z"/></svg>',
@@ -411,6 +413,14 @@ function fillAdColumn(slot: string, ads: AdsMap, cls = ''): string {
 export function header(lang: Lang, sm = false, active = '', ads: AdsMap = {}, hidden: string[] = [], site: Site = {}): string {
   void sm;
   const logoSrc = site.logo || '/xt-logo.png';
+  // The default mark has a near-black "XEETIMES" under the red tile, which
+  // disappears against a dark bar — so both files ship and CSS reveals the one
+  // for the current theme. Doing it in CSS keeps it correct on the first paint;
+  // swapping the src from JS would flash the wrong mark while the shell boots.
+  const logoDark = site.logoWhite || '/xt-logo-white.png';
+  const logoPair = (cls: string) =>
+    `<img class="${cls} xt-logo-l" src="${esc(logoSrc)}" alt="XeeTimes">` +
+    `<img class="${cls} xt-logo-d" src="${esc(logoDark)}" alt="XeeTimes">`;
   const lbl = (x: { dv: string; en: string }) => esc(lang === 'en' ? x.en : x.dv);
   const isOn = (m: { slug: string; dv: string; en: string }) => !!active && (m.slug === active || (lang === 'en' ? m.en : m.dv) === active);
   const visibleMenu = MENU.filter((m) => !hidden.includes(m.slug));
@@ -437,11 +447,15 @@ export function header(lang: Lang, sm = false, active = '', ads: AdsMap = {}, hi
     `<a href="${catUrl(m.slug, lang)}" class="xt-dlink" style="${isOn(m as MenuItem) ? 'color:var(--red);' : 'color:var(--ink);'}">${lbl(m)}${m.children?.length ? ' <span style="font-size:9px;line-height:1;">▼</span>' : ''}</a>`,
   ).join('');
 
+  // Both glyphs ship in the markup and CSS reveals the one matching the current
+  // theme, so the icon is right on the first paint without JS deciding it.
+  const themeToggle = (mobile: boolean) => `<button type="button" class="xt-theme ${mobile ? 'xt-mobonly' : ''}" data-act="theme" aria-label="Toggle dark mode" title="Toggle dark mode"><span class="xt-theme-moon">${ICON.moon}</span><span class="xt-theme-sun">${ICON.sun}</span></button>`;
+
   const drawer = `
   <button class="xt-backdrop" data-act="menu-close" aria-label="Close menu"></button>
   <aside class="xt-drawer" dir="${lang === 'dv' ? 'rtl' : 'ltr'}">
     <div class="xt-drawer-head">
-      <a href="/"><img class="xt-dlogo-img" src="${esc(logoSrc)}" alt="XeeTimes"></a>
+      <a href="/">${logoPair('xt-dlogo-img')}</a>
       <button class="xt-drawer-close" data-act="menu-close" aria-label="Close menu"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg></button>
     </div>
     <nav class="xt-drawer-nav">${drawerLinks}
@@ -458,7 +472,7 @@ export function header(lang: Lang, sm = false, active = '', ads: AdsMap = {}, hi
          ad above it and the nav bar below. Was 10/20, which read lopsided.
          15/15 keeps the header's overall height unchanged. -->
     <div class="xt-wrap xt-logorow" style="display:flex;align-items:center;justify-content:center;padding:15px 26px;">
-      <a href="/"><img class="xt-logo-img" src="${esc(logoSrc)}" alt="XeeTimes"></a>
+      <a href="/">${logoPair('xt-logo-img')}</a>
     </div>
     <nav style="background:var(--nav);">
       <div class="xt-wrap xt-navrow" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:0 22px;font-size:18px;min-height:68px;position:relative;">
@@ -467,10 +481,12 @@ export function header(lang: Lang, sm = false, active = '', ads: AdsMap = {}, hi
         <!-- Phone bar: search (left) | logo (centre) | menu (right). The first two
              are pinned absolutely by xt.css, leaving the logo centred in flow. -->
         <a href="/search" class="xt-navdark xt-mobonly" style="color:#fff;padding:11px 14px;align-items:center;" aria-label="Search">${ICON.search}</a>
-        <a href="/" class="xt-moblogo" aria-label="XeeTimes"><img src="${esc(logoSrc)}" alt="XeeTimes"></a>
+        ${themeToggle(true)}
+        <a href="/" class="xt-moblogo" aria-label="XeeTimes">${logoPair('')}</a>
         <button class="xt-burger xt-mobonly" data-act="menu" aria-label="Menu"><span></span><span></span><span></span></button>
         <span class="xt-desknav" style="position:absolute;${lang === 'dv' ? 'left' : 'right'}:20px;top:50%;transform:translateY(-50%);display:flex;align-items:center;color:#fff;">
           <a href="/search" style="padding:8px 10px;display:flex;align-items:center;color:#fff;" aria-label="Search">${ICON.search}</a>
+          ${themeToggle(false)}
         </span>
       </div>
     </nav>
@@ -534,7 +550,7 @@ function gridCard(a: Art, lang: Lang): string {
     <a href="${link(a, lang)}" class="xt-gcard" style="display:block;background:var(--bg2);border:1px solid var(--line2);overflow:hidden;">
       <div class="xt-thumb" style="width:100%;aspect-ratio:16/9;overflow:hidden;background:var(--ph2);position:relative;">${a.featuredImage ? imgFill(a, lang, 640) : `<div class="xt-img" style="position:absolute;inset:0;"><span>ފޮޓޯ</span></div>`}</div>
       <div class="xt-gcard-body" style="padding:14px 14px 16px;">
-        <h3 class="xt-hl" style="margin:0;font-size:16px;font-weight:600;line-height:1.6;color:#54595f;transition:color .2s;">${esc(shortTitle(a, lang))}</h3>
+        <h3 class="xt-hl" style="margin:0;font-size:16px;font-weight:600;line-height:1.6;color:var(--card-ink);transition:color .2s;">${esc(shortTitle(a, lang))}</h3>
         <div class="xt-gcard-date" style="color:var(--ink3);font-size:12px;margin-top:10px;${EN}text-align:right;" dir="ltr">${dvDate(a.publishedAt, lang)}</div>
       </div>
     </a>`;
@@ -1046,7 +1062,7 @@ function pagination(pages: number, page = 1): string {
   seq.push(...win);
   if (win[win.length - 1] < pages) { if (win[win.length - 1] < pages - 1) seq.push('…'); seq.push(pages); }
   const cell = (label: string, href: string | null, active: boolean, disabled = false): string => {
-    const style = `min-width:40px;height:40px;padding:0 12px;display:grid;place-items:center;border:1px solid ${active ? 'var(--red)' : 'var(--line)'};background:${active ? 'var(--red)' : 'transparent'};color:${active ? '#fff' : disabled ? 'var(--ink3)' : '#4a4842'};${EN}font-weight:700;font-size:14px;text-decoration:none;${disabled ? 'opacity:.45;pointer-events:none;' : ''}`;
+    const style = `min-width:40px;height:40px;padding:0 12px;display:grid;place-items:center;border:1px solid ${active ? 'var(--red)' : 'var(--line)'};background:${active ? 'var(--red)' : 'transparent'};color:${active ? '#fff' : disabled ? 'var(--ink3)' : 'var(--quote-ink)'};${EN}font-weight:700;font-size:14px;text-decoration:none;${disabled ? 'opacity:.45;pointer-events:none;' : ''}`;
     return href ? `<a href="${href}" class="xt-page" style="${style}">${label}</a>` : `<span class="xt-page" style="${style}">${label}</span>`;
   };
   const items = [cell('‹', cur > 1 ? `?page=${cur - 1}` : null, false, cur === 1)];
