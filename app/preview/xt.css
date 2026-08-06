@@ -323,6 +323,13 @@ body:has(#xt-root) { background: var(--page); }
 #xt-root .xt-sechead:hover h2 { color: var(--red); }
 #xt-root .xt-cat-tile:hover .xt-cat-ico { transform: scale(1.06); box-shadow: 0 10px 24px rgba(200,16,46,.28); }
 #xt-root .xt-cat-tile:hover span:last-child { color: var(--red); }
+/* Related articles carry a taller thumbnail than the rest of the grid cards —
+   3/2 like the old site, not the shared 16/9. In a column this narrow a 16/9
+   thumb is only ~85px tall, so the card reads as mostly text. Scoped to this
+   grid on purpose: the home and search grids were not asked to change.
+   !important is required, not sloppy: gridCard sets aspect-ratio:16/9 inline,
+   and an inline declaration outranks any selector without it. */
+#xt-root .xt-g-rel .xt-thumb { aspect-ratio: 3 / 2 !important; }
 #xt-root .xt-thumb img { transition: transform .5s ease; }
 #xt-root .xt-navdark { transition: background .18s, color .18s; }
 #xt-root .xt-navdark:hover { background: var(--red); color: #fff !important; }

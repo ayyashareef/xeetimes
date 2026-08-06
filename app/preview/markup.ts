@@ -950,7 +950,7 @@ export function articleHtml(a: Art, related: Art[], comments: Cmt[], lang: Lang,
         ${fillAdColumn('ARTICLE_SIDEBAR_1', ads, 'xt-artad1-mob')}
         ${rel ? `
         ${secTitle(STR[lang].related)}
-        <div class="xt-g-4" style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;">${rel}</div>` : ''}
+        <div class="xt-g-4 xt-g-rel" style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;">${rel}</div>` : ''}
         ${fillAdColumn('ARTICLE_SIDEBAR_2', ads, 'xt-artad2-mob')}
       </article>
       <aside class="xt-ad-rail">
