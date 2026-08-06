@@ -616,7 +616,12 @@ body:has(#xt-root) { background: var(--page); }
      cost: the photos are 16:9, so filling a portrait box crops roughly half
      their width. object-position below keeps that crop off the bottom-left
      corner, where the watermark sits. */
-  #xt-root .xt-rot { aspect-ratio: 8 / 9 !important; }
+  /* The photo/video section's featured card matches the main lead on a phone:
+     same 8/9 portrait, same 25px headline (both carry .xt-lead-hl). Its desktop
+     shape is a wide 741/400 banner, which only works beside the small card —
+     once the grid stacks to one column that banner reads as a thin strip. */
+  #xt-root .xt-rot,
+  #xt-root .xt-featlead { aspect-ratio: 8 / 9 !important; }
   /* The article hero is 16/9 but ALSO min-height:260px — the same conflict the
      lead had: on a phone 16/9 is ~219px, so min-height wins, the box turns
      portrait and cover crops the sides, taking the corner watermark with it. */
@@ -625,7 +630,8 @@ body:has(#xt-root) { background: var(--page); }
      baked-in watermark falls outside this window — the mark is drawn as an
      overlay instead (.xt-lead-logo), and an element cannot be cropped, which is
      what frees the photo itself to be centred. */
-  #xt-root .xt-rot .xt-rot-slide img { object-position: center; }
+  #xt-root .xt-rot .xt-rot-slide img,
+  #xt-root .xt-featlead img { object-position: center; }
   /* Phones only: desktop shows the photo uncropped, so its baked-in watermark is
      already visible there and a second mark would double up. */
   #xt-root .xt-lead-logo { display: block; }

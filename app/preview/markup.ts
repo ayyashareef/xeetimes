@@ -628,15 +628,16 @@ function othersGroupHtml(s: HomeSection, lang: Lang): string {
 
 // A "featured" home section (photo / video): one big lead card (right, ~2/3,
 // headline overlaid on the image) + one smaller card (left), like the live home.
-function featuredSectionHtml(s: HomeSection, lang: Lang): string {
+function featuredSectionHtml(s: HomeSection, lang: Lang, site: Site): string {
   const big = s.articles[0];
   if (!big) return '';
   const small = s.articles[1];
   const bigCard = `
     <a href="${link(big, lang)}" class="xt-lead" style="display:block;">
-      <div style="position:relative;overflow:hidden;width:100%;aspect-ratio:741/400;background:var(--ph2);">
+      <div class="xt-featlead" style="position:relative;overflow:hidden;width:100%;aspect-ratio:741/400;background:var(--ph2);">
         ${imgFill(big, lang, 1080, true)}
         <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(10,10,12,.82),transparent 58%);"></div>
+        ${leadLogo(site)}
         <div style="position:absolute;right:0;bottom:0;left:0;padding:24px;">
           <h2 class="xt-lead-hl" style="margin:0;color:#fff;font-size:24px;font-weight:700;line-height:1.55;transition:color .2s;">${esc(shortTitle(big, lang))}</h2>
           <div style="color:#bdb9b1;font-size:13px;margin-top:10px;text-align:${lang === 'dv' ? 'right' : 'left'};${EN}" dir="ltr">${dvDate(big.publishedAt, lang)}</div>
@@ -711,7 +712,7 @@ export function homeHtml(d: HomeData, lang: Lang): string {
       return othersGroupHtml(s, lang) + ad;
     }
     // Photo / video: a big featured card + one small card.
-    if (s.featured) return featuredSectionHtml(s, lang);
+    if (s.featured) return featuredSectionHtml(s, lang, site);
     if (!s.articles.length) return '';
     const block = `
     <section class="xt-sec-${esc(s.slug)}" style="padding:12px 0 12px;">
