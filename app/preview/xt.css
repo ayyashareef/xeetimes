@@ -412,6 +412,12 @@ body:has(#xt-root) { background: var(--page); }
 #xt-root .xt-adband.xt-adband-top > .xt-adband-label { margin-top: 0; margin-bottom: 2px; }
 
 /* ---- Vertical share rail (article) ---- */
+/* The headline and byline sit above the row that holds the share rail, so the
+   rail starts level with the first line of the article rather than the title.
+   They are padded by the rail's own width + gap to stay flush with the body
+   column; inline-start is correct in both directions, since the rail is the
+   flex row's first item and lands on the right in RTL. */
+#xt-root .xt-art-head { padding-inline-start: 60px; }
 #xt-root .xt-share-rail { display: flex; gap: 9px; }
 /* Desktop: a sticky vertical rail beside the article. */
 #xt-root .xt-share-desk { flex-direction: column; width: 38px; flex: none; position: sticky; top: 20px; }
@@ -598,6 +604,7 @@ body:has(#xt-root) { background: var(--page); }
   #xt-root .xt-art-flex { flex-direction: column !important; align-items: stretch !important; }
   #xt-root .xt-art-flex > div { width: 100%; }
   /* Share icons: full-width row, spread edge-to-edge (no white gap on the right). */
+  #xt-root .xt-art-head { padding-inline-start: 0; }
   #xt-root .xt-share-desk { display: none; }
   #xt-root .xt-share-mob { display: flex; }
   #xt-root .xt-ad-rail { position: static; flex-direction: row; flex-wrap: wrap; }

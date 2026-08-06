@@ -135,8 +135,8 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ p
   const rest = recent.filter((a) => a.slug !== heroSlug);
 
   // The hero rotates through the newest HOME_HERO_SLIDES articles. The extra
-  // slides come off the front of `rest`, and everything below shifts by the same
-  // amount so a slide never also appears in Top Stories or Latest.
+  // slides come off the front of `rest`; `afterHero` is what remains once they
+  // are taken. "Latest" deliberately does NOT use it — see below.
   const heroes = hero ? [hero, ...rest.slice(0, HOME_HERO_SLIDES - 1)] : [];
   const afterHero = rest.slice(Math.max(0, heroes.length - 1));
 
@@ -148,7 +148,10 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ p
         hero,
         heroes,
         topStories: afterHero.slice(0, 3),
-        news: afterHero.slice(3, 11),
+        // ފަހުގެ ލިޔުންތައް means the latest articles, so it lists them —
+        // including the ones the hero is rotating through. Skipping those made
+        // the newest stories the only ones missing from the newest list.
+        news: recent.slice(0, 8),
         worldFeature: null,
         worldList: [],
         sections,

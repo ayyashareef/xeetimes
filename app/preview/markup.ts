@@ -919,9 +919,7 @@ export function articleHtml(a: Art, related: Art[], comments: Cmt[], lang: Lang,
     <div class="xt-article-grid" style="display:grid;grid-template-columns:minmax(0,1.73fr) 1fr;gap:20px;align-items:start;">
       <article class="xt-art-col" style="min-width:0;">
         ${heroImg}
-        <div class="xt-art-flex" style="display:flex;gap:22px;align-items:flex-start;margin-top:14px;">
-          ${shareRail(a, lang, 'xt-share-desk')}
-          <div style="flex:1;min-width:0;">
+        <div class="xt-art-head" style="margin-top:14px;">
           <h1 class="xt-lead-hl xt-arttitle" style="margin:0 0 10px;color:var(--ink);font-size:34px;font-weight:700;line-height:1.5;">${esc(title(a, lang))}</h1>
           <div style="display:flex;align-items:center;gap:16px;margin:0 0 18px;padding:12px 0;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2);">
             ${(() => {
@@ -932,20 +930,28 @@ export function articleHtml(a: Art, related: Art[], comments: Cmt[], lang: Lang,
               return u ? `<a href="${u}" style="display:flex;align-items:center;gap:12px;" title="${esc(an)}">${inner}</a>` : `<div style="display:flex;align-items:center;gap:12px;">${inner}</div>`;
             })()}
           </div>
+        </div>
+        <div class="xt-art-flex" style="display:flex;gap:22px;align-items:flex-start;">
+          ${shareRail(a, lang, 'xt-share-desk')}
+          <div style="flex:1;min-width:0;">
           ${shareRail(a, lang, 'xt-share-mob')}
           <div class="xt-article-body">
             ${insertMidAd(content(a, lang), midAdBlock(ads))}
             ${galleryBlock(a, lang)}
           </div>
           ${reactionBar(a.id || '', reactionCounts)}
-          ${site.commentsEnabled === false ? '' : commentsBlock(comments, lang, a.id || '')}
-          ${fillAdColumn('ARTICLE_SIDEBAR_1', ads, 'xt-artad1-mob')}
-          ${rel ? `
-          ${secTitle(STR[lang].related)}
-          <div class="xt-g-4" style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;">${rel}</div>` : ''}
-          ${fillAdColumn('ARTICLE_SIDEBAR_2', ads, 'xt-artad2-mob')}
           </div>
         </div>
+        <!-- Everything past the article itself sits outside the share row, so it
+             gets the column's full width instead of being indented by the rail.
+             The rail flanks the story; comments and related articles are page
+             furniture and have no reason to give up 60px to it. -->
+        ${site.commentsEnabled === false ? '' : commentsBlock(comments, lang, a.id || '')}
+        ${fillAdColumn('ARTICLE_SIDEBAR_1', ads, 'xt-artad1-mob')}
+        ${rel ? `
+        ${secTitle(STR[lang].related)}
+        <div class="xt-g-4" style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;">${rel}</div>` : ''}
+        ${fillAdColumn('ARTICLE_SIDEBAR_2', ads, 'xt-artad2-mob')}
       </article>
       <aside class="xt-ad-rail">
         ${fillAdColumn('ARTICLE_SIDEBAR_1', ads, 'xt-art-topad')}
