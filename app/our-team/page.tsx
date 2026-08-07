@@ -55,6 +55,8 @@ const ROSTER: { id: string; lead?: boolean; fit?: 'contain' }[] = [
   { id: 'usr_41' },                                     // Yashfa Abdul Ghanee
   { id: 'usr_37' },                                     // Ahmed Mujahid
   { id: 'usr_38' },                                     // Javiz Abdul Kareem
+  { id: 'usr_26' },                                     // Mohamed Ali
+  { id: 'usr_34' },                                     // Tree Maldives
 ];
 
 export default async function OurTeamPage() {

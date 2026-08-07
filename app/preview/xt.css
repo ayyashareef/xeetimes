@@ -295,7 +295,9 @@ body:has(#xt-root) { background: var(--page); }
 /* ---- rotating article lead (category carousel; driven by XtShell) ----
    Slides are stacked and cross-faded; the slide itself is styled exactly like
    the static lead, so only the fade and these controls are new. */
-#xt-root .xt-rot-slide { transition: opacity .6s ease, visibility .6s ease; }
+/* Matched to the video carousel's .45s. Both strips already advance on the same
+   5s timer; it was the transition length that made the lead feel slower. */
+#xt-root .xt-rot-slide { transition: opacity .45s ease, visibility .45s ease; }
 /* Progress runs left-to-right regardless of the page direction: slide 1's dot is
    the leftmost and the highlight travels rightward. `direction: ltr` is required
    — without it the flex row inherits the page's RTL and slide 1 lands on the
