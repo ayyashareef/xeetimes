@@ -777,10 +777,9 @@ export function homeHtml(d: HomeData, lang: Lang): string {
       const ad = `<div style="margin:16px 0;">${adBand('HOME_AFTER_BADHIGE', d.ads)}</div>`;
       return othersGroupHtml(s, lang) + ad;
     }
-    // The video band is rendered outside <main> (see below), not here.
-    if (s.carousel) return '';
-    // Photo: a big featured card + one small.
-    if (s.featured) return featuredSectionHtml(s, lang, site);
+    // Both tail sections render after </main>: the video band because it is
+    // full-bleed, and the photo section because it now sits below the band.
+    if (s.carousel || s.featured) return '';
     if (!s.articles.length) return '';
     const block = `
     <section class="xt-sec-${esc(s.slug)}" style="padding:12px 0 12px;">
@@ -799,6 +798,10 @@ export function homeHtml(d: HomeData, lang: Lang): string {
 
   // Full-bleed, so it hangs off the end of the wrap rather than inside it.
   const videoBand = d.sections.filter((s) => s.carousel).map((s) => videoCarouselHtml(s, lang)).join('');
+  // The photo section follows the band, so it needs its own .xt-wrap — it is no
+  // longer inside <main> and would otherwise run the full width of the page.
+  const photoTail = d.sections.filter((s) => s.featured && !s.carousel)
+    .map((s) => featuredSectionHtml(s, lang, site)).join('');
 
   return `
   ${header(lang, false, '', d.ads, d.hidden || [], site)}
@@ -809,6 +812,7 @@ export function homeHtml(d: HomeData, lang: Lang): string {
     ${sections}
   </main>
   ${videoBand}
+  ${photoTail ? `<div class="xt-wrap" style="padding:0 0 10px;">${photoTail}</div>` : ''}
   ${footer(lang, site)}`;
 }
 
@@ -958,7 +962,7 @@ export function articleHtml(a: Art, related: Art[], comments: Cmt[], lang: Lang,
               const u = authorUrl(lang, a.author ?? null);
               // Byline name and date share one colour (--byline, a cool slate)
               // rather than the near-black name + warm grey date they used to be.
-              const inner = `${authorAvatar(a.author ?? null, an, 44)}<div><div class="xt-byline-name" style="font-weight:700;font-size:15px;line-height:1.25;color:var(--byline);">${esc(an)}</div><div class="xt-byline-date" style="color:var(--byline);font-size:12px;line-height:1.2;margin-top:9px;text-align:${lang === 'dv' ? 'right' : 'left'};" dir="ltr">${dvDate(a.publishedAt, lang)}</div></div>`;
+              const inner = `${authorAvatar(a.author ?? null, an, 58)}<div><div class="xt-byline-name" style="font-weight:700;font-size:15px;line-height:1.25;color:var(--byline);">${esc(an)}</div><div class="xt-byline-date" style="color:var(--byline);font-size:12px;line-height:1.2;margin-top:9px;text-align:${lang === 'dv' ? 'right' : 'left'};" dir="ltr">${dvDate(a.publishedAt, lang)}</div></div>`;
               return u ? `<a href="${u}" style="display:flex;align-items:center;gap:12px;" title="${esc(an)}">${inner}</a>` : `<div style="display:flex;align-items:center;gap:12px;">${inner}</div>`;
             })()}
           </div>
@@ -974,12 +978,15 @@ export function articleHtml(a: Art, related: Art[], comments: Cmt[], lang: Lang,
           ${reactionBar(a.id || '', reactionCounts)}
           </div>
         </div>
+        <!-- Directly under the reactions, ahead of the comment form, matching
+             the old site. It used to sit below the comments, where a reader who
+             stopped at the end of the article never reached it. -->
+        ${fillAdColumn('ARTICLE_SIDEBAR_1', ads, 'xt-artad1-mob')}
         <!-- Everything past the article itself sits outside the share row, so it
              gets the column's full width instead of being indented by the rail.
              The rail flanks the story; comments and related articles are page
              furniture and have no reason to give up 60px to it. -->
         ${site.commentsEnabled === false ? '' : commentsBlock(comments, lang, a.id || '')}
-        ${fillAdColumn('ARTICLE_SIDEBAR_1', ads, 'xt-artad1-mob')}
         ${rel ? `
         ${secTitle(STR[lang].related)}
         <div class="xt-g-4 xt-g-rel" style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;">${rel}</div>` : ''}
