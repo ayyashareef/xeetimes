@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 // Asks the photo source before uploading. "XeeTimes owned" adds the logo
 // watermark, and lets the desk pick which mark and where it sits.
-export type WatermarkOpts = { logo: string; pos: string };
+export type WatermarkOpts = { logo: string; pos: string; size: string; opacity: number };
 
 // Kept in step with WM_LOGOS / WM_POSITIONS in app/api/upload/route.ts — the
 // server whitelists both, so anything not on these lists falls back there.
@@ -15,15 +15,27 @@ const LOGOS: { id: string; label: string; hint: string }[] = [
   { id: 'black-word-white', label: 'Black + name', hint: 'white name' },
   { id: 'black-word-dark', label: 'Black + name', hint: 'dark name' },
   { id: 'black-mark', label: 'Black mark', hint: 'no name' },
+  { id: 'white-word', label: 'White + name', hint: 'letters knocked out — pair with a lower opacity' },
+  { id: 'white-mark', label: 'White mark', hint: 'no name' },
 ];
+
+const SIZES: { id: string; label: string }[] = [
+  { id: 'small', label: 'Small' },
+  { id: 'medium', label: 'Medium' },
+  { id: 'large', label: 'Large' },
+  { id: 'cover', label: 'Cover (hide a face)' },
+];
+const OPACITIES = [100, 85, 70, 50];
 
 const POSITIONS: { id: string; label: string }[] = [
   { id: 'bottom-left', label: 'Bottom left' },
   { id: 'bottom-right', label: 'Bottom right' },
   { id: 'top-left', label: 'Top left' },
   { id: 'top-right', label: 'Top right' },
-  { id: 'center', label: 'Middle (large)' },
+  { id: 'center', label: 'Middle' },
 ];
+
+const selectStyle: React.CSSProperties = { width: '100%', padding: '10px 12px', borderRadius: 10, border: '1px solid #d7dbe2', fontSize: 14, background: '#fff', color: '#111' };
 
 export default function UploadSourceDialog({ open, onChoose, onCancel }: {
   open: boolean;
@@ -32,6 +44,8 @@ export default function UploadSourceDialog({ open, onChoose, onCancel }: {
 }) {
   const [logo, setLogo] = useState('red-word-white');
   const [pos, setPos] = useState('bottom-left');
+  const [size, setSize] = useState('medium');
+  const [opacity, setOpacity] = useState(100);
   if (!open) return null;
 
   const swatch = (id: string) => {
@@ -47,7 +61,7 @@ export default function UploadSourceDialog({ open, onChoose, onCancel }: {
         style={{
           padding: 6, borderRadius: 10, cursor: 'pointer',
           border: on ? '2px solid #c8102e' : '1px solid #d7dbe2',
-          background: id.startsWith('black') ? '#f1f2f4' : '#fff',
+          background: id.startsWith('white') ? '#6f6a66' : id.startsWith('black') ? '#f1f2f4' : '#fff',
           display: 'grid', placeItems: 'center', minHeight: 58,
         }}
       >
@@ -76,18 +90,30 @@ export default function UploadSourceDialog({ open, onChoose, onCancel }: {
           {LOGOS.find((l) => l.id === logo)?.label} — {LOGOS.find((l) => l.id === logo)?.hint}
         </p>
 
-        <label style={{ display: 'block', fontSize: 12, fontWeight: 700, letterSpacing: '.04em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 8 }}>Position</label>
-        <select
-          value={pos}
-          onChange={(e) => setPos(e.target.value)}
-          style={{ width: '100%', padding: '10px 12px', borderRadius: 10, border: '1px solid #d7dbe2', fontSize: 14, marginBottom: 20, background: '#fff', color: '#111' }}
-        >
-          {POSITIONS.map((p) => <option key={p.id} value={p.id}>{p.label}</option>)}
-        </select>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 20 }}>
+          <div>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 700, letterSpacing: '.04em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 8 }}>Position</label>
+            <select value={pos} onChange={(e) => setPos(e.target.value)} style={selectStyle}>
+              {POSITIONS.map((p) => <option key={p.id} value={p.id}>{p.label}</option>)}
+            </select>
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 700, letterSpacing: '.04em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 8 }}>Size</label>
+            <select value={size} onChange={(e) => setSize(e.target.value)} style={selectStyle}>
+              {SIZES.map((x) => <option key={x.id} value={x.id}>{x.label}</option>)}
+            </select>
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 700, letterSpacing: '.04em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 8 }}>Opacity</label>
+            <select value={opacity} onChange={(e) => setOpacity(Number(e.target.value))} style={selectStyle}>
+              {OPACITIES.map((o) => <option key={o} value={o}>{o}%</option>)}
+            </select>
+          </div>
+        </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <button
-            onClick={() => onChoose(true, { logo, pos })}
+            onClick={() => onChoose(true, { logo, pos, size, opacity })}
             style={{ width: '100%', padding: '12px 16px', borderRadius: 10, border: 'none', background: '#c8102e', color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
           >
             XeeTimes owned — add watermark

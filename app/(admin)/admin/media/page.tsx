@@ -54,6 +54,8 @@ export default function MediaPage() {
           // rather than being trusted into a filesystem path.
           if (wm?.logo) formData.append('wmLogo', wm.logo);
           if (wm?.pos) formData.append('wmPos', wm.pos);
+          if (wm?.size) formData.append('wmSize', wm.size);
+          if (wm?.opacity) formData.append('wmOpacity', String(wm.opacity));
         }
 
       try {

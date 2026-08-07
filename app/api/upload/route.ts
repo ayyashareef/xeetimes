@@ -10,7 +10,12 @@ import sharp from 'sharp';
 const WM_LOGOS = new Set([
   'red-word-white', 'red-word-dark', 'red-mark',
   'black-word-white', 'black-word-dark', 'black-mark',
+  'white-word', 'white-mark',
 ]);
+// Fraction of the image WIDTH, so a mark looks the same size on every photo
+// once it is shown at a fixed container width. 'cover' is the one that hides
+// something — a face — rather than signing the picture.
+const WM_SIZES: Record<string, number> = { small: 0.08, medium: 0.105, large: 0.17, cover: 0.34 };
 type WmPos = 'bottom-left' | 'bottom-right' | 'top-left' | 'top-right' | 'center';
 const WM_POSITIONS = new Set<string>(['bottom-left', 'bottom-right', 'top-left', 'top-right', 'center']);
 
@@ -79,23 +84,32 @@ export async function POST(request: Request) {
       const wmPos = WM_POSITIONS.has(String(formData.get('wmPos') || ''))
         ? (String(formData.get('wmPos')) as WmPos)
         : 'bottom-left';
+      const wmSize = WM_SIZES[String(formData.get('wmSize') || '')] ?? WM_SIZES.medium;
+      // Clamped rather than trusted: an opacity outside 20-100 would either
+      // erase the mark or do nothing, and neither is worth honouring.
+      const wmOpacity = Math.min(100, Math.max(20, parseInt(String(formData.get('wmOpacity') || '100'), 10) || 100)) / 100;
 
       const meta = await sharp(buffer).metadata();
       const imgW = meta.width || 1200, imgH = meta.height || 800;
       // A consistent proportion of the image width (no tight min/max caps) so the
       // logo appears the SAME size on every photo once it's displayed at a fixed
       // container width — earlier caps made small vs large photos differ.
-      // Centre is the "cover this" mark (a face, a plate), so it is much larger:
-      // a corner-sized mark in the middle of a photo reads as a mistake.
-      const scale = wmPos === 'center' ? 0.34 : 0.12;
-      const logoW = Math.max(70, Math.min(wmPos === 'center' ? 900 : 360, Math.round(imgW * scale)));
-      const logo = await sharp(path.join(process.cwd(), 'public/watermarks', `${wmLogo}.png`))
+      const logoW = Math.max(60, Math.min(wmSize >= 0.3 ? 900 : 400, Math.round(imgW * wmSize)));
+      let logo = await sharp(path.join(process.cwd(), 'public/watermarks', `${wmLogo}.png`))
         .resize({ width: logoW }).ensureAlpha().png().toBuffer();
+      if (wmOpacity < 1) {
+        // Scale the existing alpha rather than flattening: the mark already has
+        // soft edges and transparent regions, and a blanket alpha would harden
+        // both.
+        const px = await sharp(logo).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+        for (let i = 3; i < px.data.length; i += 4) px.data[i] = Math.round(px.data[i] * wmOpacity);
+        logo = await sharp(px.data, { raw: px.info }).png().toBuffer();
+      }
       const rm = await sharp(logo).metadata();
       const lw = rm.width || logoW, lh = rm.height || logoW;
       // Soft shadow from the logo's own alpha for legibility on busy photos.
       const alpha = await sharp(logo).extractChannel('alpha').toColourspace('b-w').raw().toBuffer();
-      const shadowAlpha = Buffer.from(alpha.map((v) => Math.round(v * 0.5)));
+      const shadowAlpha = Buffer.from(alpha.map((v) => Math.round(v * 0.5 * wmOpacity)));
       const shadow = await sharp({ create: { width: lw, height: lh, channels: 3, background: '#000000' } })
         .joinChannel(shadowAlpha, { raw: { width: lw, height: lh, channels: 1 } }).png().blur(4).toBuffer();
 
