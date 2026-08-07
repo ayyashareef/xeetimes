@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { X, Upload, Search, FolderOpen, ImageIcon, Check, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import UploadSourceDialog from './UploadSourceDialog';
+import UploadSourceDialog, { type WatermarkOpts } from './UploadSourceDialog';
 
 interface MediaFile {
   id?: string;
@@ -66,7 +66,7 @@ export default function MediaPicker({ open, onClose, onSelect, onSelectMultiple,
     if (fileList && fileList.length) setPendingFiles(Array.from(fileList));
   };
 
-  const doUpload = async (siteOwned: boolean) => {
+  const doUpload = async (siteOwned: boolean, wm?: WatermarkOpts) => {
     const files = pendingFiles;
     setPendingFiles(null);
     if (!files?.length) return;
@@ -81,7 +81,13 @@ export default function MediaPicker({ open, onClose, onSelect, onSelectMultiple,
         const formData = new FormData();
         formData.append('file', file);
         formData.append('folder', currentFolder || folder || 'general');
-        if (siteOwned) formData.append('watermark', '1');
+        if (siteOwned) {
+          formData.append('watermark', '1');
+          // The server whitelists both, so an unknown value falls back there
+          // rather than being trusted into a filesystem path.
+          if (wm?.logo) formData.append('wmLogo', wm.logo);
+          if (wm?.pos) formData.append('wmPos', wm.pos);
+        }
 
         const res = await fetch('/api/upload', { method: 'POST', body: formData });
         if (!res.ok) {

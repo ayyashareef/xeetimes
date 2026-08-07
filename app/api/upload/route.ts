@@ -5,6 +5,15 @@ import { db } from '@/lib/db';
 import { uploadFile, deleteFile } from '@/lib/supabase-storage';
 import sharp from 'sharp';
 
+// Watermark options. Both lists are whitelists — wmLogo becomes part of a
+// filesystem path, so it can never come straight from the request.
+const WM_LOGOS = new Set([
+  'red-word-white', 'red-word-dark', 'red-mark',
+  'black-word-white', 'black-word-dark', 'black-mark',
+]);
+type WmPos = 'bottom-left' | 'bottom-right' | 'top-left' | 'top-right' | 'center';
+const WM_POSITIONS = new Set<string>(['bottom-left', 'bottom-right', 'top-left', 'top-right', 'center']);
+
 // SVG is intentionally excluded: it can embed <script> and would be served
 // same-origin, making it a stored-XSS vector. We only accept raster images.
 const EXT_BY_TYPE: Record<string, string> = {
@@ -58,17 +67,29 @@ export async function POST(request: Request) {
     }
   }
 
-  // XeeTimes-owned photos get the XeeTimes logo watermark (bottom-left), composited
-  // in its brand colours with a soft drop shadow so it reads on light or dark photos.
+  // XeeTimes-owned photos get the logo watermark, composited with a soft drop
+  // shadow so it reads on light or dark photos.
   if (String(formData.get('watermark') || '') === '1') {
     try {
+      // Whitelisted, never interpolated from the request: this value ends up in
+      // a filesystem path, and a free-form one would be a traversal.
+      const wmLogo = WM_LOGOS.has(String(formData.get('wmLogo') || '')) 
+        ? String(formData.get('wmLogo'))
+        : 'red-word-white';
+      const wmPos = WM_POSITIONS.has(String(formData.get('wmPos') || ''))
+        ? (String(formData.get('wmPos')) as WmPos)
+        : 'bottom-left';
+
       const meta = await sharp(buffer).metadata();
       const imgW = meta.width || 1200, imgH = meta.height || 800;
       // A consistent proportion of the image width (no tight min/max caps) so the
       // logo appears the SAME size on every photo once it's displayed at a fixed
       // container width — earlier caps made small vs large photos differ.
-      const logoW = Math.max(70, Math.min(360, Math.round(imgW * 0.12)));
-      const logo = await sharp(path.join(process.cwd(), 'public/xt-logo.png'))
+      // Centre is the "cover this" mark (a face, a plate), so it is much larger:
+      // a corner-sized mark in the middle of a photo reads as a mistake.
+      const scale = wmPos === 'center' ? 0.34 : 0.12;
+      const logoW = Math.max(70, Math.min(wmPos === 'center' ? 900 : 360, Math.round(imgW * scale)));
+      const logo = await sharp(path.join(process.cwd(), 'public/watermarks', `${wmLogo}.png`))
         .resize({ width: logoW }).ensureAlpha().png().toBuffer();
       const rm = await sharp(logo).metadata();
       const lw = rm.width || logoW, lh = rm.height || logoW;
@@ -77,12 +98,19 @@ export async function POST(request: Request) {
       const shadowAlpha = Buffer.from(alpha.map((v) => Math.round(v * 0.5)));
       const shadow = await sharp({ create: { width: lw, height: lh, channels: 3, background: '#000000' } })
         .joinChannel(shadowAlpha, { raw: { width: lw, height: lh, channels: 1 } }).png().blur(4).toBuffer();
+
       const margin = Math.round(imgW * 0.025) + 6;
-      const top = Math.max(0, imgH - lh - margin);
+      const atStart = wmPos.endsWith('left');
+      const atTop = wmPos.startsWith('top');
+      const left = wmPos === 'center' ? Math.round((imgW - lw) / 2)
+        : atStart ? margin : Math.max(0, imgW - lw - margin);
+      const top = wmPos === 'center' ? Math.round((imgH - lh) / 2)
+        : atTop ? margin : Math.max(0, imgH - lh - margin);
+
       buffer = await sharp(buffer)
         .composite([
-          { input: shadow, left: margin + 2, top: top + 4 },
-          { input: logo, left: margin, top },
+          { input: shadow, left: left + 2, top: top + 4 },
+          { input: logo, left, top },
         ])
         .jpeg({ quality: 85 })
         .toBuffer();

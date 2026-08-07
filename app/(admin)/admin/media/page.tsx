@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Upload, Trash2, Copy, ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
-import UploadSourceDialog from '@/components/admin/UploadSourceDialog';
+import UploadSourceDialog, { type WatermarkOpts } from '@/components/admin/UploadSourceDialog';
 
 interface MediaItem {
   id: string;
@@ -38,7 +38,7 @@ export default function MediaPage() {
     e.target.value = '';
   };
 
-  const doUpload = async (siteOwned: boolean) => {
+  const doUpload = async (siteOwned: boolean, wm?: WatermarkOpts) => {
     const files = pendingFiles;
     setPendingFiles(null);
     if (!files?.length) return;
@@ -48,7 +48,13 @@ export default function MediaPage() {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('folder', 'media');
-      if (siteOwned) formData.append('watermark', '1');
+      if (siteOwned) {
+          formData.append('watermark', '1');
+          // The server whitelists both, so an unknown value falls back there
+          // rather than being trusted into a filesystem path.
+          if (wm?.logo) formData.append('wmLogo', wm.logo);
+          if (wm?.pos) formData.append('wmPos', wm.pos);
+        }
 
       try {
         // /api/upload already records the file in the Media library, so we must
