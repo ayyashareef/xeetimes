@@ -31,14 +31,14 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Runs before first paint, so the page never flashes light then swaps to dark.
-  // A saved choice wins; otherwise the OS preference decides. Wrapped in
-  // try/catch because localStorage throws outright in some privacy modes, and a
-  // throw here would leave the document with no theme at all.
-  const themeScript = `(function(){try{var t=localStorage.getItem('xt-theme');` +
-    `if(t!=='dark'&&t!=='light'){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}` +
-    `document.documentElement.setAttribute('data-xt-theme',t);}` +
-    `catch(e){document.documentElement.setAttribute('data-xt-theme','light');}})();`;
+  // Runs before first paint, so a reader who chose dark never sees a light
+  // flash first. Light is the default: the OS preference is deliberately NOT
+  // consulted, so a first-time visitor always lands on the newspaper's own
+  // look and only gets dark by asking for it. Wrapped in try/catch because
+  // localStorage throws outright in some privacy modes, and a throw here would
+  // leave the document with no theme at all.
+  const themeScript = `(function(){var t='light';try{if(localStorage.getItem('xt-theme')==='dark')t='dark';}` +
+    `catch(e){}document.documentElement.setAttribute('data-xt-theme',t);})();`;
   return (
     <html lang="en" className={archivo.variable} suppressHydrationWarning>
       <head>

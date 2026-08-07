@@ -485,8 +485,8 @@ export function header(lang: Lang, sm = false, active = '', ads: AdsMap = {}, hi
         <a href="/" class="xt-moblogo" aria-label="XeeTimes">${logoPair('')}</a>
         <button class="xt-burger xt-mobonly" data-act="menu" aria-label="Menu"><span></span><span></span><span></span></button>
         <span class="xt-desknav" style="position:absolute;${lang === 'dv' ? 'left' : 'right'}:20px;top:50%;transform:translateY(-50%);display:flex;align-items:center;color:#fff;">
-          <a href="/search" style="padding:8px 10px;display:flex;align-items:center;color:#fff;" aria-label="Search">${ICON.search}</a>
           ${themeToggle(false)}
+          <a href="/search" style="padding:8px 10px;display:flex;align-items:center;color:#fff;" aria-label="Search">${ICON.search}</a>
         </span>
       </div>
     </nav>
