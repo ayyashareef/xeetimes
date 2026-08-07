@@ -66,17 +66,10 @@
 /* Fonts + theme tokens for the admin live in app/(admin)/admin/admin-ui.css
    (the `.adm` design system, Hanken Grotesk + Thaana fallback). */
 
-/* Admin: keep wide data tables from overflowing the viewport on mobile —
-   each table becomes its own horizontal scroll area. */
-@media (max-width: 768px) {
-  .admin-root table {
-    display: block;
-    width: 100%;
-    overflow-x: auto;
-    white-space: nowrap;
-    -webkit-overflow-scrolling: touch;
-  }
-}
+/* Admin tables on phones are handled in app/(admin)/admin/admin-ui.css, where
+   the rows become stacked cards. The rule that used to live here forced
+   white-space:nowrap, which made one Dhivehi headline wider than the screen and
+   left every row looking blank. */
 
 /* Search bar elements use mvwaheed */
 [dir="rtl"] .search-font,

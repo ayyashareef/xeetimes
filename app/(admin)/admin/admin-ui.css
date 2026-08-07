@@ -93,5 +93,43 @@
   .adm-dash-actions { grid-template-columns: 1fr !important; }
 }
 
+/* ---- Data tables on phones --------------------------------------------- */
+/* A seven-column table cannot be read on a 390px screen, and scrolling it
+   sideways is worse: the first cell is a Dhivehi headline, so the row is wider
+   than the viewport before the second column starts. Each row becomes a card
+   instead and the cells stack. This is done here, once, rather than per page —
+   every admin list shares the same markup shape.
+   The header row goes: without it the cells would carry labels they cannot
+   line up with, and the content is self-describing. */
+@media (max-width: 768px) {
+  .adm table { display: block; width: 100%; }
+  .adm thead { display: none; }
+  .adm tbody { display: block; }
+  .adm tbody tr {
+    display: block;
+    padding: 12px 14px;
+    margin: 0 0 10px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--panel);
+  }
+  .adm tbody td {
+    display: block;
+    width: auto;
+    padding: 3px 0 !important;
+    white-space: normal;
+    text-align: start !important;
+    border: 0 !important;
+  }
+  /* Action buttons stay a row, and sit at the end under the content. */
+  .adm tbody td:last-child { padding-top: 10px !important; }
+  .adm tbody td:last-child > div {
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+  /* The lead cell is the row's headline, so it carries the weight. */
+  .adm tbody td:first-child { padding-bottom: 6px !important; }
+}
+
 /* Clickable dashboard rows (recent comments) */
 .adm-hoverrow:hover { background: var(--line2); }

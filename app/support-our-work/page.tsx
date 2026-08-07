@@ -46,14 +46,16 @@ export default async function SupportOurWorkPage() {
   const L = 'dv' as Lang;
   const [ads, hidden, site] = await Promise.all([getActiveAds(), getHiddenCategorySlugs(), getSiteSettings()]);
 
+  // Colours come from tokens, never literals — a hardcoded near-black here is
+  // invisible in dark mode, which is exactly what it was.
   const para = (t: string, i: number) =>
-    `<p style="margin:0 0 ${i === 0 ? '26' : '22'}px;font-size:${i === 0 ? '22' : '18'}px;line-height:1.85;color:${i === 0 ? 'var(--ink)' : '#3a3a40'};font-weight:${i === 0 ? '700' : '400'};">${t}</p>`;
+    `<p style="margin:0 0 ${i === 0 ? '26' : '22'}px;font-size:${i === 0 ? '22' : '18'}px;line-height:1.85;color:${i === 0 ? 'var(--ink)' : 'var(--body-ink)'};font-weight:${i === 0 ? '700' : '400'};">${t}</p>`;
 
   const rows = CONTACTS.map(
     (c) => `
         <div style="display:flex;flex-wrap:wrap;gap:8px;padding:13px 0;border-bottom:1px solid var(--line2);">
           <span style="min-width:150px;font-weight:700;color:var(--ink);">${c.label}:</span>
-          <span style="color:#3a3a40;">${c.href ? `<a href="${c.href}" style="color:var(--red);">${c.value}</a>` : c.value}</span>
+          <span style="color:var(--body-ink);">${c.href ? `<a href="${c.href}" style="color:var(--red);">${c.value}</a>` : c.value}</span>
         </div>`,
   ).join('');
 
