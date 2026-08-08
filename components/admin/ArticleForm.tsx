@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { Save, Send, Eye, X, FolderOpen, Upload, UserCircle } from 'lucide-react';
 import RichTextEditor from './RichTextEditor';
 import MediaPicker from './MediaPicker';
+import UploadSourceDialog, { type WatermarkOpts } from './UploadSourceDialog';
 
 interface Category {
   id: string;
@@ -87,6 +88,7 @@ export default function ArticleForm({ article, role }: ArticleFormProps) {
   const [authors, setAuthors] = useState<Author[]>([]);
   const [activeTab, setActiveTab] = useState<'content' | 'seo'>('content');
   const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [galleryPickerOpen, setGalleryPickerOpen] = useState(false);
 
   const [form, setForm] = useState({
@@ -161,13 +163,32 @@ export default function ArticleForm({ article, role }: ArticleFormProps) {
     }));
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  // "Upload New" asks the same source/watermark question the media library
+  // does — it used to post straight through, so a featured image uploaded from
+  // here was the one route into the site that never got a watermark.
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    if (!file) return;
+    setPendingFile(file);
+    // Let the same file be chosen again after a cancel.
+    e.target.value = '';
+  };
+
+  const doFeaturedUpload = async (siteOwned: boolean, wm?: WatermarkOpts) => {
+    const file = pendingFile;
+    setPendingFile(null);
     if (!file) return;
 
     const formData = new FormData();
     formData.append('file', file);
     formData.append('folder', uploadFolder);
+    if (siteOwned) {
+      formData.append('watermark', '1');
+      if (wm?.logo) formData.append('wmLogo', wm.logo);
+      if (wm?.pos) formData.append('wmPos', wm.pos);
+      if (wm?.size) formData.append('wmSize', wm.size);
+      if (wm?.opacity) formData.append('wmOpacity', String(wm.opacity));
+    }
 
     const res = await fetch('/api/upload', { method: 'POST', body: formData });
     const data = await res.json();
@@ -607,6 +628,9 @@ export default function ArticleForm({ article, role }: ArticleFormProps) {
           </div>
         </div>
       </div>
+
+      {/* Asks source + watermark before a featured image is uploaded */}
+      <UploadSourceDialog open={!!pendingFile} onChoose={doFeaturedUpload} onCancel={() => setPendingFile(null)} />
 
       {/* Media Picker Dialog */}
       <MediaPicker

@@ -856,7 +856,9 @@ body:has(#xt-root) { background: var(--page); }
   #xt-root .xt-team-card { padding: 18px 6px !important; }
   #xt-root .xt-team-card .xt-team-pic > span { width: 104px !important; height: 104px !important; }
   /* Featured photo/video section stacks (big card then small) on phones. */
-  #xt-root .xt-g-feat { grid-template-columns: 1fr !important; }
+  /* The photo section renders after </main> now, so it no longer inherits
+     main's side padding — without this its lead runs edge to edge. */
+  #xt-root .xt-g-feat { grid-template-columns: 1fr !important; margin: 0 7px !important; }
   /* Phone: the featured section shows its lead card only. On desktop the side
      column sits beside the lead; once the grid stacks it just repeats the
      section underneath, so it is dropped rather than stacked. */

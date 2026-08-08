@@ -1101,7 +1101,7 @@ export function categoryHtml(cp: CatPage, lang: Lang, ads: AdsMap = {}, hidden: 
     return `${header(lang, false, cp.name, ads, hidden, site)}
     <main class="xt-wrap" style="padding:14px 26px 40px;">
       ${secTitle(cp.name)}
-      <section class="xt-cat-tiles" style="display:flex;flex-wrap:wrap;justify-content:center;gap:38px 48px;padding:36px 0 12px;">${tiles}</section>
+      <section class="xt-cat-tiles" style="display:flex;flex-wrap:wrap;justify-content:center;gap:34px 30px;padding:36px 0 12px;">${tiles}</section>
     </main>
     ${footer(lang, site)}`;
   }
