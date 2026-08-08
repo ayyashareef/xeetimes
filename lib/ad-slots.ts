@@ -22,18 +22,18 @@ export type AdSlotDef = {
 //   Between article content .... 400x400    (1:1)
 //   Side ad 1 and 2 ............ 800x800    (1:1)
 //   Home page main post ........ 1000x800   (5:4)
-//   Home section banners ....... 4000x500   (8:1)
+//   Home section banners ....... 4000x800   (5:1, matching the header)
 export const AD_SLOTS: AdSlotDef[] = [
   { key: 'HOMEPAGE_BANNER', label: 'Site — top banner (all pages)', w: 4000, h: 800, kind: 'banner' },
   { key: 'HOME_BOX_1', label: 'Homepage — main post side box', w: 1000, h: 800, kind: 'box' },
-  // The four homepage in-content banners share the spec's 8:1 strip. They were
-  // 2000x400 (5:1) while the comment above them claimed 8:1 — the comment was
-  // right and the numbers were wrong, so every one of these rendered half again
-  // too tall for its creative.
-  { key: 'HOMEPAGE_MID', label: 'Homepage — in-content banner (upper)', w: 4000, h: 500, kind: 'banner' },
-  { key: 'HOMEPAGE_MID_2', label: 'Homepage — in-content banner (lower)', w: 4000, h: 500, kind: 'banner' },
-  { key: 'HOME_AFTER_HEALTH', label: 'Homepage — under the Health section', w: 4000, h: 500, kind: 'banner' },
-  { key: 'HOME_AFTER_BADHIGE', label: 'Homepage — under the Badhige section', w: 4000, h: 500, kind: 'banner' },
+  // The four homepage in-content banners take the SAME shape as the top banner,
+  // 4000x800, on the newsroom's instruction — the size sheet lists them at
+  // 4000x500 but one banner shape across the homepage was the call. Keep these
+  // in step with HOMEPAGE_BANNER above if that ever changes.
+  { key: 'HOMEPAGE_MID', label: 'Homepage — in-content banner (upper)', w: 4000, h: 800, kind: 'banner' },
+  { key: 'HOMEPAGE_MID_2', label: 'Homepage — in-content banner (lower)', w: 4000, h: 800, kind: 'banner' },
+  { key: 'HOME_AFTER_HEALTH', label: 'Homepage — under the Health section', w: 4000, h: 800, kind: 'banner' },
+  { key: 'HOME_AFTER_BADHIGE', label: 'Homepage — under the Badhige section', w: 4000, h: 800, kind: 'banner' },
   // Article boxes. Side ad 1 sits under the reactions, side ad 2 after the
   // related articles; both are square per the sheet.
   { key: 'ARTICLE_SIDEBAR_1', label: 'Article — side ad 1 (under reactions)', w: 800, h: 800, kind: 'box' },
