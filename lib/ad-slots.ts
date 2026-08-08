@@ -14,24 +14,31 @@ export type AdSlotDef = {
   kind: AdKind;
 };
 
-// Sizes mirror the live xeetimes.com placements: a 1120×224 top banner (5:1),
-// a 436×349 homepage hero side box, a 380×320 article hero side box, wide
-// in-content banners (~8:1, the real 2048×256 creatives), and the sidebar box.
+// Sizes are the ratios from the newsroom's own spec sheet for xeetimes.com, and
+// w/h feed the box's aspect-ratio — so a creative uploaded at the stated size
+// fills its box exactly and never distorts. The numbers are the spec's, not a
+// scaled-down copy, so what admin tells an uploader matches the sheet.
+//   Header banner .............. 4000x800   (5:1)
+//   Between article content .... 400x400    (1:1)
+//   Side ad 1 and 2 ............ 800x800    (1:1)
+//   Home page main post ........ 1000x800   (5:4)
+//   Home section banners ....... 4000x500   (8:1)
 export const AD_SLOTS: AdSlotDef[] = [
-  { key: 'HOMEPAGE_BANNER', label: 'Site — top banner (all pages)', w: 1120, h: 224, kind: 'banner' },
-  { key: 'HOME_BOX_1', label: 'Homepage — hero side box', w: 436, h: 349, kind: 'box' },
-  // All four homepage in-content banners share one 5:1 shape so they render at
-  // the same height. The box hugs the creative's own aspect, so a creative must
-  // be uploaded at this ratio to fill it (a thinner one just renders shorter).
-  { key: 'HOMEPAGE_MID', label: 'Homepage — in-content banner (upper)', w: 2000, h: 400, kind: 'banner' },
-  { key: 'HOMEPAGE_MID_2', label: 'Homepage — in-content banner (lower)', w: 2000, h: 400, kind: 'banner' },
-  { key: 'HOME_AFTER_HEALTH', label: 'Homepage — under the Health section', w: 2000, h: 400, kind: 'banner' },
-  { key: 'HOME_AFTER_BADHIGE', label: 'Homepage — under the Badhige section', w: 2000, h: 400, kind: 'banner' },
-  // Article/category box ads: the box hugs the creative at ~379px column width
-  // (like the live site — a wide creative renders 379×303, a square one 379×379).
-  { key: 'ARTICLE_SIDEBAR_1', label: 'Article — hero side box', w: 380, h: 320, kind: 'box' },
-  { key: 'ARTICLE_MID', label: 'Article — in-content box (middle)', w: 400, h: 400, kind: 'box' },
-  { key: 'ARTICLE_SIDEBAR_2', label: 'Article — sidebar (bottom)', w: 300, h: 250, kind: 'box' },
+  { key: 'HOMEPAGE_BANNER', label: 'Site — top banner (all pages)', w: 4000, h: 800, kind: 'banner' },
+  { key: 'HOME_BOX_1', label: 'Homepage — main post side box', w: 1000, h: 800, kind: 'box' },
+  // The four homepage in-content banners share the spec's 8:1 strip. They were
+  // 2000x400 (5:1) while the comment above them claimed 8:1 — the comment was
+  // right and the numbers were wrong, so every one of these rendered half again
+  // too tall for its creative.
+  { key: 'HOMEPAGE_MID', label: 'Homepage — in-content banner (upper)', w: 4000, h: 500, kind: 'banner' },
+  { key: 'HOMEPAGE_MID_2', label: 'Homepage — in-content banner (lower)', w: 4000, h: 500, kind: 'banner' },
+  { key: 'HOME_AFTER_HEALTH', label: 'Homepage — under the Health section', w: 4000, h: 500, kind: 'banner' },
+  { key: 'HOME_AFTER_BADHIGE', label: 'Homepage — under the Badhige section', w: 4000, h: 500, kind: 'banner' },
+  // Article boxes. Side ad 1 sits under the reactions, side ad 2 after the
+  // related articles; both are square per the sheet.
+  { key: 'ARTICLE_SIDEBAR_1', label: 'Article — side ad 1 (under reactions)', w: 800, h: 800, kind: 'box' },
+  { key: 'ARTICLE_MID', label: 'Article — between article content', w: 400, h: 400, kind: 'box' },
+  { key: 'ARTICLE_SIDEBAR_2', label: 'Article — side ad 2 (after related)', w: 800, h: 800, kind: 'box' },
   { key: 'CATEGORY_SIDE', label: 'Category — lead side box (per category)', w: 400, h: 320, kind: 'box' },
 ];
 
