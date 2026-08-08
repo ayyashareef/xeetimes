@@ -812,7 +812,7 @@ export function homeHtml(d: HomeData, lang: Lang): string {
     ${sections}
   </main>
   ${videoBand}
-  ${photoTail ? `<div class="xt-wrap" style="padding:0 0 10px;">${photoTail}</div>` : ''}
+  ${photoTail ? `<div class="xt-wrap xt-phototail" style="padding:0 0 10px;">${photoTail}</div>` : ''}
   ${footer(lang, site)}`;
 }
 

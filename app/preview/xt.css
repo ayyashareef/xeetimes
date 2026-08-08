@@ -859,6 +859,9 @@ body:has(#xt-root) { background: var(--page); }
   /* The photo section renders after </main> now, so it no longer inherits
      main's side padding — without this its lead runs edge to edge. */
   #xt-root .xt-g-feat { grid-template-columns: 1fr !important; margin: 0 7px !important; }
+  /* Same reason for its heading: every section inside <main> sits 13px from the
+     screen edge, this one sat at 8. The 5px is exactly what main contributes. */
+  #xt-root .xt-phototail { padding-left: 5px !important; padding-right: 5px !important; }
   /* Phone: the featured section shows its lead card only. On desktop the side
      column sits beside the lead; once the grid stacks it just repeats the
      section underneath, so it is dropped rather than stacked. */
