@@ -76,7 +76,6 @@ const STR = {
     searchPlaceholder: 'ހޯދާ...', desk: 'ޒީ ޓައިމްސް ޑެސްކް',
     home: 'ފުރަތަމަ ޞަފްޙާ', allNews: 'އިތުރަށް',
     commentPh: 'ކޮމެންޓް ލިޔުއްވާ...', namePh: 'ނަން', postComment: 'ފޮނުވާ',
-    noComments: 'މި ޚަބަރަށް ކޮމެންޓެއް ނެތް. ފުރަތަމަ ކޮމެންޓް ކޮށްލައްވާ.',
     noResults: (q: string) => `"${q}" އާ ގުޅޭ ޚަބަރެއް ނުފެނުނު.`,
     searchPrompt: 'ހޯއްދަވާ ބަސް ލިޔުއްވާ.', noCat: 'މި ބަޔަކު އާރޓިކަލް އެއް ނެތް', news: 'ޚަބަރު',
     loadMore: 'އިތުރު ޚަބަރު', min: 'މިނެޓް', morePhotos: 'އިތުރު ފޮޓޯ',
@@ -87,7 +86,6 @@ const STR = {
     searchPlaceholder: 'Search...', desk: 'XeeTimes Desk',
     home: 'Home', allNews: 'All news',
     commentPh: 'Write a comment...', namePh: 'Name', postComment: 'Send',
-    noComments: 'No comments yet. Be the first to comment.',
     noResults: (q: string) => `No results for "${q}".`,
     searchPrompt: 'Type a search term.', noCat: 'No articles in this section.', news: 'News',
     loadMore: 'More news', min: 'min', morePhotos: 'More photos',
@@ -898,7 +896,9 @@ function commentsBlock(comments: Cmt[], lang: Lang, articleId: string): string {
             </button>
           </div>` : ''}
         </div>`).join('')
-    : `<p style="color:var(--ink3);font-size:15px;padding:14px 0;">${esc(s.noComments)}</p>`;
+    // Nothing at all when there are no comments: the form directly below is
+    // already the invitation, and an empty-state line above it just repeated it.
+    : '';
   const label = 'display:block;font-weight:700;font-size:14px;margin-bottom:8px;color:var(--ink);';
   const field = "width:100%;border:1px solid var(--line);padding:12px 14px;font-family:'MVTypewriter','Faruma',sans-serif;font-size:15px;background:#fff;color:var(--ink);box-sizing:border-box;";
   return `
