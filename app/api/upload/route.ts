@@ -4,6 +4,9 @@ import { auth } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { uploadFile, deleteFile } from '@/lib/supabase-storage';
 import sharp from 'sharp';
+import { spawn } from 'node:child_process';
+import { mkdtemp, writeFile, readFile, rm } from 'node:fs/promises';
+import os from 'node:os';
 
 // Watermark options. Both lists are whitelists — wmLogo becomes part of a
 // filesystem path, so it can never come straight from the request.
@@ -32,7 +35,10 @@ const ALLOWED_TYPES = Object.keys(EXT_BY_TYPE);
 const MAX_UPLOAD_SIZE = 5 * 1024 * 1024; // 5MB for images
 // Video needs its own ceiling: 5MB is a few seconds of 1080p. Anything longer
 // belongs on YouTube and gets embedded, which the article body already supports.
-const MAX_VIDEO_SIZE = 60 * 1024 * 1024;
+// Kept UNDER nginx's client_max_body_size (80M) — above it, nginx answers 413
+// before the request ever reaches this handler and the app's own message never
+// gets a chance to explain the limit.
+const MAX_VIDEO_SIZE = 64 * 1024 * 1024;
 const OPTIMIZE_THRESHOLD = 1 * 1024 * 1024; // optimize if over 1MB
 const MAX_DIMENSION = 2000; // max width/height after resize
 
@@ -41,6 +47,61 @@ const MAX_DIMENSION = 2000; // max width/height after resize
 function safeFolder(raw: unknown): string {
   const s = String(raw ?? '').toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 40);
   return s || 'general';
+}
+
+// Burn the chosen mark into a clip. Same logo, position, size and opacity the
+// image path uses, so a photo and a video from the same story carry an
+// identical mark. Returns null on any failure -- a clip that could not be
+// watermarked is still worth storing, exactly as with images.
+async function watermarkVideo(input: Buffer, formData: FormData): Promise<Buffer | null> {
+  const dir = await mkdtemp(path.join(os.tmpdir(), 'xtwm-'));
+  try {
+    const wmLogo = WM_LOGOS.has(String(formData.get('wmLogo') || '')) ? String(formData.get('wmLogo')) : 'red-word-white';
+    const wmPos = WM_POSITIONS.has(String(formData.get('wmPos') || '')) ? String(formData.get('wmPos')) : 'bottom-left';
+    const wmSize = WM_SIZES[String(formData.get('wmSize') || '')] ?? WM_SIZES.medium;
+    const wmOpacity = Math.min(100, Math.max(20, parseInt(String(formData.get('wmOpacity') || '100'), 10) || 100)) / 100;
+
+    const src = path.join(dir, 'in');
+    const logo = path.join(dir, 'logo.png');
+    const out = path.join(dir, 'out.mp4');
+    await writeFile(src, input);
+    await writeFile(logo, await readFile(path.join(process.cwd(), 'public/watermarks', `${wmLogo}.png`)));
+
+    // The mark scales to a fraction of the VIDEO's width, matching how it
+    // scales to a fraction of an image's width — so it looks the same size on
+    // a still and a clip of the same story.
+    const m = '(main_w*0.025+6)';
+    const pos = wmPos === 'center' ? 'x=(main_w-overlay_w)/2:y=(main_h-overlay_h)/2'
+      : `x=${wmPos.endsWith('left') ? m : `main_w-overlay_w-${m}`}:y=${wmPos.startsWith('top') ? m : `main_h-overlay_h-${m}`}`;
+    // scale2ref scales its FIRST input using the SECOND as the reference, so the
+    // mark leads and the video follows — the other way round scales the video.
+    // main_w is the reference's width, giving the same width-fraction sizing the
+    // image path uses.
+    const chain = `[1:v]format=rgba,colorchannelmixer=aa=${wmOpacity}[wm];` +
+      `[wm][0:v]scale2ref=w=main_w*${wmSize}:h=ow/mdar[wm2][base];` +
+      `[base][wm2]overlay=${pos}:format=auto`;
+
+    const args = ['-y', '-i', src, '-i', logo, '-filter_complex', chain,
+      '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '23', '-pix_fmt', 'yuv420p',
+      '-c:a', 'copy', '-movflags', '+faststart', out];
+
+    const code = await new Promise<number>((resolve) => {
+      const ps = spawn('ffmpeg', args, { stdio: ['ignore', 'ignore', 'pipe'] });
+      let err = '';
+      ps.stderr.on('data', (d) => { err += d.toString().slice(0, 400); });
+      // One core: a long clip must not hold the request open indefinitely.
+      const kill = setTimeout(() => ps.kill('SIGKILL'), 240_000);
+      ps.on('close', (c) => { clearTimeout(kill); if (c !== 0) console.error('ffmpeg watermark failed:', err.slice(-400)); resolve(c ?? 1); });
+      ps.on('error', (e) => { clearTimeout(kill); console.error('ffmpeg spawn failed:', e.message); resolve(1); });
+    });
+    if (code !== 0) return null;
+    return await readFile(out);
+  } catch (e) {
+    console.error('Video watermark failed:', e);
+    return null;
+  } finally {
+    rm(dir, { recursive: true, force: true }).catch(() => {});
+  }
 }
 
 export async function POST(request: Request) {
@@ -64,13 +125,17 @@ export async function POST(request: Request) {
   let buffer: Buffer = Buffer.from(await file.arrayBuffer());
   let contentType = file.type;
 
-  // Video is stored as uploaded: no sharp pass, no watermark, no resize. Every
-  // image branch below assumes a raster it can decode, so it has to be skipped
-  // rather than guarded step by step.
+  // Video takes its own path: the sharp pipeline below assumes a raster it can
+  // decode, so it is skipped wholesale rather than guarded step by step. The
+  // watermark is burned in with ffmpeg instead.
   if (isVideo) {
     // QuickTime .mov files are H.264 in practice and play as video/mp4, so they
     // are relabelled rather than rejected.
     if (contentType === 'video/quicktime') contentType = 'video/mp4';
+    if (String(formData.get('watermark') || '') === '1') {
+      const marked = await watermarkVideo(buffer, formData);
+      if (marked) { buffer = marked; contentType = 'video/mp4'; }
+    }
     const ext = EXT_BY_TYPE[contentType] || 'mp4';
     const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
     const url = await uploadFile(folder, buffer, filename, contentType);
