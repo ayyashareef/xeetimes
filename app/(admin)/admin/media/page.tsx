@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { Upload, Trash2, Copy, ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import UploadSourceDialog, { type WatermarkOpts } from '@/components/admin/UploadSourceDialog';
+import { uploadWithProgress, type UploadPhase } from '@/lib/upload-progress';
 
 interface MediaItem {
   id: string;
@@ -19,17 +20,28 @@ export default function MediaPage() {
   const [media, setMedia] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [query, setQuery] = useState('');
+  // Progress is per-file plus a counter, so a multi-file drop reads as
+  // "3 of 7 — 48%" rather than a bar that restarts with no explanation.
+  const [progress, setProgress] = useState<{ pct: number; phase: UploadPhase; index: number; total: number } | null>(null);
   const [visible, setVisible] = useState(30);
   const [pendingFiles, setPendingFiles] = useState<File[] | null>(null);
 
   const fetchMedia = async () => {
-    const res = await fetch('/api/admin/media');
+    const params = new URLSearchParams();
+    if (query.trim()) params.set('q', query.trim());
+    const res = await fetch(`/api/admin/media?${params}`);
     const data = await res.json();
     setMedia(data.media || []);
     setLoading(false);
   };
 
-  useEffect(() => { fetchMedia(); }, []);
+  // Debounced so each keystroke is not a query; an empty box refetches at once.
+  useEffect(() => {
+    const t = setTimeout(fetchMedia, query ? 350 : 0);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query]);
 
   // Selecting files opens the source dialog; the actual upload runs on choice.
   const onFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,7 +56,9 @@ export default function MediaPage() {
     if (!files?.length) return;
 
     setUploading(true);
+    let index = 0;
     for (const file of files) {
+      index++;
       const formData = new FormData();
       formData.append('file', file);
       formData.append('folder', 'media');
@@ -61,12 +75,13 @@ export default function MediaPage() {
       try {
         // /api/upload already records the file in the Media library, so we must
         // NOT create a second row here (that caused every upload to duplicate).
-        const res = await fetch('/api/upload', { method: 'POST', body: formData });
-        if (!res.ok) throw new Error('upload failed');
-      } catch {
-        toast.error(`Failed to upload ${file.name}`);
+        await uploadWithProgress('/api/upload', formData, (pct, phase) =>
+          setProgress({ pct, phase, index, total: files.length }));
+      } catch (e) {
+        toast.error(`Failed to upload ${file.name}: ${(e as Error).message}`);
       }
     }
+    setProgress(null);
     setUploading(false);
     toast.success('Upload complete');
     fetchMedia();
@@ -97,12 +112,46 @@ export default function MediaPage() {
     <div>
       <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
         <h1 className="text-2xl font-bold text-gray-900">Media Library</h1>
+        <div className="relative flex-1 min-w-[200px] max-w-sm">
+          <svg className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="7" /><line x1="21" y1="21" x2="16.5" y2="16.5" /></svg>
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search media by name, alt text or caption…"
+            className="w-full ps-9 pe-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20"
+          />
+        </div>
         <label className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition text-sm font-medium cursor-pointer">
           <Upload className="w-4 h-4" />
-          {uploading ? 'Uploading...' : 'Upload Files'}
+          {uploading
+            ? progress
+              ? progress.phase === 'working'
+                ? 'Processing…'
+                : `Uploading ${progress.pct}%${progress.total > 1 ? ` (${progress.index}/${progress.total})` : ''}`
+              : 'Uploading…'
+            : 'Upload Files'}
           <input type="file" accept="image/*,video/mp4,video/webm,video/ogg,video/quicktime" multiple className="hidden" onChange={onFileSelect} disabled={uploading} />
         </label>
       </div>
+
+      {uploading && progress && (
+        <div className="mb-5">
+          <div className="h-1.5 w-full rounded-full bg-gray-100 overflow-hidden">
+            <div
+              className={progress.phase === 'working' ? 'h-full bg-primary animate-pulse' : 'h-full bg-primary transition-all duration-200'}
+              style={{ width: `${progress.phase === 'working' ? 100 : progress.pct}%` }}
+            />
+          </div>
+          <p className="text-xs text-gray-500 mt-1.5">
+            {progress.phase === 'working'
+              // Video is re-encoded to burn the watermark in, which is where
+              // the wait after 100% comes from. Saying so beats a stalled bar.
+              ? 'Uploaded — processing on the server (video is re-encoded to add the watermark)…'
+              : `Uploading ${progress.pct}%${progress.total > 1 ? ` — file ${progress.index} of ${progress.total}` : ''}`}
+          </p>
+        </div>
+      )}
 
       {loading ? (
         <div className="p-8 text-center text-gray-500 bg-white rounded-xl">Loading...</div>

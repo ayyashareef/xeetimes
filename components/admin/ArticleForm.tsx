@@ -7,6 +7,7 @@ import { Save, Send, Eye, X, FolderOpen, Upload, UserCircle } from 'lucide-react
 import RichTextEditor from './RichTextEditor';
 import MediaPicker from './MediaPicker';
 import UploadSourceDialog, { type WatermarkOpts } from './UploadSourceDialog';
+import { uploadWithProgress, type UploadPhase } from '@/lib/upload-progress';
 
 interface Category {
   id: string;
@@ -89,6 +90,7 @@ export default function ArticleForm({ article, role }: ArticleFormProps) {
   const [activeTab, setActiveTab] = useState<'content' | 'seo'>('content');
   const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [upProgress, setUpProgress] = useState<{ pct: number; phase: UploadPhase } | null>(null);
   const [galleryPickerOpen, setGalleryPickerOpen] = useState(false);
 
   const [form, setForm] = useState({
@@ -190,24 +192,51 @@ export default function ArticleForm({ article, role }: ArticleFormProps) {
       if (wm?.opacity) formData.append('wmOpacity', String(wm.opacity));
     }
 
-    const res = await fetch('/api/upload', { method: 'POST', body: formData });
-    const data = await res.json();
-    if (data.url) {
-      setForm(f => ({ ...f, featuredImage: data.url }));
-      toast.success('Image uploaded');
-    } else {
-      toast.error(data.error || 'Upload failed');
+    try {
+      const data = await uploadWithProgress('/api/upload', formData, (pct, phase) => setUpProgress({ pct, phase }));
+      const url = data.url;
+      if (url) {
+        // Bound to a const: the narrowing from `if (data.url)` does not reach
+        // inside the updater closure, so `data.url` stays string | undefined.
+        setForm(f => ({ ...f, featuredImage: url }));
+        toast.success(data.kind === 'video' ? 'Video uploaded' : 'Image uploaded');
+      } else {
+        toast.error(data.error || 'Upload failed');
+      }
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setUpProgress(null);
     }
   };
 
-  const handleSave = async (status: string) => {
+  // `opts.stay` keeps the editor open and returns the id instead of navigating
+  // away — Preview needs the article saved, but sending the writer back to the
+  // list every time they peek at it would be useless.
+  // Preview opens the real article page, which already renders drafts for a
+  // signed-in admin — so what a writer sees is the actual public template, not
+  // an approximation of it. An unsaved article has nothing to open, so it is
+  // saved as a draft first (its status is untouched if it already exists).
+  const handlePreview = async () => {
+    let id = article?.id || null;
+    if (!id || !article) {
+      const saved = await handleSave(article ? (article.status || 'DRAFT') : 'DRAFT', { stay: true });
+      if (!saved) return;
+      id = saved;
+      toast.success('Saved as draft — opening preview');
+    }
+    // Public URLs use the bare WordPress number; native ids have no art_ prefix.
+    window.open(`/${String(id).replace(/^art_/, '')}`, '_blank', 'noopener');
+  };
+
+  const handleSave = async (status: string, opts?: { stay?: boolean }): Promise<string | null> => {
     if (!form.categoryId) {
       toast.error('Please select a category');
-      return;
+      return null;
     }
     if (!form.title_dv) {
       toast.error('Please enter a title');
-      return;
+      return null;
     }
 
     setSaving(true);
@@ -236,6 +265,10 @@ export default function ArticleForm({ article, role }: ArticleFormProps) {
       });
 
       if (!res.ok) throw new Error('Failed to save');
+      const saved = await res.json().catch(() => ({}));
+      const savedId: string | null = saved?.article?.id || saved?.id || article?.id || null;
+
+      if (opts?.stay) return savedId;
 
       toast.success(
         status === 'PUBLISHED'
@@ -245,8 +278,10 @@ export default function ArticleForm({ article, role }: ArticleFormProps) {
             : 'Article saved',
       );
       router.push('/admin/articles');
+      return savedId;
     } catch {
       toast.error('Failed to save article');
+      return null;
     } finally {
       setSaving(false);
     }
@@ -379,6 +414,14 @@ export default function ArticleForm({ article, role }: ArticleFormProps) {
                   Save Draft
                 </button>
                 <button
+                  onClick={handlePreview}
+                  disabled={saving}
+                  className="flex items-center justify-center gap-2 w-full py-2 px-4 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition"
+                >
+                  <Eye className="w-4 h-4" />
+                  Preview
+                </button>
+                <button
                   onClick={() => handleSave('IN_REVIEW')}
                   disabled={saving}
                   className="flex items-center justify-center gap-2 w-full py-2 px-4 border border-amber-200 bg-amber-50 rounded-lg text-sm font-medium text-amber-700 hover:bg-amber-100 disabled:opacity-50 transition"
@@ -445,8 +488,10 @@ export default function ArticleForm({ article, role }: ArticleFormProps) {
               </button>
               <label className="flex items-center justify-center gap-2 w-full py-2 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition text-gray-500 text-sm">
                 <Upload className="w-4 h-4" />
-                Upload New
-                <input type="file" accept="image/*,video/mp4,video/webm,video/ogg,video/quicktime" className="hidden" onChange={handleImageUpload} />
+                {upProgress
+                  ? upProgress.phase === 'working' ? 'Processing…' : `Uploading ${upProgress.pct}%`
+                  : 'Upload New'}
+                <input type="file" accept="image/*,video/mp4,video/webm,video/ogg,video/quicktime" className="hidden" onChange={handleImageUpload} disabled={!!upProgress} />
               </label>
             </div>
           )}

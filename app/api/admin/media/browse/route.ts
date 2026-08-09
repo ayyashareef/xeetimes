@@ -13,7 +13,19 @@ export async function GET(request: Request) {
   try {
     const where = {
       ...(folder ? { folder } : {}),
-      ...(search ? { filename: { contains: search, mode: 'insensitive' as const } } : {}),
+      // Alt text and captions are searched too: a photo is far more often
+      // remembered by what is in it than by its timestamped filename.
+      ...(search
+        ? {
+            OR: [
+              { filename: { contains: search, mode: 'insensitive' as const } },
+              { altText_en: { contains: search, mode: 'insensitive' as const } },
+              { altText_dv: { contains: search } },
+              { caption_en: { contains: search, mode: 'insensitive' as const } },
+              { caption_dv: { contains: search } },
+            ],
+          }
+        : {}),
     };
 
     const [media, folderRows] = await Promise.all([

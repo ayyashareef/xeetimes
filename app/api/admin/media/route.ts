@@ -9,9 +9,27 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url);
   const folder = searchParams.get('folder') || '';
+  const q = (searchParams.get('q') || '').trim();
+
+  // Filename and alt text are the only human-meaningful fields on a Media row —
+  // the URL is a timestamp, so searching it would match nothing anyone typed.
+  const where = {
+    ...(folder ? { folder } : {}),
+    ...(q
+      ? {
+          OR: [
+            { filename: { contains: q, mode: 'insensitive' as const } },
+            { altText_en: { contains: q, mode: 'insensitive' as const } },
+            { altText_dv: { contains: q } },
+            { caption_en: { contains: q, mode: 'insensitive' as const } },
+            { caption_dv: { contains: q } },
+          ],
+        }
+      : {}),
+  };
 
   const media = await db.media.findMany({
-    where: folder ? { folder } : {},
+    where,
     orderBy: { createdAt: 'desc' },
     take: 500,
     include: { uploadedBy: { select: { name: true } } },

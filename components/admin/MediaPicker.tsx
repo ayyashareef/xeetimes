@@ -5,6 +5,7 @@ import { X, Upload, Search, FolderOpen, ImageIcon, Check, Loader2 } from 'lucide
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import UploadSourceDialog, { type WatermarkOpts } from './UploadSourceDialog';
+import { uploadWithProgress, type UploadPhase } from '@/lib/upload-progress';
 
 interface MediaFile {
   id?: string;
@@ -31,6 +32,7 @@ export default function MediaPicker({ open, onClose, onSelect, onSelectMultiple,
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState<{ pct: number; phase: UploadPhase; index: number; total: number } | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
   const [dragOver, setDragOver] = useState(false);
   const [pendingFiles, setPendingFiles] = useState<File[] | null>(null);
@@ -61,6 +63,14 @@ export default function MediaPicker({ open, onClose, onSelect, onSelectMultiple,
     }
   }, [open, loadMedia]);
 
+  // Debounced live search — Enter still works, but nothing forces you to press it.
+  useEffect(() => {
+    if (!open) return;
+    const t = setTimeout(loadMedia, search ? 350 : 0);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search]);
+
   // Selecting/dropping files opens the source dialog; upload runs on choice.
   const requestUpload = (fileList: FileList | null) => {
     if (fileList && fileList.length) setPendingFiles(Array.from(fileList));
@@ -73,9 +83,15 @@ export default function MediaPicker({ open, onClose, onSelect, onSelectMultiple,
     setUploading(true);
 
     try {
+      let index = 0;
       for (const file of files) {
-        if (file.size > 5 * 1024 * 1024) {
-          toast.error(`${file.name} is too large (max 5MB)`);
+        index++;
+        // Mirrors the server's two ceilings. A single 5MB gate here rejected
+        // every video before it was even sent.
+        const isVideo = file.type.startsWith('video/');
+        const cap = isVideo ? 64 * 1024 * 1024 : 5 * 1024 * 1024;
+        if (file.size > cap) {
+          toast.error(`${file.name} is too large (max ${cap / 1048576}MB)`);
           continue;
         }
         const formData = new FormData();
@@ -91,15 +107,18 @@ export default function MediaPicker({ open, onClose, onSelect, onSelectMultiple,
           if (wm?.opacity) formData.append('wmOpacity', String(wm.opacity));
         }
 
-        const res = await fetch('/api/upload', { method: 'POST', body: formData });
-        if (!res.ok) {
-          toast.error(`Failed to upload ${file.name}`);
+        try {
+          await uploadWithProgress('/api/upload', formData, (pct, phase) =>
+            setProgress({ pct, phase, index, total: files.length }));
+          toast.success(`Uploaded ${file.name}`);
+        } catch (e) {
+          toast.error(`Failed to upload ${file.name}: ${(e as Error).message}`);
           continue;
         }
-        toast.success(`Uploaded ${file.name}`);
       }
       loadMedia();
     } finally {
+      setProgress(null);
       setUploading(false);
     }
   };
@@ -190,7 +209,9 @@ export default function MediaPicker({ open, onClose, onSelect, onSelectMultiple,
             uploading && 'opacity-50 pointer-events-none'
           )}>
             {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-            Upload
+            {uploading && progress
+              ? progress.phase === 'working' ? 'Processing…' : `${progress.pct}%`
+              : 'Upload'}
             <input type="file" accept="image/*,video/mp4,video/webm,video/ogg,video/quicktime" multiple className="hidden" onChange={(e) => requestUpload(e.target.files)} />
           </label>
         </div>
