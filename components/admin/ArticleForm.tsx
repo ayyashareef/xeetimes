@@ -446,7 +446,7 @@ export default function ArticleForm({ article, role }: ArticleFormProps) {
               <label className="flex items-center justify-center gap-2 w-full py-2 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition text-gray-500 text-sm">
                 <Upload className="w-4 h-4" />
                 Upload New
-                <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                <input type="file" accept="image/*,video/mp4,video/webm,video/ogg,video/quicktime" className="hidden" onChange={handleImageUpload} />
               </label>
             </div>
           )}

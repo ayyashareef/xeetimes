@@ -245,6 +245,9 @@ model Reaction {
 model Advertisement {
   id        String   @id @default(cuid())
   title     String
+  // Shown under the creative in place of the word "Advertisement". Blank means
+  // the generic label, so nothing has to be filled in for a normal house ad.
+  sponsorLabel String?
   imageUrl  String
   linkUrl   String?
   slot      String

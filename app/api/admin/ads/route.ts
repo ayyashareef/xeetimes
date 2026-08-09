@@ -21,12 +21,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'No permission' }, { status: 403 });
   }
 
-  const { title, imageUrl, linkUrl, slot, isActive, startDate, endDate, rotateSeconds, categorySlug } = await request.json();
+  const { title, sponsorLabel, imageUrl, linkUrl, slot, isActive, startDate, endDate, rotateSeconds, categorySlug } = await request.json();
 
   const ad = await db.advertisement.create({
     data: {
       title,
       imageUrl,
+      sponsorLabel: (sponsorLabel || '').trim() || null,
       linkUrl: linkUrl || null,
       slot,
       categorySlug: slot === 'CATEGORY_SIDE' ? (categorySlug || null) : null,
@@ -50,13 +51,14 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: 'No permission' }, { status: 403 });
   }
 
-  const { id, title, imageUrl, linkUrl, slot, isActive, startDate, endDate, rotateSeconds, categorySlug } = await request.json();
+  const { id, title, sponsorLabel, imageUrl, linkUrl, slot, isActive, startDate, endDate, rotateSeconds, categorySlug } = await request.json();
 
   const ad = await db.advertisement.update({
     where: { id },
     data: {
       title,
       imageUrl,
+      sponsorLabel: (sponsorLabel || '').trim() || null,
       linkUrl: linkUrl || null,
       slot,
       categorySlug: slot === 'CATEGORY_SIDE' ? (categorySlug || null) : null,

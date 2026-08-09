@@ -23,9 +23,16 @@ const WM_POSITIONS = new Set<string>(['bottom-left', 'bottom-right', 'top-left',
 // same-origin, making it a stored-XSS vector. We only accept raster images.
 const EXT_BY_TYPE: Record<string, string> = {
   'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif',
+  // Video. Only formats a browser can play natively, so an upload is always
+  // watchable without a transcode step on the server.
+  'video/mp4': 'mp4', 'video/webm': 'webm', 'video/ogg': 'ogv', 'video/quicktime': 'mp4',
 };
+const VIDEO_TYPES = new Set(['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime']);
 const ALLOWED_TYPES = Object.keys(EXT_BY_TYPE);
-const MAX_UPLOAD_SIZE = 5 * 1024 * 1024; // 5MB upload limit
+const MAX_UPLOAD_SIZE = 5 * 1024 * 1024; // 5MB for images
+// Video needs its own ceiling: 5MB is a few seconds of 1080p. Anything longer
+// belongs on YouTube and gets embedded, which the article body already supports.
+const MAX_VIDEO_SIZE = 60 * 1024 * 1024;
 const OPTIMIZE_THRESHOLD = 1 * 1024 * 1024; // optimize if over 1MB
 const MAX_DIMENSION = 2000; // max width/height after resize
 
@@ -48,12 +55,36 @@ export async function POST(request: Request) {
   if (!ALLOWED_TYPES.includes(file.type)) {
     return NextResponse.json({ error: 'Invalid file type' }, { status: 400 });
   }
-  if (file.size > MAX_UPLOAD_SIZE) {
-    return NextResponse.json({ error: 'File too large (max 5MB)' }, { status: 400 });
+  const isVideo = VIDEO_TYPES.has(file.type);
+  const cap = isVideo ? MAX_VIDEO_SIZE : MAX_UPLOAD_SIZE;
+  if (file.size > cap) {
+    return NextResponse.json({ error: `File too large (max ${Math.round(cap / 1048576)}MB)` }, { status: 400 });
   }
 
   let buffer: Buffer = Buffer.from(await file.arrayBuffer());
   let contentType = file.type;
+
+  // Video is stored as uploaded: no sharp pass, no watermark, no resize. Every
+  // image branch below assumes a raster it can decode, so it has to be skipped
+  // rather than guarded step by step.
+  if (isVideo) {
+    // QuickTime .mov files are H.264 in practice and play as video/mp4, so they
+    // are relabelled rather than rejected.
+    if (contentType === 'video/quicktime') contentType = 'video/mp4';
+    const ext = EXT_BY_TYPE[contentType] || 'mp4';
+    const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const url = await uploadFile(folder, buffer, filename, contentType);
+    let mediaId: string | undefined;
+    try {
+      const media = await db.media.create({
+        data: { url, filename, mimeType: contentType, size: buffer.length, folder, uploadedById: session.user.id },
+      });
+      mediaId = media.id;
+    } catch (e) {
+      console.error('Media record create failed:', e);
+    }
+    return NextResponse.json({ url, mediaId, kind: 'video' });
+  }
 
   // Auto-compress EVERY raster image (not just large ones), preserving the
   // format so transparency isn't lost. Resize down to a sane max and re-encode

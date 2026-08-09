@@ -8,6 +8,7 @@ import { AD_SLOTS as AD_SLOT_DEFS, adSizeLabel } from '@/lib/ad-slots';
 interface Ad {
   id: string;
   title: string;
+  sponsorLabel?: string | null;
   imageUrl: string;
   linkUrl: string;
   slot: string;
@@ -31,7 +32,7 @@ export default function AdsPage() {
   const [editing, setEditing] = useState<Ad | null>(null);
   const [uploading, setUploading] = useState(false);
   const [form, setForm] = useState({
-    title: '', imageUrl: '', linkUrl: '', slot: 'HOMEPAGE_BANNER', categorySlug: '', isActive: true, startDate: '', endDate: '', rotateSeconds: 6,
+    title: '', sponsorLabel: '', imageUrl: '', linkUrl: '', slot: 'HOMEPAGE_BANNER', categorySlug: '', isActive: true, startDate: '', endDate: '', rotateSeconds: 6,
   });
 
   const [cats, setCats] = useState<{ slug: string; name_dv: string }[]>([]);
@@ -96,7 +97,7 @@ export default function AdsPage() {
       toast.success(editing ? 'Ad updated' : 'Ad created');
       setEditing(null);
       setShowForm(false);
-      setForm({ title: '', imageUrl: '', linkUrl: '', slot: 'HOMEPAGE_BANNER', categorySlug: '', isActive: true, startDate: '', endDate: '', rotateSeconds: 6 });
+      setForm({ title: '', sponsorLabel: '', imageUrl: '', linkUrl: '', slot: 'HOMEPAGE_BANNER', categorySlug: '', isActive: true, startDate: '', endDate: '', rotateSeconds: 6 });
       fetchAds();
     }
   };
@@ -131,7 +132,7 @@ export default function AdsPage() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Advertisements</h1>
         <button
-          onClick={() => { setEditing(null); setForm({ title: '', imageUrl: '', linkUrl: '', slot: 'HOMEPAGE_BANNER', categorySlug: '', isActive: true, startDate: '', endDate: '', rotateSeconds: 6 }); setShowForm(true); }}
+          onClick={() => { setEditing(null); setForm({ title: '', sponsorLabel: '', imageUrl: '', linkUrl: '', slot: 'HOMEPAGE_BANNER', categorySlug: '', isActive: true, startDate: '', endDate: '', rotateSeconds: 6 }); setShowForm(true); }}
           className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition text-sm font-medium"
         >
           <Plus className="w-4 h-4" /> New Ad
@@ -166,6 +167,12 @@ export default function AdsPage() {
                     </select>
                   </div>
                 )}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Label under the ad <span className="text-gray-400 font-normal">(optional)</span></label>
+                  <input type="text" value={form.sponsorLabel || ''} onChange={(e) => setForm(f => ({ ...f, sponsorLabel: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20" placeholder="Advertisement" />
+                  <p className="text-xs text-gray-400 mt-1">Leave empty to show &ldquo;Advertisement&rdquo;. Enter a company name to show that instead.</p>
+                </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Click URL <span className="text-gray-400 font-normal">(optional)</span></label>
                   <input type="url" value={form.linkUrl} onChange={(e) => setForm(f => ({ ...f, linkUrl: e.target.value }))}
@@ -253,7 +260,7 @@ export default function AdsPage() {
                     <span>{ad.clickCount} clicks</span>
                   </div>
                   <div className="flex items-center gap-1 mt-3 pt-3 border-t border-gray-100">
-                    <button onClick={() => { setEditing(ad); setForm({ title: ad.title, imageUrl: ad.imageUrl, linkUrl: ad.linkUrl || '', slot: ad.slot, categorySlug: ad.categorySlug || '', isActive: ad.isActive, startDate: '', endDate: '', rotateSeconds: ad.rotateSeconds ?? 6 }); setShowForm(true); }}
+                    <button onClick={() => { setEditing(ad); setForm({ title: ad.title, sponsorLabel: ad.sponsorLabel || '', imageUrl: ad.imageUrl, linkUrl: ad.linkUrl || '', slot: ad.slot, categorySlug: ad.categorySlug || '', isActive: ad.isActive, startDate: '', endDate: '', rotateSeconds: ad.rotateSeconds ?? 6 }); setShowForm(true); }}
                       className="p-1.5 text-gray-400 hover:text-primary rounded"><Edit2 className="w-4 h-4" /></button>
                     {ad.linkUrl ? (
                     <a href={ad.linkUrl} target="_blank" rel="noopener noreferrer" className="p-1.5 text-gray-400 hover:text-blue-600 rounded">

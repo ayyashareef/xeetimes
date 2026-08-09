@@ -100,7 +100,7 @@ export default function MediaPage() {
         <label className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition text-sm font-medium cursor-pointer">
           <Upload className="w-4 h-4" />
           {uploading ? 'Uploading...' : 'Upload Files'}
-          <input type="file" accept="image/*" multiple className="hidden" onChange={onFileSelect} disabled={uploading} />
+          <input type="file" accept="image/*,video/mp4,video/webm,video/ogg,video/quicktime" multiple className="hidden" onChange={onFileSelect} disabled={uploading} />
         </label>
       </div>
 
@@ -112,7 +112,7 @@ export default function MediaPage() {
           <p className="text-gray-500 mb-4">No media files yet</p>
           <label className="inline-flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg cursor-pointer hover:bg-primary-700 transition text-sm">
             <Upload className="w-4 h-4" /> Upload your first file
-            <input type="file" accept="image/*" multiple className="hidden" onChange={onFileSelect} />
+            <input type="file" accept="image/*,video/mp4,video/webm,video/ogg,video/quicktime" multiple className="hidden" onChange={onFileSelect} />
           </label>
         </div>
       ) : (
@@ -120,7 +120,13 @@ export default function MediaPage() {
           {media.slice(0, visible).map((item) => (
             <div key={item.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden group">
               <div className="aspect-square relative">
-                <img src={item.url} alt={item.altText_en || item.filename} className="w-full h-full object-cover" />
+                {item.mimeType?.startsWith('video/') ? (
+                  // Muted + playsInline so the tile previews without asking to
+                  // play; controls appear on the item itself, not the grid.
+                  <video src={item.url} className="w-full h-full object-cover" muted playsInline preload="metadata" />
+                ) : (
+                  <img src={item.url} alt={item.altText_en || item.filename} className="w-full h-full object-cover" />
+                )}
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition flex items-center justify-center opacity-0 group-hover:opacity-100">
                   <div className="flex gap-2">
                     <button onClick={() => copyUrl(item.url)} className="p-2 bg-white rounded-lg text-gray-700 hover:text-primary" title="Copy URL">

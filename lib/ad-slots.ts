@@ -49,6 +49,6 @@ export const AD_SLOT_MAP: Record<string, AdSlotDef> = Object.fromEntries(
 export const adSizeLabel = (d: AdSlotDef) => `${d.w} × ${d.h}`;
 
 // An active ad resolved for a slot, and the slot->ad map passed to the builders.
-export type AdData = { id: string; imageUrl: string; linkUrl: string | null; title: string; rotateSeconds: number; categorySlug?: string | null };
+export type AdData = { id: string; imageUrl: string; linkUrl: string | null; title: string; rotateSeconds: number; categorySlug?: string | null; sponsorLabel?: string | null };
 // A slot can hold multiple ads that rotate on the client.
 export type AdsMap = Record<string, AdData[]>;

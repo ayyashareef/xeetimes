@@ -224,7 +224,7 @@ function autop(html: string): string {
 // A centred 400×400 in-content ad box (only rendered when a creative exists).
 function midAdBlock(ads: AdsMap): string {
   if (!ads['ARTICLE_MID']?.length) return '';
-  return `<div class="xt-adband xt-midad" style="max-width:400px;margin:30px auto;">${adSlot('ARTICLE_MID', ads)}<div class="xt-adband-label">Advertisement</div></div>`;
+  return `<div class="xt-adband xt-midad" style="max-width:400px;margin:30px auto;">${adSlot('ARTICLE_MID', ads)}<div class="xt-adband-label">${adLabel(ads, 'ARTICLE_MID')}</div></div>`;
 }
 // Drop an ad block roughly in the middle of the article body, at a safe
 // paragraph boundary (blank line, or </p>) so we never split inside a tag.
@@ -263,7 +263,17 @@ function videoEmbed(url: string): string | null {
 // WordPress stored video links as bare oEmbed URLs on their own line, so they
 // render here as un-clickable plain text. Convert every YouTube/Facebook video
 // link (bare or wrapped in <a>) into a responsive embedded player.
+// Self-hosted video: a bare /uploads/... .mp4 on its own line becomes a real
+// player. Uploaded video is stored as-is, so the browser plays the file
+// directly — there is no provider to embed.
+const SELF_VIDEO_RE = /(^|[\s>])((?:https?:\/\/[^\s<"']+)?\/(?:uploads|wp-content\/uploads)\/[^\s<"']+\.(?:mp4|webm|ogv))(?=$|[\s<])/gi;
+function embedSelfHosted(html: string): string {
+  if (!html || !/\.(?:mp4|webm|ogv)/i.test(html)) return html;
+  return html.replace(SELF_VIDEO_RE, (full, pre, url) =>
+    `${pre}<div class="xt-video"><video src="${esc(url)}" controls preload="metadata" playsinline style="width:100%;height:100%;"></video></div>`);
+}
 function embedVideos(html: string): string {
+  html = embedSelfHosted(html);
   if (!html || !/youtu|fb\.watch|facebook\.com/i.test(html)) return html;
   return html
     // 1) <a href="...video...">…</a> -> embed
@@ -366,11 +376,17 @@ export function adSlot(slot: string, ads: AdsMap): string {
   const rot = rotating ? ' data-ad-rotate' : '';
   return `<div class="xt-ad xt-ad-${def.kind} xt-ad-filled"${rot} style="${box}position:relative;">${list.map((ad, i) => adSlide(ad, i, rotating)).join('')}</div>`;
 }
+// The eyebrow under an ad. A sponsor may pay to be named, in which case their
+// name replaces the generic word entirely; when several creatives share a slot
+// the label follows the first, since that is the one showing on load.
+const adLabel = (ads: AdsMap, slot: string): string =>
+  esc((ads[slot] || []).find((a) => a.sponsorLabel && a.sponsorLabel.trim())?.sponsorLabel?.trim() || 'Advertisement');
+
 // Ad with the "Advertisement" eyebrow. Default: label centred below the ad.
 // `labelTop` puts the label above the ad, aligned to the left corner (header banner).
 function adBand(slot: string, ads: AdsMap, labelTop = false): string {
   if (!AD_SLOT_MAP[slot]) return '';
-  const label = `<div class="xt-adband-label">Advertisement</div>`;
+  const label = `<div class="xt-adband-label">${adLabel(ads, slot)}</div>`;
   const ad = adSlot(slot, ads);
   return labelTop
     ? `<div class="xt-adband xt-adband-top">${label}${ad}</div>`
@@ -403,7 +419,7 @@ function fillAdBox(slot: string, ads: AdsMap): string {
 function fillAdColumn(slot: string, ads: AdsMap, cls = ''): string {
   return `<div class="${cls}" style="display:flex;flex-direction:column;min-height:0;">
       ${fillAdBox(slot, ads)}
-      <div style="${EN}font-size:13px;letter-spacing:.01em;color:#a49f96;margin-top:2px;text-align:center;">— Advertisement —</div>
+      <div style="${EN}font-size:13px;letter-spacing:.01em;color:#a49f96;margin-top:2px;text-align:center;">— ${adLabel(ads, slot)} —</div>
     </div>`;
 }
 

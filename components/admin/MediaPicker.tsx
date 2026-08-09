@@ -191,7 +191,7 @@ export default function MediaPicker({ open, onClose, onSelect, onSelectMultiple,
           )}>
             {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
             Upload
-            <input type="file" accept="image/*" multiple className="hidden" onChange={(e) => requestUpload(e.target.files)} />
+            <input type="file" accept="image/*,video/mp4,video/webm,video/ogg,video/quicktime" multiple className="hidden" onChange={(e) => requestUpload(e.target.files)} />
           </label>
         </div>
 
@@ -227,11 +227,21 @@ export default function MediaPicker({ open, onClose, onSelect, onSelectMultiple,
                       isSelected ? 'border-primary ring-2 ring-primary/20' : 'border-transparent hover:border-gray-300'
                     )}
                   >
-                    <img
-                      src={file.url}
-                      alt={file.filename}
-                      className="w-full h-full object-cover"
-                    />
+                    {file.mimeType?.startsWith('video/') ? (
+                      <video
+                        src={file.url}
+                        className="w-full h-full object-cover"
+                        muted
+                        playsInline
+                        preload="metadata"
+                      />
+                    ) : (
+                      <img
+                        src={file.url}
+                        alt={file.filename}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
                     {isSelected && (
                       <div className="absolute top-1.5 end-1.5 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
                         <Check className="w-3.5 h-3.5 text-white" />

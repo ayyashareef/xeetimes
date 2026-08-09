@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Plus, Search, Eye, Edit2, Trash2, Clock } from 'lucide-react';
 import { toast } from 'sonner';
@@ -32,7 +33,10 @@ export default function ArticlesPage() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
-  const [search, setSearch] = useState('');
+  const params0 = useSearchParams();
+  // The top bar hands its term over as ?q=, so a search started up there lands
+  // here already applied rather than dropping the user on an unfiltered list.
+  const [search, setSearch] = useState(params0.get('q') || '');
   const [statusFilter, setStatusFilter] = useState('');
   const [loading, setLoading] = useState(true);
 
@@ -49,7 +53,14 @@ export default function ArticlesPage() {
     setLoading(false);
   };
 
-  useEffect(() => { fetchArticles(); }, [page, statusFilter]);
+  // `search` was missing from the dependencies, so typing filtered nothing
+  // until something else happened to trigger a refetch. Debounced so each
+  // keystroke does not become a query.
+  useEffect(() => {
+    const t = setTimeout(fetchArticles, search ? 350 : 0);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, statusFilter, search]);
 
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this article?')) return;
@@ -137,7 +148,7 @@ export default function ArticlesPage() {
                       )}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-500">
-                      {new Date(article.updatedAt).toLocaleDateString()}
+                      {new Date(article.publishedAt || article.updatedAt).toLocaleDateString()}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-700 text-end tabular-nums">
                       {(article.viewCount ?? 0).toLocaleString('en-US')}

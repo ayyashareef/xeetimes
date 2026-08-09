@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { signOut } from 'next-auth/react';
 
 interface TopBarProps {
@@ -25,6 +26,8 @@ function toggleTheme() {
 }
 
 export default function AdminTopBar({ user }: TopBarProps) {
+  const router = useRouter();
+  const [q, setQ] = useState('');
   const initial = (user.name || 'A').trim().charAt(0).toUpperCase();
   const role = user.role.toLowerCase().replace('_', ' ');
 
@@ -50,8 +53,17 @@ export default function AdminTopBar({ user }: TopBarProps) {
         <span style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'var(--ink3)', display: 'flex' }}>
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="7" /><line x1="21" y1="21" x2="16.5" y2="16.5" /></svg>
         </span>
+        {/* Was a decorative input with no handler at all. Enter now hands the
+            term to the articles list, which is the only searchable index. */}
         <input
-          placeholder="Search articles, users, media…"
+          placeholder="Search articles…"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key !== 'Enter') return;
+            const term = q.trim();
+            router.push(term ? `/admin/articles?q=${encodeURIComponent(term)}` : '/admin/articles');
+          }}
           style={{ width: '100%', height: 42, borderRadius: 11, border: '1px solid var(--line)', background: 'var(--bg)', color: 'var(--ink)', fontFamily: "'Hanken Grotesk',sans-serif", fontSize: 14, padding: '0 14px 0 42px', outline: 'none' }}
         />
       </div>
