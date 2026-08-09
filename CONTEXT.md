@@ -62,6 +62,17 @@ Choices that look arbitrary from the code, and the reasoning that makes them not
 
 ## Security and operations
 
+- **WordPress imports must read `post_date_gmt`, not `post_date`.** `post_date` is
+  Maldives local (UTC+5); `publishedAt` holds UTC. The original migration took
+  the local column, so all 3,069 rows sat 5h ahead, and the display layer's
+  UTC->Maldives conversion compounded it to 10h — 713 articles showed the wrong
+  day. Corrected 2026-08-09 (backup: `/root/backups/article-dates-before-*.csv`).
+  Tooling and the full rule: `scripts/wp-import/`. (2026-08-09)
+- **After adding files under `/var/www/xeetimes/wp-content/`, restart pm2.** Next
+  serves `public/wp-content` (a symlink) from a listing read at startup, so until
+  `pm2 restart xeetimes` the image optimizer returns `400 "The requested resource
+  isn't a valid image"` for anything new — while nginx serves the same file fine.
+  The error names the file, so it reads like corruption; it isn't. (2026-08-09)
 - **Never commit:** `/var/www/xeetimes/.env`, `.env.local`, the WordPress dump, and `.localdb/` (DB binaries + data). Only code + assets go in git.
 - **Access:** the VM is reached as `root` over SSH (key auth). pm2, nginx, and Postgres run on the VM and come back after a reboot; the local dev DB does not.
 - **Known outstanding risk:** deploys cause a ~10 s outage **and** break open tabs (see gotchas). The standing fix — zero-downtime build-then-swap + a Cloudflare cache purge — is **not yet implemented** (2026-07-18).
