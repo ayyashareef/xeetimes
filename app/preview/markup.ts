@@ -226,21 +226,32 @@ function midAdBlock(ads: AdsMap): string {
   if (!ads['ARTICLE_MID']?.length) return '';
   return `<div class="xt-adband xt-midad" style="max-width:400px;margin:30px auto;">${adSlot('ARTICLE_MID', ads)}<div class="xt-adband-label">${adLabel(ads, 'ARTICLE_MID')}</div></div>`;
 }
-// Drop an ad block roughly in the middle of the article body, at a safe
-// paragraph boundary (blank line, or </p>) so we never split inside a tag.
+const MID_AD_AFTER_PARAGRAPHS = 3;
+// The in-content ad sits after the third paragraph, every time. It used to go
+// at the midpoint of the body, so its position moved with the article's length
+// — halfway down a long piece is well past the fold, and an advertiser buying
+// the slot could not know where it would land.
+//
+// Only paragraphs carrying TEXT count. A <p> holding just an image is a block
+// but not a paragraph anyone reads, and letting one use up part of the
+// allowance would push the ad further down than asked. Splitting after </p>
+// keeps the cut on a tag boundary, so it can never land inside markup.
 function insertMidAd(html: string, adHtml: string): string {
   if (!adHtml || !html) return html;
-  let blocks = html.split(/\n\s*\n/);
-  if (blocks.length >= 3) {
-    blocks.splice(Math.floor(blocks.length / 2), 0, adHtml);
-    return blocks.join('\n\n');
+
+  const blocks = html.split(/(?<=<\/p>)/i);
+  const hasText = (b: string) => stripTags(b.replace(/<img\b[^>]*>/gi, '')).length > 0;
+
+  let seen = 0;
+  for (let i = 0; i < blocks.length; i++) {
+    if (hasText(blocks[i])) seen++;
+    if (seen === MID_AD_AFTER_PARAGRAPHS) {
+      blocks.splice(i + 1, 0, adHtml);
+      return blocks.join('');
+    }
   }
-  blocks = html.split(/(?<=<\/p>)/i);
-  if (blocks.length >= 3) {
-    blocks.splice(Math.floor(blocks.length / 2), 0, adHtml);
-    return blocks.join('');
-  }
-  return html + adHtml; // short article: place it after the body
+  // Fewer than three paragraphs — nothing to sit between, so it follows the body.
+  return html + adHtml;
 }
 
 // Extract a YouTube video id from any of its URL shapes.
