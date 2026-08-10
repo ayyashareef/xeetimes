@@ -1108,7 +1108,7 @@ export const CAT_PER_PAGE = 8;
 // heading) — that column used to hold an ad.
 export const CAT_LEAD_SLIDES = 5;
 export const CAT_SIDE_FEATURE = 1;
-export const HOME_HERO_SLIDES = 4;
+export const HOME_HERO_SLIDES = 3;
 export const ROTATE_SECS = 5;
 // Articles the whole lead ROW consumes on page 1 (carousel + the side feature),
 // so pages 2+ start after them and nothing is shown twice.

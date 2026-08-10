@@ -150,18 +150,26 @@ export default function XtShell({
           document.body.appendChild(el);
           setTimeout(() => el.remove(), 2600);
         };
-        if (navigator.share) {
-          // A cancelled sheet rejects — that is the reader deciding not to
-          // share, not a failure, so it must not surface as an error.
-          navigator.share({ title, url }).catch(() => {});
-        } else if (navigator.clipboard?.writeText) {
-          navigator.clipboard.writeText(url).then(
-            () => toast(dir === 'rtl' ? 'ލިންކް ކޮޕީ ކުރެވިއްޖެ' : 'Link copied'),
-            () => window.open(nativeShare.href, '_blank', 'noopener'),
-          );
-        } else {
-          window.open(nativeShare.href, '_blank', 'noopener');
-        }
+        // Copy first, whichever route follows. Instagram accepts no link from
+        // a share sheet the way WhatsApp or Telegram do — whatever opens, the
+        // reader ends up pasting, so the clipboard is the part that has to work.
+        const copied = navigator.clipboard?.writeText
+          ? navigator.clipboard.writeText(`${title} ${url}`).then(() => true, () => false)
+          : Promise.resolve(false);
+
+        copied.then((ok) => {
+          if (navigator.share) {
+            if (ok) toast(dir === 'rtl' ? 'ލިންކް ކޮޕީ ކުރެވިއްޖެ' : 'Link copied — pick Instagram');
+            // A cancelled sheet rejects. That is the reader changing their
+            // mind, not a failure, so it must not surface as an error.
+            navigator.share({ title, url }).catch(() => {});
+          } else if (ok) {
+            toast(dir === 'rtl' ? 'ލިންކް ކޮޕީ ކުރެވިއްޖެ' : 'Link copied — paste it in Instagram');
+            window.open(nativeShare.href, '_blank', 'noopener');
+          } else {
+            window.open(nativeShare.href, '_blank', 'noopener');
+          }
+        });
         return;
       }
 
