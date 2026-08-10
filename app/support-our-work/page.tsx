@@ -3,6 +3,7 @@ import { getActiveAds } from '@/lib/ads';
 import { getHiddenCategorySlugs } from '@/lib/categories';
 import { getSiteSettings } from '@/lib/settings';
 import { SITE_URL } from '@/lib/seo';
+import { DEFAULT_OG_IMAGE } from '@/lib/og';
 import XtShell from '@/app/preview/XtShell';
 import { header, footer, type Lang } from '@/app/preview/markup';
 
@@ -38,7 +39,9 @@ export async function generateMetadata(): Promise<Metadata> {
       url: `${SITE_URL}/support-our-work`,
       siteName: 'XeeTimes',
       type: 'website',
+      images: [DEFAULT_OG_IMAGE],
     },
+    twitter: { card: 'summary_large_image', title: TITLE, description: DESCRIPTION, images: [DEFAULT_OG_IMAGE.url] },
   };
 }
 

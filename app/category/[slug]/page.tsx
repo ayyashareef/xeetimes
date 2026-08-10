@@ -5,6 +5,7 @@ import { getActiveAds } from '@/lib/ads';
 import { getHiddenCategorySlugs } from '@/lib/categories';
 import { getSiteSettings } from '@/lib/settings';
 import { SITE_URL } from '@/lib/seo';
+import { DEFAULT_OG_IMAGE } from '@/lib/og';
 import XtShell from '@/app/preview/XtShell';
 import { categoryHtml, sectionLabel, catPageCount, CAT_PER_PAGE, CAT_LEAD_SLIDES, type Art, type CatPage, type Lang } from '@/app/preview/markup';
 
@@ -32,7 +33,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     alternates: {
       canonical,
     },
-    openGraph: { title: name, description, url: canonical, siteName: 'XeeTimes', type: 'website' },
+    openGraph: { title: name, description, url: canonical, siteName: 'XeeTimes', type: 'website', images: [DEFAULT_OG_IMAGE] },
+    twitter: { card: 'summary_large_image', title: name, description, images: [DEFAULT_OG_IMAGE.url] },
   };
 }
 

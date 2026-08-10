@@ -26,6 +26,9 @@ export async function generateMetadata(): Promise<Metadata> {
       'XeeTimes (ޒީ ޓައިމްސް) — the latest news from the Maldives: politics, sports, business, world news and in-depth reports in Dhivehi.',
     applicationName: 'XeeTimes',
     robots: IS_STAGING ? { index: false, follow: false } : undefined,
+    // Next fills the image in from the sibling opengraph-image.tsx; without a
+    // card declared here the tags default to the small square preview.
+    twitter: { card: 'summary_large_image' },
     // Favicon from Admin → Settings (falls back to the app's default icon).
     icons: site.favicon ? { icon: site.favicon } : undefined,
   };
