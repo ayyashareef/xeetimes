@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/lib/db';
+import { rateLimit } from '@/lib/rate-limit';
 
 const schema = z.object({
   name: z.string().min(2, 'Name is too short').max(100),
@@ -12,6 +13,16 @@ const schema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // The contact form had length validation but nothing to stop a script
+    // submitting it in a loop — every submission is a row in ContactMessage.
+    const wait = rateLimit(request, 'contact', 3, 60 * 60_000);
+    if (wait !== null) {
+      return NextResponse.json(
+        { success: false, error: 'Too many messages. Please try again later.' },
+        { status: 429, headers: { 'Retry-After': String(wait) } },
+      );
+    }
+
     let body: unknown;
     try {
       body = await request.json();

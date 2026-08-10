@@ -3,6 +3,8 @@ import { dirname } from 'path';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Do not advertise the framework and its version to scanners.
+  poweredByHeader: false,
   // Pin the file-tracing root to this project. A stray package-lock.json in the
   // parent dir made Next infer the wrong workspace root (breaking the local
   // Windows build with a readlink EISDIR); this also silences that warning.
@@ -27,6 +29,30 @@ const nextConfig = {
   },
   // Every WordPress-era feed URL variant still lands on the real feed —
   // aggregators (Adafi etc.) were configured against the old WP endpoints.
+  // Baseline hardening. Deliberately NO Content-Security-Policy: the page
+  // builders emit inline styles on nearly every element, so any workable policy
+  // would need 'unsafe-inline' and would buy almost nothing. Worth revisiting
+  // only alongside moving those styles into the stylesheet.
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          // Stops the site being framed for clickjacking.
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          // Stops a browser second-guessing a declared content type — the upload
+          // route serves user-supplied files, so sniffing is a real risk there.
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          // Full URLs leak to same-origin only; cross-origin sees the origin.
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()' },
+          // Two years, with subdomains — the site is HTTPS-only behind Cloudflare.
+          { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains' },
+        ],
+      },
+    ];
+  },
+
   async redirects() {
     return [
       { source: '/rss', destination: '/feed', permanent: true },

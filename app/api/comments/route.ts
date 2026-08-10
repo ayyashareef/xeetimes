@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { verifyTurnstile } from '@/lib/turnstile';
+import { rateLimit } from '@/lib/rate-limit';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -30,6 +31,16 @@ export async function POST(request: Request) {
   }
 
   // Cloudflare Turnstile — no-op when TURNSTILE_SECRET_KEY is unset.
+  // Runs BEFORE Turnstile: verifyTurnstile returns true when no secret is
+  // configured, so without this the endpoint has no protection at all.
+  const wait = rateLimit(request, 'comment', 5, 10 * 60_000);
+  if (wait !== null) {
+    return NextResponse.json(
+      { error: 'Too many comments. Please wait a few minutes and try again.' },
+      { status: 429, headers: { 'Retry-After': String(wait) } },
+    );
+  }
+
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || null;
   if (!(await verifyTurnstile(turnstileToken, ip))) {
     return NextResponse.json({ error: 'Verification failed' }, { status: 400 });
