@@ -26,6 +26,12 @@ export async function generateMetadata(): Promise<Metadata> {
       'XeeTimes (ޒީ ޓައިމްސް) — the latest news from the Maldives: politics, sports, business, world news and in-depth reports in Dhivehi.',
     applicationName: 'XeeTimes',
     robots: IS_STAGING ? { index: false, follow: false } : undefined,
+    // Brand name for share previews. The public pages each set this themselves,
+    // but anything that does not — /login, /admin — fell through to Telegram
+    // guessing a name from the domain, which capitalises only the first letter
+    // and rendered the masthead as "Xeetimes". Declaring it at the root means
+    // every page, present and future, carries the correct casing.
+    openGraph: { siteName: 'XeeTimes', locale: 'dv_MV', type: 'website' },
     // Next fills the image in from the sibling opengraph-image.tsx; without a
     // card declared here the tags default to the small square preview.
     twitter: { card: 'summary_large_image' },

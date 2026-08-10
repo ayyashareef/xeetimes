@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { db } from '@/lib/db';
@@ -5,6 +6,14 @@ import AdminSidebar from '@/components/admin/Sidebar';
 import AdminTopBar from '@/components/admin/TopBar';
 import { Toaster } from 'sonner';
 import './admin-ui.css';
+
+// The newsroom's back office is not a page to be indexed or link-previewed.
+// robots.txt already disallows /admin, but that only binds crawlers that choose
+// to read it — Telegram and the other chat scrapers ignore it entirely, which is
+// how pasting an /admin link produced a full branded preview card.
+export const metadata: Metadata = {
+  robots: { index: false, follow: false, nocache: true },
+};
 
 const ADM_THEME_SCRIPT = `(function(){try{var t=localStorage.getItem('xt-adm-theme')||'light';document.documentElement.setAttribute('data-adm',t);}catch(e){document.documentElement.setAttribute('data-adm','light');}})();`;
 
