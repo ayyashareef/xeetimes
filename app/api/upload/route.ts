@@ -70,7 +70,7 @@ async function watermarkVideo(input: Buffer, formData: FormData): Promise<Buffer
     // The mark scales to a fraction of the VIDEO's width, matching how it
     // scales to a fraction of an image's width — so it looks the same size on
     // a still and a clip of the same story.
-    const m = '(main_w*0.025+6)';
+    const m = '(main_w*0.055)';   // matches the still-image inset above
     const pos = wmPos === 'center' ? 'x=(main_w-overlay_w)/2:y=(main_h-overlay_h)/2'
       : `x=${wmPos.endsWith('left') ? m : `main_w-overlay_w-${m}`}:y=${wmPos.startsWith('top') ? m : `main_h-overlay_h-${m}`}`;
     // scale2ref scales its FIRST input using the SECOND as the reference, so the
@@ -209,7 +209,11 @@ export async function POST(request: Request) {
       const shadow = await sharp({ create: { width: lw, height: lh, channels: 3, background: '#000000' } })
         .joinChannel(shadowAlpha, { raw: { width: lw, height: lh, channels: 1 } }).png().blur(4).toBuffer();
 
-      const margin = Math.round(imgW * 0.025) + 6;
+      // Measured off the old site's own watermarks: the mark sat 6.2% of the
+      // width in from the left and 12.6% of the height up from the bottom. The
+      // previous 2.5%+6px put it about half that far in, so it read as stuck to
+      // the corner. Proportional to width on both axes so it holds at any size.
+      const margin = Math.round(imgW * 0.055);
       const atStart = wmPos.endsWith('left');
       const atTop = wmPos.startsWith('top');
       const left = wmPos === 'center' ? Math.round((imgW - lw) / 2)
