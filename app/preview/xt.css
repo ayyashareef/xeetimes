@@ -1000,3 +1000,14 @@ body:has(#xt-root) { background: var(--page); }
 
 
 
+
+/* Confirmation for the copy-link fallback on desktops with no share sheet.
+   Fixed to the viewport so it is visible wherever the reader has scrolled. */
+.xt-toast{
+  position:fixed; left:50%; bottom:32px; transform:translateX(-50%);
+  background:#1c1c1c; color:#fff; padding:11px 20px; border-radius:999px;
+  font-size:14px; letter-spacing:.01em; z-index:9999;
+  box-shadow:0 6px 22px rgba(0,0,0,.28);
+  animation:xt-toast-in .18s ease-out;
+}
+@keyframes xt-toast-in{ from{ opacity:0; transform:translate(-50%,8px);} to{ opacity:1; transform:translate(-50%,0);} }
