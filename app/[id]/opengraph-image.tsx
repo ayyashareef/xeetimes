@@ -8,7 +8,7 @@ import { db } from '@/lib/db';
 
 // Branded share card (imported "OG Image.dc.html" design): featured photo on the
 // left blending into a blue radial brand panel — logo-in-a-box masthead, accent
-// rule, the Dhivehi headline, and a category pill + xeetimes.com. Dhivehi is
+// rule, the Dhivehi headline, and xeetimes.com. Dhivehi is
 // rendered with MV Waheed via sharp/Pango (correct Thaana shaping) and embedded.
 // Output is JPEG + disk-cached per article/updatedAt so scrapers get it fast.
 export const runtime = 'nodejs';
@@ -21,7 +21,9 @@ const WAHEED = path.join(process.cwd(), 'public/fonts/MVWaheed.ttf');
 const FARUMA = path.join(process.cwd(), 'public/fonts/Faruma.ttf');
 const CACHE_DIR = path.join(process.cwd(), '.og-cache');
 const IMG_CACHE = path.join(CACHE_DIR, 'img');
-const OG_VERSION = 'v14';
+// Bumping this invalidates every card on disk — required whenever the artwork
+// changes, or readers keep getting the previous design from the cache.
+const OG_VERSION = 'v15';
 const HEADERS = {
   'Content-Type': 'image/jpeg',
   'Cache-Control': 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800',
@@ -158,7 +160,6 @@ export default async function OgImage({ params }: { params: Promise<{ id: string
         ? article.shortTitle_en || article.shortTitle_dv || article.title_en || article.title_dv
         : article.shortTitle_dv || article.shortTitle_en || article.title_dv || article.title_en)
     : 'ޒީ ޓައިމްސް';
-  const cat = article?.category ? (en ? article.category.name_en || article.category.name_dv : article.category.name_dv) : '';
 
   const [faruma, logo, photo] = await Promise.all([
     readFile(FARUMA),
@@ -174,10 +175,7 @@ export default async function OgImage({ params }: { params: Promise<{ id: string
   const headSizePt = long ? 49 : mid ? 57 : 68;
   // Headline sits bottom-centre and is centre-aligned ('centre' is symmetric,
   // so no logical/visual RTL flip to worry about — unlike 'left'/'right').
-  const [headImg, catImg] = await Promise.all([
-    renderText(heading, { width: textW, sizePt: headSizePt, color: '#ffffff', align: 'centre' }),
-    cat ? renderText(cat, { width: 340, sizePt: 29, color: '#ffffff', align: 'centre' }) : Promise.resolve(null),
-  ]);
+  const headImg = await renderText(heading, { width: textW, sizePt: headSizePt, color: '#ffffff', align: 'centre' });
   let hW = headImg?.w ?? 0;
   let hH = headImg?.h ?? 0;
   const MAX_H = 340;
@@ -194,13 +192,6 @@ export default async function OgImage({ params }: { params: Promise<{ id: string
     </div>
   );
   const siteTag = <div style={{ display: 'flex', color: 'rgba(255,255,255,0.85)', fontSize: 29, fontWeight: 600, letterSpacing: 0.4 }}>xeetimes.com</div>;
-  const catPill = catImg ? (
-    <div style={{ display: 'flex', alignItems: 'center', background: '#c8102e', borderRadius: 999, padding: '13px 28px' }}>
-      <img src={catImg.src} width={catImg.w} height={catImg.h} alt="" />
-    </div>
-  ) : (
-    <div style={{ display: 'flex' }} />
-  );
 
   const png = await new ImageResponse(
     (
@@ -229,7 +220,7 @@ export default async function OgImage({ params }: { params: Promise<{ id: string
           </div>
 
           {/* centre block: the centred headline, pushed toward the bottom */}
-          <div style={{ display: 'flex', flex: 1, flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', paddingBottom: 22 }}>
+          <div style={{ display: 'flex', flex: 1, flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', paddingBottom: 0 }}>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
               {headImg ? (
                 <img src={headImg.src} width={hW} height={hH} alt="" />
@@ -239,10 +230,9 @@ export default async function OgImage({ params }: { params: Promise<{ id: string
             </div>
           </div>
 
-          {/* footer: site tag on the left, category pill on the right (bottom) */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          {/* footer: site tag alone in the bottom-left */}
+          <div style={{ display: 'flex', alignItems: 'center' }}>
             {siteTag}
-            {catPill}
           </div>
         </div>
       </div>
