@@ -8,10 +8,16 @@
    =================================================================== */
 
 /* Ammu — headings + nav (MV A. Waheed display face) */
+/* Weight ranges must match what the FILE contains. Declaring a single-weight
+   face as a range (400 700) tells the browser that file covers bold too, so it
+   renders bold with the regular outlines and never synthesises one — which is
+   why <strong> has done nothing, in the editor and on the live article page.
+   Faruma, MVWaheed and Mv_Faseyha are all usWeightClass 400; MVAWaheed is a
+   genuinely bold face at 700. */
 @font-face {
   font-family: 'Ammu';
   src: url('/fonts/MVAWaheed.ttf') format('truetype');
-  font-weight: 400 900;
+  font-weight: 700;
   font-display: swap;
 }
 /* AmmuFK — headings font */
@@ -25,21 +31,21 @@
 @font-face {
   font-family: 'Waheed';
   src: url('/fonts/MVWaheed.woff2') format('woff2'), url('/fonts/MVWaheed.ttf') format('truetype');
-  font-weight: 400 900;
+  font-weight: 400;
   font-display: swap;
 }
 /* MVTypewriter — reading body (MV Faseyha) */
 @font-face {
   font-family: 'MVTypewriter';
   src: url('/fonts/Mv_Faseyha.ttf') format('truetype');
-  font-weight: 400 700;
+  font-weight: 400;
   font-display: swap;
 }
 /* Faruma — bundled Thaana fallback so nothing ever falls back to MV Boli */
 @font-face {
   font-family: 'Faruma';
   src: url('/fonts/Faruma.woff2') format('woff2');
-  font-weight: 400 700;
+  font-weight: 400;
   font-display: swap;
 }
 /* MV Utheemu — article reading body (regular + bold faces) */

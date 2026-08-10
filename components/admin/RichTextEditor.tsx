@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
+import TextStyle from '@tiptap/extension-text-style';
+import Color from '@tiptap/extension-color';
 import TextAlign from '@tiptap/extension-text-align';
 import TipTapLink from '@tiptap/extension-link';
 import Youtube from '@tiptap/extension-youtube';
@@ -54,6 +56,9 @@ export default function RichTextEditor({
   const editor = useEditor({
     extensions: [
       StarterKit.configure({ blockquote: false }),
+      // Color stores the colour as a style on a TextStyle mark, so both are needed.
+      TextStyle,
+      Color,
       QuoteWithAuthor,
       Underline,
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
@@ -190,6 +195,47 @@ export default function RichTextEditor({
           <ToolButton onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} active={editor.isActive('heading', { level: 3 })} title="Heading 3">
             <Heading3 className="w-4 h-4" />
           </ToolButton>
+
+          <div className="w-px h-5 bg-gray-300 mx-1" />
+
+          {/* Colours the newsroom actually uses: the brand red for emphasis, a
+              couple of neutrals, and "reset" to clear back to the body colour.
+              The swatch is a native colour input for anything else. */}
+          <span className="flex items-center gap-1 pe-1">
+            {[
+              { c: '#c8102e', label: 'Red' },
+              { c: '#1b5e20', label: 'Green' },
+              { c: '#0a2350', label: 'Navy' },
+            ].map(({ c, label }) => (
+              <button
+                key={c}
+                type="button"
+                title={label}
+                onClick={() => editor.chain().focus().setColor(c).run()}
+                className="w-5 h-5 rounded border border-gray-300 hover:scale-110 transition"
+                style={{ background: c }}
+              />
+            ))}
+            <label
+              title="Pick a colour"
+              className="w-5 h-5 rounded border border-gray-300 overflow-hidden cursor-pointer relative"
+              style={{ background: 'linear-gradient(135deg,#e11,#fb0,#0a0,#08f,#a0f)' }}
+            >
+              <input
+                type="color"
+                onChange={(e) => editor.chain().focus().setColor(e.target.value).run()}
+                className="absolute inset-0 opacity-0 cursor-pointer"
+              />
+            </label>
+            <button
+              type="button"
+              title="Remove colour"
+              onClick={() => editor.chain().focus().unsetColor().run()}
+              className="px-1.5 h-5 rounded border border-gray-300 text-[10px] leading-none text-gray-600 hover:bg-gray-100"
+            >
+              A&#818;
+            </button>
+          </span>
 
           <div className="w-px h-5 bg-gray-300 mx-1" />
 

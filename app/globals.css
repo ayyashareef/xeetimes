@@ -5,6 +5,10 @@
 @tailwind utilities;
 
 /* ==================== DHIVEHI FONTS ==================== */
+/* Weight ranges must match what the FILE contains. Declaring the single-weight
+   Faruma as a range (400 700) told the browser it covered bold too, so bold
+   rendered with the regular outlines and was never synthesised -- which is why
+   the Bold button appeared to do nothing. */
 @font-face {
   font-family: 'mvwaheed';
   src: url('/fonts/MVWaheed.woff2') format('woff2');
@@ -17,7 +21,7 @@
 @font-face {
   font-family: 'Faruma';
   src: url('/fonts/Faruma.woff2') format('woff2');
-  font-weight: 400 700;
+  font-weight: 400;
   font-display: swap;
 }
 
