@@ -421,6 +421,16 @@
    app/preview/xt.css — keep the two in step. Scoped to the editor rather than
    changing font-dv-body, which also styles category, tag, user and settings
    fields that are not article body copy. */
+/* Composing size. The published article body is 22px/1.9; the editor was
+   inheriting the admin's small UI size, so Thaana was cramped to write in.
+   Close to the published size without matching it exactly — the editor column
+   is narrower than the article column, so identical numbers do not read the
+   same. */
+.font-dv-article {
+  font-size: 20px;
+  line-height: 1.9;
+}
+
 .font-dv-article,
 .font-dv-article p,
 .font-dv-article li,

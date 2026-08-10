@@ -77,7 +77,11 @@ export default function RichTextEditor({
     editorProps: {
       attributes: {
         class: cn(
-          'prose max-w-none min-h-[300px] outline-none px-4 py-3',
+          // A tall article used to push the toolbar off the top of the screen,
+          // so bolding a word near the end meant scrolling back up. The content
+          // scrolls inside its own box instead and the toolbar stays put.
+          'prose max-w-none outline-none px-4 py-3',
+          'min-h-[300px] max-h-[65vh] overflow-y-auto',
           dir === 'rtl' && 'font-dv-article text-right',
         ),
         dir,
@@ -185,7 +189,7 @@ export default function RichTextEditor({
   return (
     <>
       <div className={cn('border border-gray-200 rounded-lg overflow-hidden', className)}>
-        <div className="flex flex-wrap items-center gap-0.5 p-2 border-b border-gray-200 bg-gray-50">
+        <div className="sticky top-0 z-10 flex flex-wrap items-center gap-0.5 p-2 border-b border-gray-200 bg-gray-50">
           <ToolButton onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} active={editor.isActive('heading', { level: 1 })} title="Heading 1">
             <Heading1 className="w-4 h-4" />
           </ToolButton>
