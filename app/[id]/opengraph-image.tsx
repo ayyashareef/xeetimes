@@ -6,9 +6,10 @@ import crypto from 'node:crypto';
 import sharp from 'sharp';
 import { db } from '@/lib/db';
 
-// Branded share card (imported "OG Image.dc.html" design): featured photo on the
-// left blending into a blue radial brand panel — logo-in-a-box masthead, accent
-// rule, the Dhivehi headline, and xeetimes.com. Dhivehi is
+// Share card for a single article: the featured photo full-bleed, washed dark
+// at the bottom, with the Dhivehi headline centred over it. Nothing else — the
+// photo already carries the XT watermark from the uploader, so the card adds no
+// logo or domain of its own. Dhivehi is
 // rendered with MV Waheed via sharp/Pango (correct Thaana shaping) and embedded.
 // Output is JPEG + disk-cached per article/updatedAt so scrapers get it fast.
 export const runtime = 'nodejs';
@@ -23,7 +24,7 @@ const CACHE_DIR = path.join(process.cwd(), '.og-cache');
 const IMG_CACHE = path.join(CACHE_DIR, 'img');
 // Bumping this invalidates every card on disk — required whenever the artwork
 // changes, or readers keep getting the previous design from the cache.
-const OG_VERSION = 'v15';
+const OG_VERSION = 'v16';
 const HEADERS = {
   'Content-Type': 'image/jpeg',
   'Cache-Control': 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800',
@@ -161,12 +162,10 @@ export default async function OgImage({ params }: { params: Promise<{ id: string
         : article.shortTitle_dv || article.shortTitle_en || article.title_dv || article.title_en)
     : 'ޒީ ޓައިމްސް';
 
-  const [faruma, logo, photo] = await Promise.all([
+  const [faruma, photo] = await Promise.all([
     readFile(FARUMA),
-    readFile(path.join(process.cwd(), 'public/xt-logo.png')),
     loadPhoto(article?.featuredImage),
   ]);
-  const logoSrc = `data:image/png;base64,${logo.toString('base64')}`;
   const withPhoto = !!photo;
 
   const textW = 1000;
@@ -185,13 +184,11 @@ export default async function OgImage({ params }: { params: Promise<{ id: string
     hH = Math.round(hH * s);
   }
 
-  // Masthead is just the logo box pinned to the top-left corner (no wordmark).
-  const logoBox = (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 78, height: 78, borderRadius: 18, background: '#ffffff', padding: 10 }}>
-      <img src={logoSrc} width={58} height={58} style={{ width: 58, height: 58, objectFit: 'contain' }} alt="XeeTimes" />
-    </div>
-  );
-  const siteTag = <div style={{ display: 'flex', color: 'rgba(255,255,255,0.85)', fontSize: 29, fontWeight: 600, letterSpacing: 0.4 }}>xeetimes.com</div>;
+  // No corner logo box and no xeetimes.com line any more. The featured photo
+  // already carries the XT watermark baked in by the uploader, so both were
+  // branding the same card a second and third time — and the top-left corner is
+  // exactly where Facebook's composer puts its own swap/delete buttons, so the
+  // logo sat underneath them anyway. Photo and headline only.
 
   const png = await new ImageResponse(
     (
@@ -202,25 +199,18 @@ export default async function OgImage({ params }: { params: Promise<{ id: string
         ) : (
           <div style={{ position: 'absolute', top: 0, left: 0, width: 1200, height: 630, display: 'flex', background: 'radial-gradient(circle at 100% 0%, #2f6fd0 0%, #14509c 46%, #0a2f70 100%)' }} />
         )}
-        {/* legibility overlays: strong at the bottom (behind the headline),
-            light at the top (behind the masthead) */}
+        {/* Legibility wash behind the headline. The matching wash across the top
+            went with the logo it existed to protect — nothing sits up there now,
+            so it was only darkening the photo. */}
         {photo ? (
           <div style={{ position: 'absolute', top: 0, left: 0, width: 1200, height: 630, display: 'flex', background: 'linear-gradient(to top, rgba(6,18,45,0.92) 0%, rgba(6,18,45,0.6) 32%, rgba(6,18,45,0) 60%)' }} />
         ) : null}
-        {photo ? (
-          <div style={{ position: 'absolute', top: 0, left: 0, width: 1200, height: 630, display: 'flex', background: 'linear-gradient(to bottom, rgba(6,18,45,0.55) 0%, rgba(6,18,45,0) 24%)' }} />
-        ) : null}
 
-        {/* content: logo pinned top-left, category + centred headline in the
-            middle, xeetimes.com centred at the bottom */}
+        {/* content: the centred headline, and nothing else */}
         <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', width: 1200, height: 630, padding: '42px 54px 38px' }}>
-          {/* masthead — logo box in the top-left corner */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-            {logoBox}
-          </div>
-
-          {/* centre block: the centred headline, pushed toward the bottom */}
-          <div style={{ display: 'flex', flex: 1, flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', paddingBottom: 0 }}>
+          {/* The 36px stands in for the footer row that used to sit below the
+              headline, so removing it leaves the text at the same height. */}
+          <div style={{ display: 'flex', flex: 1, flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', paddingBottom: 36 }}>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
               {headImg ? (
                 <img src={headImg.src} width={hW} height={hH} alt="" />
@@ -228,11 +218,6 @@ export default async function OgImage({ params }: { params: Promise<{ id: string
                 <div style={{ direction: en ? 'ltr' : 'rtl', textAlign: 'center', color: '#fff', fontSize: 34, lineHeight: 1.7 }}>{heading}</div>
               )}
             </div>
-          </div>
-
-          {/* footer: site tag alone in the bottom-left */}
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            {siteTag}
           </div>
         </div>
       </div>

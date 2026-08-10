@@ -26,7 +26,8 @@ export const contentType = 'image/jpeg';
 const WAHEED = path.join(process.cwd(), 'public/fonts/MVWaheed.ttf');
 const FARUMA = path.join(process.cwd(), 'public/fonts/Faruma.ttf');
 const CACHE_DIR = path.join(process.cwd(), '.og-cache');
-const OG_VERSION = 'v1';
+// Bump to invalidate the cached card whenever the artwork changes.
+const OG_VERSION = 'v2';
 const HEADERS = {
   'Content-Type': 'image/jpeg',
   'Cache-Control': 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800',
@@ -98,7 +99,10 @@ export default async function OgImage() {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'radial-gradient(circle at 100% 0%, #2f6fd0 0%, #14509c 46%, #0a2f70 100%)',
+          // XeeTimes red rather than the article card's blue — this card IS the
+          // masthead, so it carries the brand colour instead of receding behind
+          // a photo. #c8102e is the same red as the logo and the section rules.
+          background: 'radial-gradient(circle at 100% 0%, #e11d3a 0%, #c8102e 46%, #8b0a1f 100%)',
           fontFamily: 'Faruma',
         }}
       >
@@ -125,7 +129,9 @@ export default async function OgImage() {
           <div style={{ display: 'flex', marginTop: 34, color: '#fff', fontSize: 62 }}>{nameDv}</div>
         )}
 
-        <div style={{ display: 'flex', width: 190, height: 6, borderRadius: 999, background: '#c8102e', marginTop: 30 }} />
+        {/* White, not the brand red it used to be — on a red panel that rule
+            would have been invisible. */}
+        <div style={{ display: 'flex', width: 190, height: 6, borderRadius: 999, background: '#ffffff', marginTop: 30 }} />
 
         <div
           style={{

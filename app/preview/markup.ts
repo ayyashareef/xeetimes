@@ -566,7 +566,11 @@ export function footer(lang: Lang, site: Site = {}): string {
 
   // The contact address is no longer shown in the footer (removed on request);
   // `site.email` is still used by the contact page.
-  const copyright = site.copyright || 'Copyright 2021 © All rights Reserved';
+  // Year comes from the clock, not a literal. The old site's footer still reads
+  // "Copyright 2021" five years on, and this fallback had inherited it — every
+  // page on the new site was launching with a five-year-old copyright line.
+  // Admin → Settings still overrides it if the newsroom wants specific wording.
+  const copyright = site.copyright || `Copyright ${new Date().getFullYear()} © All rights Reserved`;
   const footLogo = site.logoWhite || '/xt-logo-white.png';
 
   return `
