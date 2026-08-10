@@ -186,7 +186,7 @@ const shortTitle = (a: Art, lang: Lang) =>
   (lang === 'en' ? a.shortTitle_en || a.shortTitle_dv : a.shortTitle_dv || a.shortTitle_en) || title(a, lang);
 const excerpt = (a: Art, lang: Lang) => (lang === 'en' ? a.excerpt_en ?? a.excerpt_dv : a.excerpt_dv ?? a.excerpt_en) || '';
 const content = (a: Art, lang: Lang) =>
-  autop(embedVideos((lang === 'en' ? a.content_en || a.content_dv : a.content_dv || a.content_en) || ''));
+  autop(embedVideos(stripShortcodes((lang === 'en' ? a.content_en || a.content_dv : a.content_dv || a.content_en) || '')));
 
 // Real block-level elements that must NOT be wrapped in <p>.
 const BLOCK_RE = /^<\/?(?:address|article|aside|blockquote|details|div|dl|fieldset|figure|figcaption|footer|form|h[1-6]|header|hr|main|nav|ol|p|pre|section|table|tbody|thead|tr|td|th|ul|li|iframe|img|video|source|script)[\s/>]/i;
@@ -259,6 +259,32 @@ function videoEmbed(url: string): string | null {
     return `<div class="xt-video"><iframe src="https://www.facebook.com/plugins/video.php?show_text=false&href=${encodeURIComponent(clean)}" title="Video" loading="lazy" scrolling="no" allowfullscreen></iframe></div>`;
   }
   return null;
+}
+// WordPress shortcodes the importer never expanded. Readers were seeing raw
+// [ngg src="galleries" ids="319" ...] as body text, which is worse than seeing
+// nothing at all.
+//
+// [caption] is the one worth keeping: it wraps a real <img> and carries the
+// credit line, so it becomes a proper figure. Everything else is a plugin call
+// with nothing behind it here and is dropped — including the Outlook
+// conditional junk ([if gte mso 9]) that arrives with text pasted from Word.
+//
+// A paired shortcode keeps its inner content and loses only the tags, so a
+// wrapper never takes the article's text down with it.
+const SHORTCODE = /\[\/?[a-z][a-z0-9_-]*(?:\s[^\]]*)?\]/gi;
+function stripShortcodes(html: string): string {
+  if (!html || !html.includes('[')) return html;
+  return html
+    .replace(
+      /\[caption[^\]]*\]([\s\S]*?)\[\/caption\]/gi,
+      (_m, inner: string) => {
+        const img = inner.match(/<img[^>]*>/i)?.[0] || '';
+        const caption = inner.replace(/<img[^>]*>/i, '').replace(/<[^>]+>/g, '').trim();
+        if (!img) return caption;
+        return `<figure class="image-caption-figure">${img}${caption ? `<figcaption>${esc(caption)}</figcaption>` : ''}</figure>`;
+      },
+    )
+    .replace(SHORTCODE, '');
 }
 // WordPress stored video links as bare oEmbed URLs on their own line, so they
 // render here as un-clickable plain text. Convert every YouTube/Facebook video

@@ -87,7 +87,6 @@ export default function ArticleForm({ article, role }: ArticleFormProps) {
   const [tagLimit, setTagLimit] = useState(24);
   const [creatingTag, setCreatingTag] = useState(false);
   const [authors, setAuthors] = useState<Author[]>([]);
-  const [activeTab, setActiveTab] = useState<'content' | 'seo'>('content');
   const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [upProgress, setUpProgress] = useState<{ pct: number; phase: UploadPhase } | null>(null);
@@ -291,24 +290,9 @@ export default function ArticleForm({ article, role }: ArticleFormProps) {
     <div className="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-6">
       {/* Main content */}
       <div className="space-y-6">
-        {/* Tab switcher */}
-        <div className="flex gap-2 bg-white rounded-xl p-1 shadow-sm border border-gray-100">
-          <button
-            onClick={() => setActiveTab('content')}
-            className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition ${activeTab === 'content' ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-50'}`}
-          >
-            Content
-          </button>
-          <button
-            onClick={() => setActiveTab('seo')}
-            className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition ${activeTab === 'seo' ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-50'}`}
-          >
-            SEO
-          </button>
-        </div>
-
-        {activeTab === 'content' && (
-          <>
+        {/* Content and SEO are one continuous form. They were two tabs, which
+            hid the SEO fields behind a click most writers never made — so
+            headlines went out with no Latin title or description. */}
             {/* Title */}
             <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
               <label className="block text-sm font-medium text-gray-700 mb-2">ސުރުޚީ (Title)</label>
@@ -337,6 +321,35 @@ export default function ArticleForm({ article, role }: ArticleFormProps) {
               </p>
             </div>
 
+            <div className="space-y-4">
+                <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 space-y-4">
+                  <h3 className="font-medium text-gray-900">SEO</h3>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">English / Latin title (Google &amp; share text)</label>
+                    <input
+                      type="text"
+                      value={form.metaTitle_dv}
+                      onChange={(e) => setForm(f => ({ ...f, metaTitle_dv: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                      dir="ltr"
+                      placeholder="e.g. Masthuvaathakechaa gulhun huri neydhevey nufozzuthah: Raees"
+                    />
+                    <p className="mt-1 text-xs text-gray-400">Shown as the link/preview title in Google &amp; social shares (og:title). The image keeps the Dhivehi short heading.</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-600 mb-1">Meta Description (Latin)</label>
+                    <textarea
+                      value={form.metaDescription_dv}
+                      onChange={(e) => setForm(f => ({ ...f, metaDescription_dv: e.target.value }))}
+                      rows={2}
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                      dir="ltr"
+                      placeholder="e.g. Dharinnakee gina guna niumaiythakugetherein enmmebodu ni'umaiy"
+                    />
+                  </div>
+                </div>
+              </div>
+
             {/* Content */}
             <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
               <label className="block text-sm font-medium text-gray-700 mb-2">ލިޔުން (Content)</label>
@@ -362,39 +375,7 @@ export default function ArticleForm({ article, role }: ArticleFormProps) {
                 maxLength={500}
               />
             </div>
-          </>
-        )}
 
-        {activeTab === 'seo' && (
-          <div className="space-y-4">
-            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 space-y-4">
-              <h3 className="font-medium text-gray-900">SEO</h3>
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">English / Latin title (Google &amp; share text)</label>
-                <input
-                  type="text"
-                  value={form.metaTitle_dv}
-                  onChange={(e) => setForm(f => ({ ...f, metaTitle_dv: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20"
-                  dir="ltr"
-                  placeholder="e.g. Masthuvaathakechaa gulhun huri neydhevey nufozzuthah: Raees"
-                />
-                <p className="mt-1 text-xs text-gray-400">Shown as the link/preview title in Google &amp; social shares (og:title). The image keeps the Dhivehi short heading.</p>
-              </div>
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">Meta Description (Latin)</label>
-                <textarea
-                  value={form.metaDescription_dv}
-                  onChange={(e) => setForm(f => ({ ...f, metaDescription_dv: e.target.value }))}
-                  rows={2}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20"
-                  dir="ltr"
-                  placeholder="e.g. Dharinnakee gina guna niumaiythakugetherein enmmebodu ni'umaiy"
-                />
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Sidebar */}
