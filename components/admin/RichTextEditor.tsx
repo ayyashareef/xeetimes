@@ -73,7 +73,7 @@ export default function RichTextEditor({
       attributes: {
         class: cn(
           'prose max-w-none min-h-[300px] outline-none px-4 py-3',
-          dir === 'rtl' && 'font-dv-body text-right',
+          dir === 'rtl' && 'font-dv-article text-right',
         ),
         dir,
       },

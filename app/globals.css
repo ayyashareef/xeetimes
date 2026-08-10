@@ -11,6 +11,16 @@
   font-display: swap;
 }
 
+/* Faruma — the face the PUBLIC article body actually renders in. The admin had
+   no @font-face for it at all, so the editor could not have shown it even if
+   asked to. */
+@font-face {
+  font-family: 'Faruma';
+  src: url('/fonts/Faruma.woff2') format('woff2');
+  font-weight: 400 700;
+  font-display: swap;
+}
+
 @font-face {
   font-family: 'utheemu';
   src: url('/fonts/mvutheemuREGULAR.woff2') format('woff2');
@@ -400,4 +410,18 @@
 /* Editor preview for social embeds */
 .social-embed-preview {
   user-select: none;
+}
+
+/* The editor body must match what gets published, or a writer is composing in
+   one typeface and readers see another. Mirrors .xt-article-body in
+   app/preview/xt.css — keep the two in step. Scoped to the editor rather than
+   changing font-dv-body, which also styles category, tag, user and settings
+   fields that are not article body copy. */
+.font-dv-article,
+.font-dv-article p,
+.font-dv-article li,
+.font-dv-article blockquote,
+.font-dv-article span,
+.font-dv-article div {
+  font-family: 'Faruma', 'utheemu', sans-serif;
 }
