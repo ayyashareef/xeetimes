@@ -20,11 +20,14 @@ export const contentType = 'image/jpeg';
 
 const WAHEED = path.join(process.cwd(), 'public/fonts/MVWaheed.ttf');
 const FARUMA = path.join(process.cwd(), 'public/fonts/Faruma.ttf');
+// Where the 1200x630 crop is anchored. Named so it can go into the photo cache
+// key — see loadPhoto.
+const CROP = 'bottom-left';
 const CACHE_DIR = path.join(process.cwd(), '.og-cache');
 const IMG_CACHE = path.join(CACHE_DIR, 'img');
 // Bumping this invalidates every card on disk — required whenever the artwork
 // changes, or readers keep getting the previous design from the cache.
-const OG_VERSION = 'v16';
+const OG_VERSION = 'v18';
 const HEADERS = {
   'Content-Type': 'image/jpeg',
   'Cache-Control': 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800',
@@ -61,8 +64,19 @@ async function renderText(
 }
 
 // Full-bleed background: the featured photo fills the whole 1200x630 card.
+//
+// Anchored bottom-left, not 'attention'. The uploader stamps the XT watermark
+// into the bottom-left corner of every featured photo, and an attention crop
+// slides its window toward whatever it judges interesting — which dragged the
+// watermark up the frame, or clipped it against the edge, differently on every
+// article. Anchoring the crop to the corner the mark lives in keeps it exactly
+// where the newsroom put it, at the size they chose.
+//
+// The cost is that on a tall photo the crop now takes the bottom rather than the
+// subject, so a head can go. Featured images are overwhelmingly landscape, where
+// the vertical crop is a few dozen pixels and the two choices barely differ.
 const resizePhoto = (input: Buffer) =>
-  sharp(input).resize(1200, 630, { fit: 'cover', position: 'attention' }).jpeg({ quality: 82 }).toBuffer();
+  sharp(input).resize(1200, 630, { fit: 'cover', position: 'left bottom' }).jpeg({ quality: 82 }).toBuffer();
 
 // Featured image -> data URI. Cached locally by URL (the xeetimes.com host is
 // flaky from the droplet); retried; null only when genuinely unavailable.
@@ -75,7 +89,10 @@ async function loadPhoto(src: string | null | undefined): Promise<string | null>
       return null;
     }
   }
-  const cacheKey = path.join(IMG_CACHE, `${md5(src)}.jpg`);
+  // Crop settings are part of the key. They were not, so changing the crop left
+  // every already-downloaded photo serving its old framing for a week — the code
+  // looked fixed while the cards did not change.
+  const cacheKey = path.join(IMG_CACHE, `${md5(`${src}|${CROP}`)}.jpg`);
   try {
     return dataUri(await readFile(cacheKey));
   } catch {
@@ -84,7 +101,9 @@ async function loadPhoto(src: string | null | undefined): Promise<string | null>
   // Fetch through the wsrv.nl image proxy: it resizes on its (fast) servers so
   // the droplet only downloads a small (~45KB) result. The droplet's own link to
   // xeetimes.com is too slow for the multi-MB WP originals (they time out).
-  const proxied = `https://wsrv.nl/?url=${encodeURIComponent(src)}&w=1200&h=630&fit=cover&a=attention&output=jpg&q=82`;
+  // a=bottom-left for the same reason resizePhoto anchors there: keep the
+  // watermark in its corner instead of letting a smart crop wander off it.
+  const proxied = `https://wsrv.nl/?url=${encodeURIComponent(src)}&w=1200&h=630&fit=cover&a=bottom-left&output=jpg&q=82`;
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
       const res = await fetch(proxied, { signal: AbortSignal.timeout(12000) });
