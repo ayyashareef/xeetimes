@@ -1,12 +1,20 @@
 import type { MetadataRoute } from 'next';
+import { headers } from 'next/headers';
 import { SITE_URL } from '@/lib/seo';
 
-// /robots.txt — invite crawlers in (staging stays blocked) and point them at
-// both sitemaps. Cloudflare prepends its content-signals policy block.
-const IS_STAGING = /beta\.|staging\.|localhost|127\.0\.0\.1/.test(SITE_URL);
+export const dynamic = 'force-dynamic';
 
-export default function robots(): MetadataRoute.Robots {
-  if (IS_STAGING) {
+// Staging is decided by the host the request ARRIVED on, not by SITE_URL.
+// Both names point at this one server, so a single build has to answer
+// differently for each: beta.xeetimes.com must stay out of Google while
+// xeetimes.com is indexed. Keying off SITE_URL could only ever give one answer
+// for both, which made the go-live order matter — set it early and beta became
+// crawlable, set it late and the live domain launched saying noindex.
+export default async function robots(): Promise<MetadataRoute.Robots> {
+  const host = (await headers()).get('host') || '';
+  const isStaging = /^(beta|staging|localhost|127\.0\.0\.1)/i.test(host);
+
+  if (isStaging) {
     return { rules: [{ userAgent: '*', disallow: '/' }] };
   }
   return {

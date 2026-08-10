@@ -2,17 +2,22 @@ import type { Metadata } from 'next';
 import { Archivo } from 'next/font/google';
 import { getSiteSettings } from '@/lib/settings';
 import './globals.css';
+import { headers } from 'next/headers';
 
 // Archivo — the Latin display/UI face used across the XeeTimes design (dates,
 // labels, numerals). Exposed as --font-archivo so the public builders can use it.
 const archivo = Archivo({ subsets: ['latin'], weight: ['400', '500', '600', '700', '800', '900'], variable: '--font-archivo' });
 
 // Keep the beta/staging site out of Google — only the real domain gets indexed.
+// Decided by the REQUEST host, not SITE_URL: both names resolve to this same
+// server and this same build, so the noindex has to follow whichever one the
+// reader arrived on.
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://beta.xeetimes.com';
-const IS_STAGING = /beta\.|staging\.|localhost|127\.0\.0\.1/.test(SITE_URL);
 
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getSiteSettings();
+  const host = (await headers()).get('host') || '';
+  const IS_STAGING = /^(beta|staging|localhost|127\.0\.0\.1)/i.test(host);
   return {
     // Absolute base for OG/twitter image + canonical URLs (share cards need it).
     metadataBase: new URL(SITE_URL),
