@@ -434,7 +434,18 @@ body:has(#xt-root) { background: var(--page); }
 /* Nudge the home icon up so it sits level with the Thaana nav text (whose
    glyphs render in the upper part of their line box). Reset on mobile, where
    it sits among plain icons instead. */
-#xt-root .xt-navhome { transform: translateY(-4px); }
+/* The search + theme cluster is absolutely positioned on the left, so it takes
+   no part in centring — the links ended up centred on the ROW while the bar as
+   a whole read left-heavy (110px of space against 293). Padding the row by
+   twice the cluster's width shifts the centred links right by exactly its
+   width, which balances the two sides. Desktop only: below 860px the cluster is
+   replaced by the phone bar's own layout. */
+/* Both clusters are pinned to their own edge now, so the links centre on their
+   own — no padding trick needed. The row keeps room for them either side. */
+@media (min-width: 861px) {
+  #xt-root .xt-navrow { padding-left: 110px !important; padding-right: 110px !important; }
+}
+#xt-root .xt-navhome { transform: translateY(-50%); }
 /* Desktop nav search icon. Sized here rather than on ICON.search, which is
    shared with the search form's button and the phone bar. .xt-desknav is
    display:none below 860px, so this only ever applies on desktop. */

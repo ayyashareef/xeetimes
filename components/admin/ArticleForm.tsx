@@ -387,8 +387,9 @@ export default function ArticleForm({ article, role }: ArticleFormProps) {
                   value={form.metaDescription_dv}
                   onChange={(e) => setForm(f => ({ ...f, metaDescription_dv: e.target.value }))}
                   rows={2}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 font-dv-body"
-                  dir="rtl"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                  dir="ltr"
+                  placeholder="e.g. Dharinnakee gina guna niumaiythakugetherein enmmebodu ni'umaiy"
                 />
               </div>
             </div>

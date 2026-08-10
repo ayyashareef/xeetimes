@@ -56,6 +56,9 @@ const ROSTER: { id: string; lead?: boolean; fit?: 'contain' }[] = [
   { id: 'usr_37' },                                     // Ahmed Mujahid
   { id: 'usr_38' },                                     // Javiz Abdul Kareem
   { id: 'usr_26' },                                     // Mohamed Ali
+  { id: 'usr_22' },                                     // Aishath Jana Sameer
+  { id: 'usr_20' },                                     // Ibrahim Zahir
+  { id: 'usr_23' },                                     // Aaisha
   { id: 'usr_34' },                                     // Tree Maldives
 ];
 

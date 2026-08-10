@@ -490,7 +490,12 @@ export function header(lang: Lang, sm = false, active = '', ads: AdsMap = {}, hi
     </div>
     <nav style="background:var(--nav);">
       <div class="xt-wrap xt-navrow" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:0 22px;font-size:18px;min-height:68px;position:relative;">
-        <a href="/" class="xt-navdark xt-navhome" style="color:#fff;padding:13px 16px;display:flex;align-items:center;" aria-label="Home">${ICON.home}</a>
+        <!-- Home is pinned to the opposite edge, mirroring the search/theme
+             cluster's 20px inset. With one cluster absolute and the other in the
+             flow the bar could never balance: the links centred on the row while
+             the bar itself sat 110px from one edge and 293 from the other. As
+             bookends the links can simply centre. -->
+        <a href="/" class="xt-navdark xt-navhome xt-desknav" style="position:absolute;${lang === 'dv' ? 'right' : 'left'}:20px;top:50%;transform:translateY(-50%);color:#fff;padding:13px 16px;align-items:center;" aria-label="Home">${ICON.home}</a>
         <span class="xt-desknav" style="display:flex;align-items:center;gap:16px;">${navLinks}</span>
         <!-- Phone bar: search (left) | logo (centre) | menu (right). The first two
              are pinned absolutely by xt.css, leaving the logo centred in flow. -->
