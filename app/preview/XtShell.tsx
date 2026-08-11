@@ -133,46 +133,6 @@ export default function XtShell({
         if (id) beacon(`/api/ads/click?id=${encodeURIComponent(id)}`);
       }
 
-      // Instagram share. There is no URL that hands Instagram a link to post,
-      // so this opens the device's own share sheet — which lists Instagram
-      // alongside everything else installed. Desktop browsers mostly have no
-      // sheet, so there it copies the link and says so.
-      const nativeShare = target.closest<HTMLAnchorElement>('.xt-share-native');
-      if (nativeShare && root.contains(nativeShare)) {
-        e.preventDefault();
-        const rail = nativeShare.closest<HTMLElement>('.xt-share-rail');
-        const url = rail?.getAttribute('data-share-url') || window.location.href;
-        const title = rail?.getAttribute('data-share-title') || document.title;
-        const toast = (msg: string) => {
-          const el = document.createElement('div');
-          el.className = 'xt-toast';
-          el.textContent = msg;
-          document.body.appendChild(el);
-          setTimeout(() => el.remove(), 2600);
-        };
-        // Copy first, whichever route follows. Instagram accepts no link from
-        // a share sheet the way WhatsApp or Telegram do — whatever opens, the
-        // reader ends up pasting, so the clipboard is the part that has to work.
-        const copied = navigator.clipboard?.writeText
-          ? navigator.clipboard.writeText(`${title} ${url}`).then(() => true, () => false)
-          : Promise.resolve(false);
-
-        copied.then((ok) => {
-          if (navigator.share) {
-            if (ok) toast(dir === 'rtl' ? 'ލިންކް ކޮޕީ ކުރެވިއްޖެ' : 'Link copied — pick Instagram');
-            // A cancelled sheet rejects. That is the reader changing their
-            // mind, not a failure, so it must not surface as an error.
-            navigator.share({ title, url }).catch(() => {});
-          } else if (ok) {
-            toast(dir === 'rtl' ? 'ލިންކް ކޮޕީ ކުރެވިއްޖެ' : 'Link copied — paste it in Instagram');
-            window.open(nativeShare.href, '_blank', 'noopener');
-          } else {
-            window.open(nativeShare.href, '_blank', 'noopener');
-          }
-        });
-        return;
-      }
-
       // Gallery image -> open the lightbox for that gallery's images.
       const galImg = target.closest<HTMLImageElement>('.xt-gallery img, .article-gallery img');
       if (galImg && root.contains(galImg)) {

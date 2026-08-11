@@ -887,14 +887,14 @@ function shareRail(a: Art, lang: Lang, extraClass = ''): string {
     [ICON.whatsapp, `https://api.whatsapp.com/send?text=${enc(t + ' ' + url)}`, 'WhatsApp', true, SHARE_COLORS.whatsapp, ''],
     [ICON.telegram, `https://t.me/share/url?url=${enc(url)}&text=${enc(t)}`, 'Telegram', true, SHARE_COLORS.telegram, ''],
     [ICON.viber, `viber://forward?text=${enc(t + ' ' + url)}`, 'Viber', true, SHARE_COLORS.viber, ''],
-    // Instagram has no share-a-link URL — nothing to point an href at. It used
-    // to open the XeeTimes profile, which looks like a share button and isn't
-    // one. The click is handled in XtShell instead: the phone's own share sheet
-    // (which lists Instagram), or copy-the-link on a desktop that has no sheet.
-    [ICON.instagram, 'https://www.instagram.com/xeetimes/', 'Instagram', false, SHARE_COLORS.instagram, ''],
+    // No Instagram button here. Every other network publishes a share-a-link
+    // URL; Instagram publishes none, so the button could only ever open the
+    // profile or copy the link for the reader to paste — a share button that
+    // does not share. The footer still links to the Instagram account, which is
+    // what that icon honestly is.
   ];
-  return `<div class="xt-share-rail ${extraClass}" dir="ltr" data-share-url="${esc(url)}" data-share-title="${esc(t)}">${links.map(([ic, h, ti, blank, bg]) =>
-    `<a class="xt-share${ti === 'Instagram' ? ' xt-share-native' : ''}" href="${h}" title="${ti}" style="background:${bg};"${blank ? ' target="_blank" rel="noopener"' : (ti === 'Print' ? ' onclick="window.print();return false;"' : '')}>${ic}</a>`).join('')}</div>`;
+  return `<div class="xt-share-rail ${extraClass}" dir="ltr">${links.map(([ic, h, ti, blank, bg]) =>
+    `<a class="xt-share" href="${h}" title="${ti}" style="background:${bg};"${blank ? ' target="_blank" rel="noopener"' : (ti === 'Print' ? ' onclick="window.print();return false;"' : '')}>${ic}</a>`).join('')}</div>`;
 }
 
 const GALLERY_PAGE = 8;
