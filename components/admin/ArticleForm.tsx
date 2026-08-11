@@ -326,11 +326,19 @@ export default function ArticleForm({ article, role }: ArticleFormProps) {
                   <h3 className="font-medium text-gray-900">SEO</h3>
                   <div>
                     <label className="block text-sm text-gray-600 mb-1">English / Latin title (Google &amp; share text)</label>
-                    <input
-                      type="text"
+                    {/* A textarea, not a single-line input, so a full Latin
+                        headline wraps into view instead of scrolling out of the
+                        right-hand edge — on a phone only about four words fit.
+                        It still holds ONE line of text: newlines are stripped on
+                        the way in and Enter is swallowed, because this value
+                        becomes <title> and og:title, where a line break would
+                        end up as a stray space in Google's results. */}
+                    <textarea
                       value={form.metaTitle_dv}
-                      onChange={(e) => setForm(f => ({ ...f, metaTitle_dv: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                      onChange={(e) => setForm(f => ({ ...f, metaTitle_dv: e.target.value.replace(/[\r\n]+/g, ' ') }))}
+                      onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault(); }}
+                      rows={2}
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 resize-y"
                       dir="ltr"
                       placeholder="e.g. Masthuvaathakechaa gulhun huri neydhevey nufozzuthah: Raees"
                     />
