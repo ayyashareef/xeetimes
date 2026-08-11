@@ -27,7 +27,7 @@ const CACHE_DIR = path.join(process.cwd(), '.og-cache');
 const IMG_CACHE = path.join(CACHE_DIR, 'img');
 // Bumping this invalidates every card on disk — required whenever the artwork
 // changes, or readers keep getting the previous design from the cache.
-const OG_VERSION = 'v18';
+const OG_VERSION = 'v19';
 const HEADERS = {
   'Content-Type': 'image/jpeg',
   'Cache-Control': 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800',
@@ -139,6 +139,8 @@ export default async function OgImage({ params }: { params: Promise<{ id: string
       title_dv: true,
       title_en: true,
       featuredImage: true,
+      metaDescription_dv: true,
+      excerpt_dv: true,
       updatedAt: true,
       category: { select: { name_dv: true, name_en: true } },
     },
@@ -194,6 +196,21 @@ export default async function OgImage({ params }: { params: Promise<{ id: string
   // Headline sits bottom-centre and is centre-aligned ('centre' is symmetric,
   // so no logical/visual RTL flip to worry about — unlike 'left'/'right').
   const headImg = await renderText(heading, { width: textW, sizePt: headSizePt, color: '#ffffff', align: 'centre' });
+
+  // The romanised headline, printed under the Thaana one.
+  //
+  // Facebook is the reason this exists. It receives og:description perfectly
+  // well and simply does not draw it — its preview is the site name and the
+  // headline, nothing else — while Telegram shows it. The only way to put the
+  // romanisation in front of a Facebook reader is to make it part of the image.
+  //
+  // Guarded by hasNonAscii: the field usually holds a romanisation but is free
+  // text, and if the newsroom typed Thaana into it, this would render it as raw
+  // unshaped codepoints (no Pango here, unlike the headline above). Latin only.
+  const latinRaw = (article?.metaDescription_dv || article?.excerpt_dv || '').trim();
+  const latin = latinRaw && !hasNonAscii(latinRaw)
+    ? (latinRaw.length > 120 ? `${latinRaw.slice(0, 117).trimEnd()}…` : latinRaw)
+    : '';
   let hW = headImg?.w ?? 0;
   let hH = headImg?.h ?? 0;
   const MAX_H = 340;
@@ -225,7 +242,7 @@ export default async function OgImage({ params }: { params: Promise<{ id: string
           <div style={{ position: 'absolute', top: 0, left: 0, width: 1200, height: 630, display: 'flex', background: 'linear-gradient(to top, rgba(6,18,45,0.92) 0%, rgba(6,18,45,0.6) 32%, rgba(6,18,45,0) 60%)' }} />
         ) : null}
 
-        {/* content: the centred headline, and nothing else */}
+        {/* content: the Thaana headline, with the romanisation beneath it */}
         <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', width: 1200, height: 630, padding: '42px 54px 38px' }}>
           {/* The 36px stands in for the footer row that used to sit below the
               headline, so removing it leaves the text at the same height. */}
@@ -237,6 +254,25 @@ export default async function OgImage({ params }: { params: Promise<{ id: string
                 <div style={{ direction: en ? 'ltr' : 'rtl', textAlign: 'center', color: '#fff', fontSize: 34, lineHeight: 1.7 }}>{heading}</div>
               )}
             </div>
+            {latin ? (
+              // Dimmer and much smaller than the Thaana above it: a subtitle for
+              // readers who do not read Thaana, not a competing headline. Inset
+              // well clear of the watermark's corner.
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  textAlign: 'center',
+                  marginTop: 16,
+                  maxWidth: 880,
+                  color: 'rgba(255,255,255,0.82)',
+                  fontSize: 25,
+                  lineHeight: 1.35,
+                }}
+              >
+                {latin}
+              </div>
+            ) : null}
           </div>
         </div>
       </div>

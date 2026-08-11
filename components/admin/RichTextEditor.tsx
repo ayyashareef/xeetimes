@@ -27,6 +27,39 @@ import { ArticleCard } from '@/lib/article-card';
 import ArticlePicker, { type PickArticle } from './ArticlePicker';
 
 const DV_MONTHS = ['ޖެނުއަރީ', 'ފެބްރުއަރީ', 'މާޗް', 'އޭޕްރީލު', 'މެއި', 'ޖޫން', 'ޖުލައި', 'އޯގަސްޓު', 'ސެޕްޓެމްބަރ', 'އޮކްޓޯބަރ', 'ނޮވެމްބަރ', 'ޑިސެމްބަރ'];
+// Defined at module scope on purpose. It used to live inside RichTextEditor,
+// which made it a NEW component type on every render — and Tiptap re-renders on
+// every transaction, selection changes included. React therefore threw away and
+// rebuilt every toolbar button whenever the caret moved, so pressing Bold went:
+// mousedown on the button, selection transaction, re-render, button replaced,
+// mouseup on a different element. A click only fires when both halves land on
+// the same node, so no click ever fired and Bold appeared dead.
+//
+// onMouseDown is swallowed so pressing a button never pulls the caret out of
+// the editor — without it the selection collapses and the command applies to
+// nothing. This is the documented Tiptap pattern for toolbar buttons.
+function ToolButton({ onClick, active, children, title }: {
+  onClick: () => void;
+  active?: boolean;
+  children: React.ReactNode;
+  title: string;
+}) {
+  return (
+    <button
+      type="button"
+      onMouseDown={(e) => e.preventDefault()}
+      onClick={onClick}
+      title={title}
+      className={cn(
+        'p-1.5 rounded hover:bg-gray-100 transition',
+        active && 'bg-primary-100 text-primary'
+      )}
+    >
+      {children}
+    </button>
+  );
+}
+
 function mvDate(iso: string | null): string {
   if (!iso) return '';
   const p = new Intl.DateTimeFormat('en-GB', { timeZone: 'Indian/Maldives', year: 'numeric', month: '2-digit', day: '2-digit' })
@@ -166,25 +199,6 @@ export default function RichTextEditor({
       attrs: { url: url.trim(), platform: detected.platform },
     }).run();
   };
-
-  const ToolButton = ({ onClick, active, children, title }: {
-    onClick: () => void;
-    active?: boolean;
-    children: React.ReactNode;
-    title: string;
-  }) => (
-    <button
-      type="button"
-      onClick={onClick}
-      title={title}
-      className={cn(
-        'p-1.5 rounded hover:bg-gray-100 transition',
-        active && 'bg-primary-100 text-primary'
-      )}
-    >
-      {children}
-    </button>
-  );
 
   return (
     <>
