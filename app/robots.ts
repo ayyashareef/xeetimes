@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { headers } from 'next/headers';
+import { isStagingHost } from '@/lib/host';
 import { SITE_URL } from '@/lib/seo';
 
 export const dynamic = 'force-dynamic';
@@ -11,8 +12,7 @@ export const dynamic = 'force-dynamic';
 // for both, which made the go-live order matter — set it early and beta became
 // crawlable, set it late and the live domain launched saying noindex.
 export default async function robots(): Promise<MetadataRoute.Robots> {
-  const host = (await headers()).get('host') || '';
-  const isStaging = /^(beta|staging|localhost|127\.0\.0\.1)/i.test(host);
+  const isStaging = isStagingHost((await headers()).get('host'));
 
   if (isStaging) {
     return { rules: [{ userAgent: '*', disallow: '/' }] };

@@ -3,6 +3,8 @@ import { Archivo } from 'next/font/google';
 import { getSiteSettings } from '@/lib/settings';
 import './globals.css';
 import { headers } from 'next/headers';
+import Script from 'next/script';
+import { isStagingHost } from '@/lib/host';
 
 // Archivo — the Latin display/UI face used across the XeeTimes design (dates,
 // labels, numerals). Exposed as --font-archivo so the public builders can use it.
@@ -16,8 +18,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://beta.xeetimes.com'
 
 export async function generateMetadata(): Promise<Metadata> {
   const site = await getSiteSettings();
-  const host = (await headers()).get('host') || '';
-  const IS_STAGING = /^(beta|staging|localhost|127\.0\.0\.1)/i.test(host);
+  const IS_STAGING = isStagingHost((await headers()).get('host'));
   return {
     // Absolute base for OG/twitter image + canonical URLs (share cards need it).
     metadataBase: new URL(SITE_URL),
@@ -40,11 +41,18 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // Google Analytics 4. Loaded only on the live hostname: beta and production
+  // are the same build on the same server, so without the host check every
+  // internal test and every page the newsroom previews would land in the
+  // newspaper's real traffic figures.
+  const GA_ID = process.env.NEXT_PUBLIC_GA_ID || '';
+  const analytics = GA_ID && !isStagingHost((await headers()).get('host'));
+
   // Runs before first paint, so a reader who chose dark never sees a light
   // flash first. Light is the default: the OS preference is deliberately NOT
   // consulted, so a first-time visitor always lands on the newspaper's own
@@ -60,7 +68,20 @@ export default function RootLayout({
         <meta name="google" content="notranslate" />
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className={archivo.className}>{children}</body>
+      <body className={archivo.className}>
+        {children}
+        {analytics ? (
+          <>
+            <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} strategy="afterInteractive" />
+            {/* Public pages are plain server-rendered HTML with ordinary <a>
+                links, so every article is a real page load and GA's automatic
+                page_view is enough — no router hook needed. */}
+            <Script id="ga4" strategy="afterInteractive">
+              {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_ID}');`}
+            </Script>
+          </>
+        ) : null}
+      </body>
     </html>
   );
 }
