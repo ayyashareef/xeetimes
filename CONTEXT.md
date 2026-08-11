@@ -3,12 +3,13 @@
 Durable facts that are expensive to rediscover. Not a substitute for reading the code or CLAUDE.md.
 Everything here is a point-in-time claim: verify before relying on it.
 
-**Last updated:** 2026-07-18
+**Last updated:** 2026-08-11
 
 ## Core links
 
-- **Live beta:** https://beta.xeetimes.com — the current XeeTimes Next.js app. Cloudflare-proxied to the VM `168.144.96.165`; SSL/TLS mode **Full** with a self-signed origin cert.
-- **Old WordPress site:** https://xeetimes.com — still live as of 2026-07-18 and still the public production site. It is **not** the new app. This session scraped it to recover NextGEN photo galleries and author avatars (now self-hosted under `/wp-content/`); don't assume xeetimes.com serves the new build.
+- **Live site:** https://www.xeetimes.com — the Next.js app, public since **2026-08-10**. Cloudflare-proxied to the VM `168.144.96.165`; SSL/TLS mode **Full** with a self-signed origin cert (Full, not Strict — Strict would reject the self-signed origin).
+- **Staging:** https://beta.xeetimes.com — the SAME build on the SAME server, told apart only by the request host. `lib/host.ts` decides: beta gets `noindex` + `Disallow: /` and loads no analytics, the live host gets none of that. nginx carries a matching `map $host $xt_robots_tag` in `conf.d/xt-robots-map.conf`.
+- **Old WordPress site:** no longer serves the domain. Still running on the cPanel host and reachable directly at `162.241.224.128` (`curl --resolve www.xeetimes.com:443:162.241.224.128`), which is how view counts and the GA measurement ID were recovered after the cutover. **Mail still lives there** — the MX records were deliberately left pointing at it.
 - **Repository:** `ayyashareef/xeetimes` (git remote `origin`). A second remote `hirinews` → `incodemaldives/hirinews` is the old codebase — don't push there.
 - **Design source:** Claude Design project `93d2ea8c-1585-4700-a172-b0345c972711` (file `XeeTimes.dc.html`), read via the `claude_design` MCP / DesignSync.
 
@@ -44,6 +45,11 @@ ssh root@168.144.96.165 'cp /tmp/<file> /var/www/xeetimes/<path> \
 - DB schema changes: `DATABASE_URL=... npx prisma db push --skip-generate` on the VM (no migration files in the deploy path).
 
 ## Platform gotchas
+
+- **Cloudflare hides every visitor IP unless nginx is told otherwise.** Requests reach nginx from Cloudflare edge servers, so `$remote_addr` was a Cloudflare address on every line — a full day of traffic looked like 368 visitors because that is how many edge machines were involved, and no per-IP rule or allow-list could work. `/etc/nginx/conf.d/cloudflare-realip.conf` restores it via `real_ip_header CF-Connecting-IP`, trusting only Cloudflare's published ranges (trusting any source would let a caller name whatever IP it liked). Regenerate the ranges from cloudflare.com/ips-v4 and /ips-v6 when they change. App code was already fine: `lib/rate-limit.ts` reads the header directly. (2026-08-11)
+
+- **Cloudflare caches 404s from whatever host the domain pointed at.** After the DNS cutover, an ad image 404'd on the live domain while serving 200 on beta and 200 from the origin — Cloudflare was replaying a not-found it had cached while `xeetimes.com` still pointed at the old WordPress box, with a 30-day TTL. Purge the cache after any origin move, and check `cf-cache-status` before believing a 404. (2026-08-10)
+
 
 Each line is a scar. Keep the reason attached — it is what stops someone re-adding the thing.
 
