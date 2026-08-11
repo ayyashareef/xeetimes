@@ -69,7 +69,7 @@ async function renderText(
 
 export default async function OgImage() {
   const site = await getSiteSettings();
-  const nameDv = site.siteName_dv || 'ޒީ ޓައިމްސް';
+  const nameDv = site.siteName_dv || 'ޒީޓައިމްސް';
 
   // Static art, so the cache key is just the version and whatever name the
   // settings currently carry — rename the site and the card follows.

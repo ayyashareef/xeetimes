@@ -34,7 +34,7 @@ export const getSiteSettings = cache(async (): Promise<SiteData> => {
     logo: s?.logo || null,
     logoWhite: s?.logoWhite || null,
     favicon: s?.favicon || null,
-    siteName_dv: s?.siteName_dv || 'ޒީ ޓައިމްސް',
+    siteName_dv: s?.siteName_dv || 'ޒީޓައިމްސް',
     siteName_en: s?.siteName_en || 'XeeTimes',
     registrationNo: s?.registrationNo || null,
     phone: s?.phone || null,

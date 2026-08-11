@@ -181,7 +181,7 @@ export default async function OgImage({ params }: { params: Promise<{ id: string
     ? (en
         ? article.shortTitle_en || article.shortTitle_dv || article.title_en || article.title_dv
         : article.shortTitle_dv || article.shortTitle_en || article.title_dv || article.title_en)
-    : 'ޒީ ޓައިމްސް';
+    : 'ޒީޓައިމްސް';
 
   const [faruma, photo] = await Promise.all([
     readFile(FARUMA),

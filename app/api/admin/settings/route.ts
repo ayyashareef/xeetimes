@@ -39,7 +39,7 @@ export async function PUT(request: Request) {
     },
     create: {
       id: 'default',
-      siteName_dv: body.siteName_dv || 'ޒީ ޓައިމްސް',
+      siteName_dv: body.siteName_dv || 'ޒީޓައިމްސް',
       siteName_en: body.siteName_en || 'XeeTimes',
       siteDescription_dv: body.siteDescription_dv,
       siteDescription_en: body.siteDescription_en,

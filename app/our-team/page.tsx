@@ -10,7 +10,7 @@ import { teamHtml, type TeamMember, type Lang } from '@/app/preview/markup';
 
 export const dynamic = 'force-dynamic';
 
-const DESCRIPTION = 'ޒީ ޓައިމްސްގެ ލިޔުންތެރިންނާއި ކޮންޓްރިބިއުޓަރުން.';
+const DESCRIPTION = 'ޒީޓައިމްސްގެ ލިޔުންތެރިންނާއި ކޮންޓްރިބިއުޓަރުން.';
 
 export async function generateMetadata(): Promise<Metadata> {
   return {

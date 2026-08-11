@@ -23,7 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(SITE_URL),
     title: { default: site.siteName_en || 'XeeTimes', template: `%s · ${site.siteName_en || 'XeeTimes'}` },
     description:
-      'XeeTimes (ޒީ ޓައިމްސް) — the latest news from the Maldives: politics, sports, business, world news and in-depth reports in Dhivehi.',
+      'XeeTimes (ޒީޓައިމްސް) — the latest news from the Maldives: politics, sports, business, world news and in-depth reports in Dhivehi.',
     applicationName: 'XeeTimes',
     robots: IS_STAGING ? { index: false, follow: false } : undefined,
     // Brand name for share previews. The public pages each set this themselves,

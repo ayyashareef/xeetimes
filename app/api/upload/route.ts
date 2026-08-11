@@ -19,6 +19,11 @@ const WM_LOGOS = new Set([
 // once it is shown at a fixed container width. 'cover' is the one that hides
 // something — a face — rather than signing the picture.
 const WM_SIZES: Record<string, number> = { small: 0.08, medium: 0.105, large: 0.17, cover: 0.34 };
+// The newsroom's house photo size. Watermarked photos are cropped to this shape
+// first, so the mark lands in the same spot relative to the frame every time and
+// featured images stop arriving in a dozen different aspect ratios.
+const WM_CANVAS = { width: 1640, height: 924 };
+const WM_CANVAS_AR = WM_CANVAS.width / WM_CANVAS.height;
 type WmPos = 'bottom-left' | 'bottom-right' | 'top-left' | 'top-right' | 'center';
 const WM_POSITIONS = new Set<string>(['bottom-left', 'bottom-right', 'top-left', 'top-right', 'center']);
 
@@ -184,6 +189,32 @@ export async function POST(request: Request) {
       // Clamped rather than trusted: an opacity outside 20-100 would either
       // erase the mark or do nothing, and neither is worth honouring.
       const wmOpacity = Math.min(100, Math.max(20, parseInt(String(formData.get('wmOpacity') || '100'), 10) || 100)) / 100;
+
+      // Crop to the house shape BEFORE stamping, so the mark is placed against
+      // the final frame rather than against whatever the camera happened to
+      // produce and then re-cropped later by a card or a thumbnail.
+      //
+      // Never upscales. sharp's withoutEnlargement would have been the obvious
+      // way to express that, but combined with fit:cover it declines to crop a
+      // small image AT ALL — a 1200x900 photo came back untouched at 1200x900,
+      // so the shape would not have been normalised for exactly the photos that
+      // need it most. Capping the target instead keeps the 1640:924 shape at
+      // whatever resolution the source can honestly fill.
+      const src = await sharp(buffer).metadata();
+      const sw = src.width || 0, sh = src.height || 0;
+      if (sw && sh) {
+        let tw = Math.min(WM_CANVAS.width, sw);
+        let th = Math.round(tw / WM_CANVAS_AR);
+        if (th > sh) {
+          th = Math.min(WM_CANVAS.height, sh);
+          tw = Math.round(th * WM_CANVAS_AR);
+        }
+        // No explicit output format: keep whatever came in, or a PNG upload
+        // would become JPEG bytes while contentType still said image/png.
+        buffer = await sharp(buffer)
+          .resize(tw, th, { fit: 'cover', position: 'attention' })
+          .toBuffer();
+      }
 
       const meta = await sharp(buffer).metadata();
       const imgW = meta.width || 1200, imgH = meta.height || 800;

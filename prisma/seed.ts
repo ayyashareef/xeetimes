@@ -102,7 +102,7 @@ async function main() {
     create: {
       name: 'Admin', name_dv: 'އެޑްމިން', email: 'admin@xeetimes.com',
       password: adminPassword, role: 'SUPER_ADMIN', avatar: img('xtadmin', 200, 200),
-      bio_en: 'XeeTimes site administrator.', bio_dv: 'ޒީ ޓައިމްސްގެ އެޑްމިން',
+      bio_en: 'XeeTimes site administrator.', bio_dv: 'ޒީޓައިމްސްގެ އެޑްމިން',
     },
   });
 
@@ -118,7 +118,7 @@ async function main() {
       create: {
         name, name_dv, email, password: staffPassword, role: 'JOURNALIST',
         avatar: img(`xtauthor${i}`, 200, 200),
-        bio_en: 'XeeTimes journalist.', bio_dv: 'ޒީ ޓައިމްސް ނޫސްވެރިޔާ',
+        bio_en: 'XeeTimes journalist.', bio_dv: 'ޒީޓައިމްސް ނޫސްވެރިޔާ',
       },
     });
     authors.push(u);
@@ -209,7 +209,7 @@ async function main() {
     update: {},
     create: {
       id: 'default',
-      siteName_dv: 'ޒީ ޓައިމްސް',
+      siteName_dv: 'ޒީޓައިމްސް',
       siteName_en: 'XeeTimes',
       siteDescription_dv: 'ދިވެހިރާއްޖޭގެ އެންމެ ފަހުގެ ޚަބަރު',
       siteDescription_en: 'The latest news from the Maldives',

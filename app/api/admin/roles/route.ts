@@ -89,7 +89,7 @@ export async function PUT(request: Request) {
       },
       create: {
         id: 'default',
-        siteName_dv: 'ޒީ ޓައިމްސް',
+        siteName_dv: 'ޒީޓައިމްސް',
         siteName_en: 'XeeTimes',
         rolePermissions: toStore,
       },

@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const en = lang === 'en';
   const name = (en ? c.name_en || c.name_dv : c.name_dv) || slug;
   const description = (en ? c.description_en || c.description_dv : c.description_dv)
-    || (en ? `Latest ${name} news from the Maldives — XeeTimes.` : `${name} — ޒީ ޓައިމްސް، ރާއްޖޭގެ އެންމެ ފަހުގެ ޚަބަރު.`);
+    || (en ? `Latest ${name} news from the Maldives — XeeTimes.` : `${name} — ޒީޓައިމްސް، ރާއްޖޭގެ އެންމެ ފަހުގެ ޚަބަރު.`);
   const canonical = `${SITE_URL}/category/${slug}`;
   // Browser-tab title in English: the curated nav label when we have one,
   // else the capitalised slug (category names in the DB are Thaana).
