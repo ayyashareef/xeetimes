@@ -40,7 +40,10 @@ export default async function AdminLayout({
         <AdminSidebar user={user} pendingComments={pendingComments} />
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
           <AdminTopBar user={user} />
-          <main style={{ flex: 1, padding: 30 }}>
+          {/* Padding lives in CSS, not inline, so it can shrink on a phone. At
+              a flat 30px it took 60px off a ~390px screen — a sixth of the
+              width — before any card padding was even counted. */}
+          <main className="adm-main">
             <div style={{ maxWidth: 1320, margin: '0 auto' }}>{children}</div>
           </main>
         </div>

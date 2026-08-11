@@ -133,3 +133,30 @@
 
 /* Clickable dashboard rows (recent comments) */
 .adm-hoverrow:hover { background: var(--line2); }
+
+/* Admin content area. Was an inline padding:30 on <main>, which a media query
+   could not reach — so a phone lost 60px of a ~390px screen before the cards
+   added their own padding on top. */
+.adm-main { flex: 1; padding: 30px; }
+
+@media (max-width: 640px) {
+  .adm-main { padding: 10px; }
+
+  /* Cards give back their side padding too: on a phone the writer needs the
+     width for the text, not for whitespace either side of it. */
+  .adm-main .bg-white.rounded-xl { padding-left: 12px; padding-right: 12px; }
+
+  /* 16px is not a style choice — iOS Safari zooms the whole page in when a
+     focused input is smaller than that, and the reader is then left scrolled
+     sideways. Every field the newsroom types into has to clear it. */
+  .adm-main input[type="text"],
+  .adm-main input[type="url"],
+  .adm-main input[type="email"],
+  .adm-main input[type="number"],
+  .adm-main textarea,
+  .adm-main select {
+    font-size: 16px;
+    padding-top: 11px;
+    padding-bottom: 11px;
+  }
+}
