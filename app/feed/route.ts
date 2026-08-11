@@ -49,7 +49,18 @@ export async function GET() {
       '  <item>',
       `    <title>${esc(title)}</title>`,
       `    <link>${esc(link)}</link>`,
-      `    <guid isPermaLink="true">${esc(link)}</guid>`,
+      // The identifier WordPress published for five years, kept deliberately.
+      //
+      // guid is how an aggregator decides whether it has seen an item before.
+      // Changing it re-introduces the ENTIRE archive as brand new: Adafi showed
+      // every XeeTimes story stamped with the moment it re-read the feed ("2
+      // hours ago", all of them) and displayed a second copy of anything it
+      // still held from the old feed.
+      //
+      // isPermaLink="false" says this string is an identity, not an address —
+      // so the odd-looking ?p= form is correct here and must not be "tidied up"
+      // to match <link>. Readers follow <link>; only machines read this.
+      `    <guid isPermaLink="false">${esc(`${SITE}/?p=${id}`)}</guid>`,
       `    <pubDate>${pub}</pubDate>`,
       a.category?.name_dv ? `    <category>${esc(a.category.name_dv)}</category>` : '',
       a.author ? `    <dc:creator>${esc(a.author.name_dv || a.author.name || '')}</dc:creator>` : '',
