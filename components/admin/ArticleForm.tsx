@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Save, Send, Eye, X, FolderOpen, Upload, UserCircle } from 'lucide-react';
@@ -8,6 +8,46 @@ import RichTextEditor from './RichTextEditor';
 import MediaPicker from './MediaPicker';
 import UploadSourceDialog, { type WatermarkOpts } from './UploadSourceDialog';
 import { uploadWithProgress, type UploadPhase } from '@/lib/upload-progress';
+
+/**
+ * A textarea that grows to whatever it holds, so nothing is ever half-hidden
+ * behind a scrollbar.
+ *
+ * A fixed row count is a guess at how long a headline will be, and it is wrong
+ * as soon as someone writes a longer one — the previous two-row box clipped its
+ * third line. Measuring the content instead means the box is right for every
+ * length without anyone tuning a number again.
+ *
+ * Module scope, not nested inside ArticleForm: a component declared inside
+ * another is a new type on every render, so React would throw the field away
+ * and rebuild it on each keystroke, losing focus mid-word.
+ */
+function AutoTextarea({
+  value,
+  minRows = 3,
+  ...rest
+}: React.TextareaHTMLAttributes<HTMLTextAreaElement> & { value: string; minRows?: number }) {
+  const ref = useRef<HTMLTextAreaElement>(null);
+  // Layout effect, not a plain effect: this runs before paint, so the box is
+  // never briefly the wrong size. Keyed on value so it also fits correctly when
+  // an existing article's text arrives after the first render.
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    const cs = getComputedStyle(el);
+    const lineHeight = parseFloat(cs.lineHeight) || 20;
+    const padding = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+    const border = parseFloat(cs.borderTopWidth) + parseFloat(cs.borderBottomWidth);
+    // scrollHeight ignores the rows attribute, so an EMPTY box would collapse to
+    // a single line and clip its own placeholder — the floor has to be applied
+    // here. It covers padding and border because Tailwind sets border-box, where
+    // height includes both, while scrollHeight includes only padding.
+    const floor = lineHeight * minRows + padding + border;
+    el.style.height = `${Math.max(el.scrollHeight + border, floor)}px`;
+  }, [value, minRows]);
+  return <textarea ref={ref} value={value} rows={minRows} {...rest} />;
+}
 
 interface Category {
   id: string;
@@ -333,12 +373,12 @@ export default function ArticleForm({ article, role }: ArticleFormProps) {
                         the way in and Enter is swallowed, because this value
                         becomes <title> and og:title, where a line break would
                         end up as a stray space in Google's results. */}
-                    <textarea
+                    <AutoTextarea
                       value={form.metaTitle_dv}
                       onChange={(e) => setForm(f => ({ ...f, metaTitle_dv: e.target.value.replace(/[\r\n]+/g, ' ') }))}
                       onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault(); }}
-                      rows={2}
-                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 resize-y"
+                      minRows={3}
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 resize-y overflow-hidden"
                       dir="ltr"
                       placeholder="e.g. Masthuvaathakechaa gulhun huri neydhevey nufozzuthah: Raees"
                     />
@@ -346,11 +386,11 @@ export default function ArticleForm({ article, role }: ArticleFormProps) {
                   </div>
                   <div>
                     <label className="block text-sm text-gray-600 mb-1">Meta Description (Latin)</label>
-                    <textarea
+                    <AutoTextarea
                       value={form.metaDescription_dv}
                       onChange={(e) => setForm(f => ({ ...f, metaDescription_dv: e.target.value }))}
-                      rows={2}
-                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                      minRows={4}
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 resize-y overflow-hidden"
                       dir="ltr"
                       placeholder="e.g. Dharinnakee gina guna niumaiythakugetherein enmmebodu ni'umaiy"
                     />
