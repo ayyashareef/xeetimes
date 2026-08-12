@@ -336,11 +336,17 @@ export default function ArticleForm({ article, role }: ArticleFormProps) {
             {/* Title */}
             <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
               <label className="block text-sm font-medium text-gray-700 mb-2">ސުރުޚީ (Title)</label>
-              <input
-                type="text"
+              {/* Grows with the headline, like the SEO fields. A Dhivehi
+                  headline is long and a single line pushed most of it out of
+                  sight on a phone. Enter is swallowed and pasted newlines
+                  collapse to a space: this is one line of text in a box that
+                  happens to wrap. */}
+              <AutoTextarea
                 value={form.title_dv}
-                onChange={(e) => setForm(f => ({ ...f, title_dv: e.target.value }))}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg text-lg outline-none focus:ring-2 focus:ring-primary/20 font-dv-heading"
+                onChange={(e) => setForm(f => ({ ...f, title_dv: e.target.value.replace(/[\r\n]+/g, ' ') }))}
+                onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault(); }}
+                minRows={2}
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg text-lg outline-none focus:ring-2 focus:ring-primary/20 font-dv-heading resize-y overflow-hidden"
                 dir="rtl"
                 placeholder="ސުރުޚީ ލިޔޭ..."
               />
@@ -348,11 +354,12 @@ export default function ArticleForm({ article, role }: ArticleFormProps) {
               {/* Short title — shown on home cards + the share/OG preview. Falls
                   back to the full title when left blank. */}
               <label className="block text-sm font-medium text-gray-700 mt-4 mb-2">ކުރު ސުރުޚީ (Short title — home & share)</label>
-              <input
-                type="text"
+              <AutoTextarea
                 value={form.shortTitle_dv}
-                onChange={(e) => setForm(f => ({ ...f, shortTitle_dv: e.target.value }))}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-primary/20 font-dv-heading"
+                onChange={(e) => setForm(f => ({ ...f, shortTitle_dv: e.target.value.replace(/[\r\n]+/g, ' ') }))}
+                onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault(); }}
+                minRows={2}
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-primary/20 font-dv-heading resize-y overflow-hidden"
                 dir="rtl"
                 placeholder="ކުރު ސުރުޚީ (ހުސްކޮށް ބާއްވައިފިނަމަ ސުރުޚީ ބޭނުންކުރެވޭނެ)"
               />
