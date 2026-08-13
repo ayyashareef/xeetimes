@@ -1,5 +1,11 @@
+import { auth } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { maldivesDay, recentDays } from '@/lib/day';
+
+// Who may see readership figures. Kept here rather than at the call site so the
+// restriction travels with the component: rendering it on another page cannot
+// accidentally expose the numbers to a journalist or a contributor.
+const MAY_SEE_TRAFFIC = new Set(['SUPER_ADMIN', 'EDITOR']);
 
 // Reader traffic, in the shape the newsroom already reads it in Google
 // Analytics: a headline number, the change against the day before, and a chart
@@ -25,6 +31,13 @@ const num: React.CSSProperties = {
 const DAYS = 14;
 
 export default async function TrafficPanel() {
+  // Checked before any query runs — an unauthorised viewer should not cost the
+  // database a read, and nothing about the numbers should reach the page they
+  // are served.
+  const session = await auth();
+  const role = (session?.user as { role?: string } | undefined)?.role;
+  if (!role || !MAY_SEE_TRAFFIC.has(role)) return null;
+
   const days = recentDays(DAYS);
   const today = maldivesDay();
 
