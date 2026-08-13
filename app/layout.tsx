@@ -62,7 +62,11 @@ export default async function RootLayout({
   const themeScript = `(function(){var t='light';try{if(localStorage.getItem('xt-theme')==='dark')t='dark';}` +
     `catch(e){}document.documentElement.setAttribute('data-xt-theme',t);})();`;
   return (
-    <html lang="en" className={archivo.variable} suppressHydrationWarning>
+    // dv, not en. The newspaper publishes in Dhivehi, and this attribute is what
+    // tells Google (and every screen reader) which language the page is in. It
+    // said "en" while every headline on the page was Thaana. The admin, which is
+    // genuinely English, overrides it on its own wrapper.
+    <html lang="dv" className={archivo.variable} suppressHydrationWarning>
       <head>
         {/* Stop Chrome offering to "translate this page" for the Dhivehi content. */}
         <meta name="google" content="notranslate" />

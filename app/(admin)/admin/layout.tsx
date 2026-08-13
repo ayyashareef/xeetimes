@@ -36,7 +36,10 @@ export default async function AdminLayout({
   return (
     <>
       <script dangerouslySetInnerHTML={{ __html: ADM_THEME_SCRIPT }} />
-      <div className="adm admin-root" style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg)', color: 'var(--ink)' }}>
+      {/* The document declares Dhivehi for the newspaper; the back office is in
+          English, so it says so here rather than letting a screen reader try to
+          read English UI labels with Thaana pronunciation. */}
+      <div lang="en" className="adm admin-root" style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg)', color: 'var(--ink)' }}>
         <AdminSidebar user={user} pendingComments={pendingComments} />
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
           <AdminTopBar user={user} />

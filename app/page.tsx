@@ -5,6 +5,7 @@ import { getActiveAds } from '@/lib/ads';
 import { getHiddenCategorySlugs } from '@/lib/categories';
 import { getSiteSettings } from '@/lib/settings';
 import { SITE_URL, jsonLd, organizationJsonLd, webSiteJsonLd } from '@/lib/seo';
+import { DEFAULT_OG_IMAGE } from '@/lib/og';
 import XtShell from '@/app/preview/XtShell';
 import { homeHtml, HOME_HERO_SLIDES, VC_SLIDES, type Art, type Lang, type HomeSection } from '@/app/preview/markup';
 
@@ -18,16 +19,26 @@ export async function generateMetadata({ params }: { params: Promise<Record<stri
   // Browser-tab title stays Latin (Thaana next to the favicon is unreadable
   // on most systems); the Dhivehi name lives in description/JSON-LD instead.
   const title = 'XeeTimes - Exclusive Profiles | Social Concerns | Health and Wellbeing Articles';
-  const description = en
-    ? 'XeeTimes (ޒީޓައިމްސް) — the latest news from the Maldives: politics, sports, business, world news and reports, updated daily in Dhivehi.'
-    : 'ޒީޓައިމްސް- ތަފާތު ޝައުގުވެރި މުހިންމު މައުލޫމާތާއި ވީޑިއޯ';
+  // The SEARCH description carries the Dhivehi tagline AND an English sentence.
+  //
+  // Google was ignoring the Dhivehi-only description and building the snippet
+  // out of the footer instead — "Copyright 2026 © All rights Reserved · Terms
+  // and Conditions · Privacy Policy" — because on an English results page the
+  // footer was the only English prose on the site. Giving it a real English
+  // sentence gives it something to use that actually describes the newspaper,
+  // while Dhivehi readers still get Thaana first.
+  const description =
+    'ޒީޓައިމްސް- ތަފާތު ޝައުގުވެރި މުހިންމު މައުލޫމާތާއި ވީޑިއޯ — XeeTimes: exclusive profiles, social concerns, health and wellbeing reporting from the Maldives, published daily in Dhivehi.';
+  // Share cards keep the short Thaana line: they are read by Dhivehi speakers
+  // in Dhivehi apps, and the English half only takes up room there.
+  const ogDescription = 'ޒީޓައިމްސް- ތަފާތު ޝައުގުވެރި މުހިންމު މައުލޫމާތާއި ވީޑިއޯ';
   return {
     title: { absolute: title },
     description,
     alternates: {
       canonical: `${SITE_URL}`,
     },
-    openGraph: { title, description, url: `${SITE_URL}`, siteName: 'XeeTimes', type: 'website', locale: en ? 'en_US' : 'dv_MV' },
+    openGraph: { title, description: ogDescription, url: `${SITE_URL}`, siteName: 'XeeTimes', type: 'website', locale: en ? 'en_US' : 'dv_MV', images: [DEFAULT_OG_IMAGE] },
   };
 }
 
