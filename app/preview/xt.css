@@ -621,6 +621,15 @@ body:has(#xt-root) { background: var(--page); }
   margin: 26px 0; font-size: 15px; line-height: 1.9; color: var(--quote-ink);
 }
 #xt-root .xt-article-body blockquote p { margin: 0; font-size: 15px; line-height: 1.9; color: var(--quote-ink); text-align: right; }
+/* On a desktop column the body runs at 22px, and a 15px quote read as a
+   footnote rather than as the thing being quoted — the one line in the piece
+   that is meant to carry weight was the smallest text on the page. Left alone
+   on phones, where the narrower column keeps it in proportion. */
+@media (min-width: 861px) {
+  #xt-root .xt-article-body blockquote { font-size: 21px; padding: 20px 24px; }
+  #xt-root .xt-article-body blockquote p { font-size: 21px; }
+  #xt-root .xt-article-body blockquote .xt-quote-author { font-size: 16px; }
+}
 #xt-root .xt-article-body blockquote .xt-quote-body { margin: 0; }
 #xt-root .xt-article-body blockquote .xt-quote-author { display: block; margin-top: 12px; font-style: normal; font-weight: 700; font-size: 14px; color: var(--red); font-family: 'Ammu','Faruma',sans-serif; }
 

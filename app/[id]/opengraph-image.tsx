@@ -159,10 +159,20 @@ export default async function OgImage({ params }: { params: Promise<{ id: string
     }
   }
 
+  // X gets the card without the romanised line under the headline; Facebook
+  // keeps it. The line exists only because Facebook refuses to draw
+  // og:description — X lays out its cards differently and the newsroom does not
+  // want it doubled up there.
+  const isTwitter = /twitterbot/.test(ua);
+
   const safeId = id.replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 60);
   const stamp = article?.updatedAt ? new Date(article.updatedAt).getTime() : 0;
-  const goodFile = path.join(CACHE_DIR, `${OG_VERSION}-${lang}-${safeId}-${stamp}.jpg`);
-  const tmpFile = path.join(CACHE_DIR, `${OG_VERSION}-${lang}-${safeId}-${stamp}.tmp.jpg`);
+  // The variant is part of the cache key. Two different pictures now share one
+  // article and one timestamp, so without it whichever scraper arrived first
+  // would decide what every other scraper saw for the next week.
+  const variant = isTwitter ? 'tw' : 'std';
+  const goodFile = path.join(CACHE_DIR, `${OG_VERSION}-${lang}-${variant}-${safeId}-${stamp}.jpg`);
+  const tmpFile = path.join(CACHE_DIR, `${OG_VERSION}-${lang}-${variant}-${safeId}-${stamp}.tmp.jpg`);
   try {
     const st = await stat(goodFile);
     if (Date.now() - st.mtimeMs < 7 * 86400000) return new Response(new Uint8Array(await readFile(goodFile)), { headers: HEADERS });
@@ -207,7 +217,7 @@ export default async function OgImage({ params }: { params: Promise<{ id: string
   // Guarded by hasNonAscii: the field usually holds a romanisation but is free
   // text, and if the newsroom typed Thaana into it, this would render it as raw
   // unshaped codepoints (no Pango here, unlike the headline above). Latin only.
-  const latinRaw = (article?.metaDescription_dv || article?.excerpt_dv || '').trim();
+  const latinRaw = isTwitter ? '' : (article?.metaDescription_dv || article?.excerpt_dv || '').trim();
   const latin = latinRaw && !hasNonAscii(latinRaw)
     ? (latinRaw.length > 120 ? `${latinRaw.slice(0, 117).trimEnd()}…` : latinRaw)
     : '';
