@@ -63,7 +63,7 @@ async function watermarkVideo(input: Buffer, formData: FormData): Promise<Buffer
   try {
     const wmLogo = WM_LOGOS.has(String(formData.get('wmLogo') || '')) ? String(formData.get('wmLogo')) : 'red-word-white';
     const wmPos = WM_POSITIONS.has(String(formData.get('wmPos') || '')) ? String(formData.get('wmPos')) : 'bottom-left';
-    const wmSize = WM_SIZES[String(formData.get('wmSize') || '')] ?? WM_SIZES.medium;
+    const wmSize = WM_SIZES[String(formData.get('wmSize') || '')] ?? WM_SIZES.small;
     const wmOpacity = Math.min(100, Math.max(20, parseInt(String(formData.get('wmOpacity') || '100'), 10) || 100)) / 100;
 
     const src = path.join(dir, 'in');
@@ -185,7 +185,7 @@ export async function POST(request: Request) {
       const wmPos = WM_POSITIONS.has(String(formData.get('wmPos') || ''))
         ? (String(formData.get('wmPos')) as WmPos)
         : 'bottom-left';
-      const wmSize = WM_SIZES[String(formData.get('wmSize') || '')] ?? WM_SIZES.medium;
+      const wmSize = WM_SIZES[String(formData.get('wmSize') || '')] ?? WM_SIZES.small;
       // Clamped rather than trusted: an opacity outside 20-100 would either
       // erase the mark or do nothing, and neither is worth honouring.
       const wmOpacity = Math.min(100, Math.max(20, parseInt(String(formData.get('wmOpacity') || '100'), 10) || 100)) / 100;

@@ -44,7 +44,9 @@ export default function UploadSourceDialog({ open, onChoose, onCancel }: {
 }) {
   const [logo, setLogo] = useState('red-word-white');
   const [pos, setPos] = useState('bottom-left');
-  const [size, setSize] = useState('medium');
+  // Small by default: the newsroom signs a photo, it does not label it, and a
+  // mark that has to be un-noticed is the one people leave on.
+  const [size, setSize] = useState('small');
   const [opacity, setOpacity] = useState(100);
   if (!open) return null;
 
