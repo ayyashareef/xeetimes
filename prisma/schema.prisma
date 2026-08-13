@@ -348,3 +348,37 @@ model DailyStat {
   views     Int      @default(0)
   updatedAt DateTime @updatedAt
 }
+
+// One row per visitor per day. Counting rows gives "how many people", which a
+// view total cannot: one reader opening nine articles is nine views and one
+// visitor, and the newsroom needs both numbers to mean different things.
+//
+// `vid` is a salted hash of IP + user agent. It is one-way — the address cannot
+// be read back out of it — and no cookie is set, so nothing follows a reader
+// around and there is nothing to ask consent for. The cost of that choice: a
+// reader on mobile data whose IP changes counts twice, and an office sharing one
+// address counts once. Fine for a trend, wrong for a headcount, and deliberately
+// so.
+//
+// `country` comes from Cloudflare's CF-IPCountry header — already computed at
+// the edge, so it costs nothing and needs no geo database here.
+model VisitorDay {
+  day      String
+  vid      String
+  country  String?
+  lastSeen DateTime @default(now())
+
+  @@id([day, vid])
+  @@index([day])
+  // Realtime ("active in the last 30 minutes") reads this index.
+  @@index([lastSeen])
+}
+
+// First time each visitor was seen, so a day's visitors can be split into new
+// and returning.
+model Visitor {
+  vid      String @id
+  firstDay String
+
+  @@index([firstDay])
+}

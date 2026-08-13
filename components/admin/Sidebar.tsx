@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useState, type CSSProperties } from 'react';
 import {
   LayoutDashboard, FileText, FolderTree, Tags, ImageIcon, Users, Settings,
-  MessageSquare, Megaphone, ClipboardList, Shield, Menu, X, FileStack,
+  MessageSquare, Megaphone, ClipboardList, Shield, Menu, X, FileStack, BarChart3,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -22,6 +22,7 @@ const MAIN: Item[] = [
   { label: 'Tags', href: '/admin/tags', icon: Tags },
   { label: 'Media', href: '/admin/media', icon: ImageIcon },
   { label: 'Comments', href: '/admin/comments', icon: MessageSquare },
+  { label: 'Analytics', href: '/admin/analytics', icon: BarChart3, roles: ['SUPER_ADMIN', 'EDITOR'] },
   { label: 'Advertisements', href: '/admin/ads', icon: Megaphone, roles: ['SUPER_ADMIN', 'EDITOR'] },
   { label: 'Pages', href: '/admin/pages', icon: FileStack, roles: ['SUPER_ADMIN', 'EDITOR'] },
 ];
