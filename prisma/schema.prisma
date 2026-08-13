@@ -58,37 +58,37 @@ enum ArticleStatus {
 }
 
 model Article {
-  id                 String        @id @default(cuid())
-  slug               String        @unique
-  title_dv           String
-  title_en           String
-  shortTitle_dv      String?
-  shortTitle_en      String?
-  content_dv         String        @db.Text
-  content_en         String        @db.Text
-  excerpt_dv         String?       @db.VarChar(500)
-  excerpt_en         String?       @db.VarChar(500)
-  metaTitle_dv       String?
-  metaTitle_en       String?
-  metaDescription_dv String?
-  metaDescription_en String?
-  featuredImage      String?
-  galleryImages      Json?
-  featuredImageAlt_dv String?
-  featuredImageAlt_en String?
+  id                      String        @id @default(cuid())
+  slug                    String        @unique
+  title_dv                String
+  title_en                String
+  shortTitle_dv           String?
+  shortTitle_en           String?
+  content_dv              String        @db.Text
+  content_en              String        @db.Text
+  excerpt_dv              String?       @db.VarChar(500)
+  excerpt_en              String?       @db.VarChar(500)
+  metaTitle_dv            String?
+  metaTitle_en            String?
+  metaDescription_dv      String?
+  metaDescription_en      String?
+  featuredImage           String?
+  galleryImages           Json?
+  featuredImageAlt_dv     String?
+  featuredImageAlt_en     String?
   featuredImageCaption_dv String?
   featuredImageCaption_en String?
-  status             ArticleStatus @default(DRAFT)
-  isFeatured         Boolean       @default(false)
-  isBreaking         Boolean       @default(false)
-  viewCount          Int           @default(0)
-  publishedAt        DateTime?
-  scheduledAt        DateTime?
-  createdAt          DateTime      @default(now())
-  updatedAt          DateTime      @updatedAt
+  status                  ArticleStatus @default(DRAFT)
+  isFeatured              Boolean       @default(false)
+  isBreaking              Boolean       @default(false)
+  viewCount               Int           @default(0)
+  publishedAt             DateTime?
+  scheduledAt             DateTime?
+  createdAt               DateTime      @default(now())
+  updatedAt               DateTime      @updatedAt
 
-  categoryId String
-  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId    String
+  category      Category   @relation(fields: [categoryId], references: [id])
   // Secondary categories (WordPress allowed an article in several categories;
   // beta keeps one primary `category` + these extras so cross-cutting sections
   // like "video" list every article that belongs to them).
@@ -176,20 +176,20 @@ model Media {
 // ==================== COMMENTS ====================
 
 model Comment {
-  id        String   @id @default(cuid())
-  articleId String
-  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  id         String        @id @default(cuid())
+  articleId  String
+  article    Article       @relation(fields: [articleId], references: [id], onDelete: Cascade)
   authorName String
-  content   String   @db.Text
-  isApproved Boolean @default(false)
-  parentId  String?
-  parent    Comment? @relation("CommentReplies", fields: [parentId], references: [id])
-  replies   Comment[] @relation("CommentReplies")
-  userId    String?
-  user      User?    @relation(fields: [userId], references: [id])
-  votes     CommentVote[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  content    String        @db.Text
+  isApproved Boolean       @default(false)
+  parentId   String?
+  parent     Comment?      @relation("CommentReplies", fields: [parentId], references: [id])
+  replies    Comment[]     @relation("CommentReplies")
+  userId     String?
+  user       User?         @relation(fields: [userId], references: [id])
+  votes      CommentVote[]
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
 
   @@index([articleId, isApproved])
 }
@@ -227,12 +227,12 @@ enum ReactionType {
 }
 
 model Reaction {
-  id         String       @id @default(cuid())
-  articleId  String
-  article    Article      @relation(fields: [articleId], references: [id], onDelete: Cascade)
-  type       ReactionType
-  sessionId  String
-  createdAt  DateTime     @default(now())
+  id        String       @id @default(cuid())
+  articleId String
+  article   Article      @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  type      ReactionType
+  sessionId String
+  createdAt DateTime     @default(now())
 
   @@unique([articleId, sessionId])
   @@index([articleId])
@@ -243,24 +243,24 @@ model Reaction {
 // slot is a free-form key from lib/ad-slots.ts (each key defines a placement +
 // its correct size), so placements can change without a schema migration.
 model Advertisement {
-  id        String   @id @default(cuid())
-  title     String
+  id            String    @id @default(cuid())
+  title         String
   // Shown under the creative in place of the word "Advertisement". Blank means
   // the generic label, so nothing has to be filled in for a normal house ad.
-  sponsorLabel String?
-  imageUrl  String
-  linkUrl   String?
-  slot      String
+  sponsorLabel  String?
+  imageUrl      String
+  linkUrl       String?
+  slot          String
   // For per-category slots (e.g. CATEGORY_SIDE): which category this ad targets.
-  categorySlug String?
-  isActive  Boolean  @default(true)
-  startDate DateTime?
-  endDate   DateTime?
-  clickCount Int     @default(0)
-  viewCount  Int     @default(0)
-  rotateSeconds Int  @default(6)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  categorySlug  String?
+  isActive      Boolean   @default(true)
+  startDate     DateTime?
+  endDate       DateTime?
+  clickCount    Int       @default(0)
+  viewCount     Int       @default(0)
+  rotateSeconds Int       @default(6)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   @@index([slot, isActive])
 }
@@ -268,22 +268,22 @@ model Advertisement {
 // ==================== SETTINGS ====================
 
 model SiteSettings {
-  id                  String  @id @default("default")
-  siteName_dv         String  @default("ޒީ ޓައިމްސް")
-  siteName_en         String  @default("XeeTimes")
-  siteDescription_dv  String?
-  siteDescription_en  String?
-  logo                String?
-  logoWhite           String?
-  favicon             String?
-  socialLinks         Json?
-  analyticsId         String?
-  registrationNo      String?
-  phone               String?
-  email               String?
-  copyright           String?
-  commentsEnabled     Boolean @default(true)
-  rolePermissions     Json?
+  id                 String  @id @default("default")
+  siteName_dv        String  @default("ޒީ ޓައިމްސް")
+  siteName_en        String  @default("XeeTimes")
+  siteDescription_dv String?
+  siteDescription_en String?
+  logo               String?
+  logoWhite          String?
+  favicon            String?
+  socialLinks        Json?
+  analyticsId        String?
+  registrationNo     String?
+  phone              String?
+  email              String?
+  copyright          String?
+  commentsEnabled    Boolean @default(true)
+  rolePermissions    Json?
 }
 
 // ==================== PAGES (Privacy, Terms, etc.) ====================
@@ -331,4 +331,20 @@ model AuditLog {
 
   @@index([userId])
   @@index([createdAt])
+}
+
+// One row per day: how many article pages readers actually opened.
+//
+// Article.viewCount is a running total with no time in it, so the dashboard
+// could show "14.1 million views" and nothing about today — no chart, no
+// comparison with yesterday. This is the missing dimension, kept as a single
+// counter per day rather than a row per view: 365 rows a year instead of
+// millions, and no personal data stored at all.
+//
+// `day` is a plain YYYY-MM-DD string in Maldives time, so a day here means the
+// day the newsroom means, not a UTC day that ends at 5am local.
+model DailyStat {
+  day       String   @id
+  views     Int      @default(0)
+  updatedAt DateTime @updatedAt
 }

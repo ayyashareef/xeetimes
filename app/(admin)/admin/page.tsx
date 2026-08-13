@@ -1,5 +1,6 @@
 import { auth } from '@/lib/auth';
 import { db } from '@/lib/db';
+import TrafficPanel from '@/components/admin/TrafficPanel';
 import {
   FileText, CheckCircle2, MessageSquare, Users, ImageIcon, Plus, type LucideIcon,
 } from 'lucide-react';
@@ -71,6 +72,9 @@ export default async function AdminDashboard() {
           <Plus style={{ width: 17, height: 17 }} /> New Article
         </a>
       </div>
+
+      {/* Reader traffic — the newsroom asked for their Analytics view here. */}
+      <TrafficPanel />
 
       {/* stat cards */}
       <div className="adm-dash-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 18, marginBottom: 18 }}>
