@@ -607,7 +607,21 @@ body:has(#xt-root) { background: var(--page); }
 #xt-root .xt-video { position: relative; width: 100%; aspect-ratio: 16 / 9; margin: 16px 0 26px; background: #000; overflow: hidden; }
 #xt-root .xt-video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 #xt-root .xt-article-body figure { margin: 12px 0 22px; }
-#xt-root .xt-article-body figcaption { font-family: var(--en); font-size: 13px; color: var(--ink3); text-align: center; margin-top: 8px; }
+/* A caption belongs to the picture above it, so it sits tight against it and
+   starts at the right edge like every other line of Thaana on the page.
+   
+   The gap was not the caption's 8px — it was the IMAGE's 22px bottom margin,
+   meant for pictures standing on their own. Inside a figure the caption comes
+   next, so that margin is removed there rather than fought with a negative one.
+   
+   Faruma joins the font stack because captions here are written in Dhivehi and
+   the Latin-only stack left Thaana to whatever the device happened to pick. */
+#xt-root .xt-article-body figure img,
+#xt-root .xt-article-body figure video { margin-bottom: 0; }
+#xt-root .xt-article-body figcaption {
+  font-family: var(--en), 'Faruma', 'MV Utheemu', sans-serif;
+  font-size: 13px; color: var(--ink3); text-align: right; margin-top: 5px;
+}
 #xt-root .xt-article-body a { color: var(--red); text-decoration: underline; }
 #xt-root .xt-article-body ul, #xt-root .xt-article-body ol { margin: 0 0 22px; padding-right: 26px; }
 /* Tables from WP content: ignore the baked-in pixel heights/widths (they leave
