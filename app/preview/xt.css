@@ -1036,3 +1036,22 @@ body:has(#xt-root) { background: var(--page); }
   margin-top: 8px; font-size: 15px; color: var(--phink); text-align: start;
   font-family: 'Faruma', 'MV Utheemu', sans-serif;
 }
+
+/* Justified paragraphs, on a phone.
+   
+   Nine of the WordPress articles carry an inline text-align: justify. On a wide
+   column that is barely noticeable, which is why the same article looks correct
+   in the editor. On a phone the line holds three or four Thaana words, and
+   justification stretches the gaps between them until the text has rivers
+   running through it.
+   
+   Thaana has no hyphenation to fall back on, so there is nothing to relieve the
+   pressure — the spaces take all of it. Overridden only under 860px: the desktop
+   column is wide enough for justification to behave, and this leaves the
+   newsroom's choice intact where it works.
+   
+   !important is needed because the alignment is an inline style on each
+   paragraph, not a stylesheet rule. */
+@media (max-width: 860px) {
+  #xt-root .xt-article-body [style*="justify"] { text-align: start !important; }
+}

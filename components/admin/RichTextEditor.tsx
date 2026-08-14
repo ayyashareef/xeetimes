@@ -115,8 +115,10 @@ export default function RichTextEditor({
           // A tall article used to push the toolbar off the top of the screen,
           // so bolding a word near the end meant scrolling back up. The content
           // scrolls inside its own box instead and the toolbar stays put.
-          'prose max-w-none outline-none px-4 py-3',
-          'min-h-[300px] max-h-[65vh] overflow-y-auto',
+          // Scrolling lives on the wrapper below, not here: a browser puts the
+          // scrollbar on the LEFT of an RTL element, and the newsroom reads it
+          // on the right like every other scrollbar on their screen.
+          'prose max-w-none outline-none px-4 py-3 min-h-[300px]',
           dir === 'rtl' && 'font-dv-article text-right',
         ),
         dir,
@@ -353,7 +355,13 @@ export default function RichTextEditor({
           </ToolButton>
         </div>
 
-        <EditorContent editor={editor} />
+        {/* dir="ltr" on the SCROLLING box puts the scrollbar on the right; the
+            editor inside keeps its own dir, so the Thaana still runs
+            right-to-left. Direction is what decides which edge a scrollbar
+            sits on, and it is inherited — so the two have to be separated. */}
+        <div dir="ltr" className="max-h-[65vh] overflow-y-auto">
+          <EditorContent editor={editor} />
+        </div>
       </div>
 
       <MediaPicker
