@@ -10,6 +10,7 @@ import TextAlign from '@tiptap/extension-text-align';
 import TipTapLink from '@tiptap/extension-link';
 import Youtube from '@tiptap/extension-youtube';
 import { ImageWithCaption } from '@/lib/image-caption';
+import { VideoClip } from '@/lib/video-node';
 import { Gallery } from '@/lib/gallery-extension';
 import { QuoteWithAuthor } from '@/lib/quote-extension';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -97,6 +98,7 @@ export default function RichTextEditor({
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
       TipTapLink.configure({ openOnClick: false }),
       ImageWithCaption,
+      VideoClip,
       Gallery,
       Youtube.configure({ width: 640, height: 360 }),
       SocialEmbed,
@@ -136,11 +138,22 @@ export default function RichTextEditor({
 
   // Ask for a caption/credit on insert so the feature is discoverable (it can
   // still be edited later by clicking the caption under the image).
+  // The picker lists videos as well as photos, so what gets inserted has to
+  // follow the file. Inserting a clip as an image produced a broken image icon
+  // in the middle of the article.
+  const isVideoUrl = (u: string) => /\.(mp4|webm|ogv|ogg|mov)(\?|#|$)/i.test(u.trim());
+
   const insertImage = (url: string) => {
+    const src = url.trim();
+    if (isVideoUrl(src)) {
+      const caption = (prompt('Video caption / credit (optional):') || '').trim();
+      editor.chain().focus().insertContent({ type: 'videoClip', attrs: { src, caption } }).run();
+      return;
+    }
     const caption = (prompt('Photo caption / credit (optional):') || '').trim();
     editor.chain().focus().insertContent({
       type: 'imageWithCaption',
-      attrs: { src: url.trim(), caption },
+      attrs: { src, caption },
     }).run();
   };
 
@@ -149,6 +162,15 @@ export default function RichTextEditor({
   };
 
   const handleMultipleSelect = (urls: string[]) => {
+    // Clips are inserted one by one as video blocks; only photos can form a
+    // gallery, which is a grid of thumbnails opening a lightbox.
+    const videos = urls.filter(isVideoUrl);
+    const photos = urls.filter((u) => !isVideoUrl(u));
+    for (const v of videos) {
+      editor.chain().focus().insertContent({ type: 'videoClip', attrs: { src: v.trim(), caption: '' } }).run();
+    }
+    if (photos.length === 0) return;
+    urls = photos;
     if (urls.length === 1) {
       insertImage(urls[0]);
     } else {

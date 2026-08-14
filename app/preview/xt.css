@@ -1010,3 +1010,15 @@ body:has(#xt-root) { background: var(--page); }
 
 
 
+
+/* Uploaded video clips in the article body (figure[data-video] from the
+   editor). Full width like a photo, with the black letterbox showing rather
+   than a transparent gap while the first frame loads. */
+#xt-root .xt-article-body .video-clip-figure { margin: 12px 0 22px; }
+#xt-root .xt-article-body video.xt-video-clip {
+  width: 100%; height: auto; display: block; background: #000; border-radius: 3px;
+}
+#xt-root .xt-article-body .video-clip-figure figcaption {
+  margin-top: 8px; font-size: 15px; color: var(--phink); text-align: start;
+  font-family: 'Faruma', 'MV Utheemu', sans-serif;
+}

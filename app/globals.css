@@ -439,3 +439,8 @@
 .font-dv-article div {
   font-family: 'Faruma', 'utheemu', sans-serif;
 }
+
+/* Video clips inside the editor, so a writer sees the clip they inserted
+   rather than an empty block. */
+.ProseMirror video { width: 100%; height: auto; display: block; background: #000; border-radius: 8px; margin: 12px 0; }
+.ProseMirror .video-clip-figure figcaption { font-size: 13px; color: #6b7280; margin-top: 6px; }
