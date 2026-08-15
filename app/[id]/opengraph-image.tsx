@@ -27,7 +27,7 @@ const CACHE_DIR = path.join(process.cwd(), '.og-cache');
 const IMG_CACHE = path.join(CACHE_DIR, 'img');
 // Bumping this invalidates every card on disk — required whenever the artwork
 // changes, or readers keep getting the previous design from the cache.
-const OG_VERSION = 'v19';
+const OG_VERSION = 'v20';
 const HEADERS = {
   'Content-Type': 'image/jpeg',
   'Cache-Control': 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800',
@@ -206,7 +206,10 @@ export default async function OgImage({ params }: { params: Promise<{ id: string
   const textW = 1000;
   const long = heading.length > 90;
   const mid = heading.length > 50;
-  const headSizePt = long ? 49 : mid ? 57 : 68;
+  // Roughly 15% down from 49/57/68. The card is read at thumbnail size in a
+  // feed, where the headline was filling most of the picture and leaving little
+  // of the photograph to see.
+  const headSizePt = long ? 42 : mid ? 49 : 58;
   // Headline sits bottom-centre and is centre-aligned ('centre' is symmetric,
   // so no logical/visual RTL flip to worry about — unlike 'left'/'right').
   const headImg = await renderText(heading, { width: textW, sizePt: headSizePt, color: '#ffffff', align: 'centre' });
