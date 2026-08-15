@@ -139,6 +139,7 @@ export default async function OgImage({ params }: { params: Promise<{ id: string
       title_dv: true,
       title_en: true,
       featuredImage: true,
+      ogPlainImage: true,
       metaDescription_dv: true,
       excerpt_dv: true,
       updatedAt: true,
@@ -152,7 +153,10 @@ export default async function OgImage({ params }: { params: Promise<{ id: string
   // so they get the PLAIN featured photo instead — no doubled text.
   const ua = ((await headers()).get('user-agent') || '').toLowerCase();
   const socialBot = /facebookexternalhit|facebot|meta-externalagent|twitterbot|telegrambot|whatsapp|viber|linkedinbot|discordbot|slackbot|skypeuripreview|pinterest|line\//.test(ua);
-  if (!socialBot && article?.featuredImage) {
+  // The newsroom can turn the overlay off per article, for photos that already
+  // carry writing of their own — an event backdrop, a poster, a scoreboard —
+  // where a headline drawn on top lands on text that is already there.
+  if ((!socialBot || article?.ogPlainImage) && article?.featuredImage) {
     const plain = await loadPhoto(article.featuredImage);
     if (plain) {
       return new Response(new Uint8Array(Buffer.from(plain.split(',')[1], 'base64')), { headers: HEADERS });

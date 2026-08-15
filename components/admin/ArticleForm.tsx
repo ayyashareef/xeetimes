@@ -95,6 +95,7 @@ interface ArticleFormProps {
     status: string;
     isFeatured: boolean;
     isBreaking: boolean;
+    ogPlainImage?: boolean;
     scheduledAt: string | null;
     publishedAt?: string | null;
     tags: Tag[];
@@ -155,6 +156,7 @@ export default function ArticleForm({ article, role }: ArticleFormProps) {
     authorId: article?.authorId || '',
     isFeatured: article?.isFeatured || false,
     isBreaking: article?.isBreaking || false,
+    ogPlainImage: article?.ogPlainImage || false,
     scheduledAt: toMvtInput(article?.scheduledAt),
     publishedAt: toMvtInput(article?.publishedAt),
     selectedTags: article?.tags?.map(t => t.id) || [],
@@ -402,6 +404,23 @@ export default function ArticleForm({ article, role }: ArticleFormProps) {
                       placeholder="e.g. Dharinnakee gina guna niumaiythakugetherein enmmebodu ni'umaiy"
                     />
                   </div>
+                  {/* Some photos already have writing in them — an event
+                      backdrop, a poster, a scoreboard — and the headline drawn
+                      over the top lands on text that is already there. */}
+                  <label className="flex items-start gap-2.5 cursor-pointer pt-1">
+                    <input
+                      type="checkbox"
+                      checked={form.ogPlainImage}
+                      onChange={(e) => setForm(f => ({ ...f, ogPlainImage: e.target.checked }))}
+                      className="mt-0.5 w-4 h-4 accent-primary"
+                    />
+                    <span>
+                      <span className="block text-sm text-gray-700">Share photo without the headline on it</span>
+                      <span className="block text-xs text-gray-400 mt-0.5">
+                        Facebook and X get the plain photo. Use it when the photo already has writing in it.
+                      </span>
+                    </span>
+                  </label>
                 </div>
               </div>
 

@@ -73,7 +73,7 @@ export async function POST(request: Request) {
     metaTitle_dv, metaTitle_en, metaDescription_dv, metaDescription_en,
     featuredImage, featuredImageAlt_dv, featuredImageAlt_en,
     featuredImageCaption_dv, featuredImageCaption_en,
-    categoryId, tags, status, isFeatured, isBreaking,
+    categoryId, tags, status, isFeatured, isBreaking, ogPlainImage,
     scheduledAt } = body;
 
   // A category is mandatory (the schema requires it; without this check a
@@ -133,6 +133,7 @@ export async function POST(request: Request) {
     status: articleStatus,
     isFeatured: isFeatured || false,
     isBreaking: isBreaking || false,
+    ogPlainImage: ogPlainImage || false,
     scheduledAt: mvtLocalToDate(scheduledAt),
     publishedAt: mvtLocalToDate(body.publishedAt) ?? (articleStatus === 'PUBLISHED' ? new Date() : null),
     tags: tags?.length ? { connect: tags.map((tagId: string) => ({ id: tagId })) } : undefined,

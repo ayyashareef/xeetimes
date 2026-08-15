@@ -81,6 +81,10 @@ model Article {
   status                  ArticleStatus @default(DRAFT)
   isFeatured              Boolean       @default(false)
   isBreaking              Boolean       @default(false)
+  // Share card shows the featured photo alone, with no headline drawn over it.
+  // For photos that already carry text — an event backdrop, a poster, a chart —
+  // where the overlay would land on top of writing that is already there.
+  ogPlainImage            Boolean       @default(false)
   viewCount               Int           @default(0)
   publishedAt             DateTime?
   scheduledAt             DateTime?

@@ -55,7 +55,7 @@ export async function PUT(
     metaTitle_dv, metaTitle_en, metaDescription_dv, metaDescription_en,
     featuredImage, featuredImageAlt_dv, featuredImageAlt_en,
     featuredImageCaption_dv, featuredImageCaption_en,
-    categoryId, tags, status, isFeatured, isBreaking,
+    categoryId, tags, status, isFeatured, isBreaking, ogPlainImage,
     scheduledAt, changeNote } = body;
 
   // Only editors+ can publish
@@ -96,6 +96,7 @@ export async function PUT(
       status: articleStatus,
       isFeatured: isFeatured ?? article.isFeatured,
       isBreaking: isBreaking ?? article.isBreaking,
+      ogPlainImage: ogPlainImage ?? article.ogPlainImage,
       scheduledAt: mvtLocalToDate(scheduledAt),
       publishedAt,
       tags: tags ? { set: tags.map((tid: string) => ({ id: tid })) } : undefined,
