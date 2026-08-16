@@ -81,7 +81,22 @@ export async function generateMetadata({
       publishedTime: a.publishedAt?.toISOString(),
       modifiedTime: (a.updatedAt || a.publishedAt)?.toISOString(),
     },
-    twitter: { card: 'summary_large_image', title: textTitle, description: desc },
+    // X draws the card title in a dark box ACROSS THE BOTTOM OF THE PICTURE,
+    // where Facebook prints it underneath. With textTitle — the newsroom's Latin
+    // SEO title — that put a line of romanised text over the photo on X and
+    // nowhere else, which is the "Latin text on Twitter" the newsroom kept
+    // seeing. It was never in the image.
+    //
+    // X therefore gets the Thaana headline, matching the one already drawn on
+    // the card. Facebook keeps the Latin title, where it sits below the image
+    // and does no harm.
+    //
+    // No description either: X would stack it under that same box, over the
+    // photograph.
+    twitter: {
+      card: 'summary_large_image',
+      title: a.shortTitle_dv || a.title_dv || textTitle,
+    },
   };
 }
 
