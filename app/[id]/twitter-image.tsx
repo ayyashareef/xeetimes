@@ -18,5 +18,12 @@ export const contentType = 'image/jpeg';
 
 export default async function TwitterImage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  return renderShareCard({ id, withLatin: false });
+  // No headline drawn on the picture either. X prints its own title in a dark
+  // box ACROSS THE IMAGE and gives no way to switch that off — Next fills
+  // twitter:title in even when it is omitted — so a headline on the card meant
+  // the same sentence twice, once large and once small.
+  //
+  // Same rule the aggregator apps already follow: anything that draws its own
+  // headline over the picture gets the picture, not our headline.
+  return renderShareCard({ id, withLatin: false, withHeadline: false });
 }
