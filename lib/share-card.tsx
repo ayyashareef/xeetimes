@@ -124,11 +124,7 @@ async function loadPhoto(src: string | null | undefined): Promise<string | null>
  * the picture with the same agent it fetches the page. Two routes, two URLs,
  * no guessing.
  */
-export async function renderShareCard({
-  id,
-  withLatin,
-  withHeadline = true,
-}: { id: string; withLatin: boolean; withHeadline?: boolean }) {
+export async function renderShareCard({ id, withLatin }: { id: string; withLatin: boolean }) {
   const lang = 'dv';
 
   const forms = new Set<string>([id]);
@@ -165,7 +161,7 @@ export async function renderShareCard({
   // The newsroom can turn the overlay off per article, for photos that already
   // carry writing of their own — an event backdrop, a poster, a scoreboard —
   // where a headline drawn on top lands on text that is already there.
-  if ((!socialBot || article?.ogPlainImage || !withHeadline) && article?.featuredImage) {
+  if ((!socialBot || article?.ogPlainImage) && article?.featuredImage) {
     const plain = await loadPhoto(article.featuredImage);
     if (plain) {
       return new Response(new Uint8Array(Buffer.from(plain.split(',')[1], 'base64')), { headers: HEADERS });
@@ -177,7 +173,7 @@ export async function renderShareCard({
   // The variant is part of the cache key. Two different pictures now share one
   // article and one timestamp, so without it whichever scraper arrived first
   // would decide what every other scraper saw for the next week.
-  const variant = `${withLatin ? 'std' : 'tw'}${withHeadline ? '' : '-nohl'}`;
+  const variant = withLatin ? 'std' : 'tw';
   const goodFile = path.join(CACHE_DIR, `${OG_VERSION}-${lang}-${variant}-${safeId}-${stamp}.jpg`);
   const tmpFile = path.join(CACHE_DIR, `${OG_VERSION}-${lang}-${variant}-${safeId}-${stamp}.tmp.jpg`);
   try {
