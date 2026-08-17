@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { headers } from 'next/headers';
 import { db } from '@/lib/db';
 import { auth } from '@/lib/auth';
 import { SITE_URL, jsonLd, newsArticleJsonLd } from '@/lib/seo';
@@ -56,7 +55,6 @@ export async function generateMetadata({
       ? a.shortTitle_en || a.shortTitle_dv || a.title_en || a.title_dv
       : a.shortTitle_dv || a.shortTitle_en || a.title_dv || a.title_en) ||
     'XeeTimes';
-  const isTwitterBot = /twitterbot/i.test((await headers()).get('user-agent') || '');
   const desc = (en
     ? a.metaDescription_en || a.excerpt_en || a.metaDescription_dv || a.excerpt_dv
     : a.metaDescription_dv || a.excerpt_dv) || undefined;
@@ -74,7 +72,7 @@ export async function generateMetadata({
       canonical,
     },
     openGraph: {
-      title: isTwitterBot ? (a.shortTitle_dv || a.title_dv || textTitle) : textTitle,
+      title: textTitle,
       description: desc,
       type: 'article',
       siteName: 'XeeTimes',
@@ -95,17 +93,11 @@ export async function generateMetadata({
     //
     // No description either: X would stack it under that same box, over the
     // photograph.
-    // X puts its title in a dark box ON TOP of the picture, which the card
-    // already carries as a headline — so the newsroom saw the same Dhivehi
-    // sentence twice, once large and once small.
-    //
-    // X gives no way to say "no title": leave twitter:title out and it falls
-    // back to og:title. So the fallback is made harmless instead — for
-    // Twitterbot ONLY, og:title becomes the Thaana headline too. If X drops the
-    // box, the duplicate is gone; if it insists on one, it is at least Thaana
-    // and not the Latin line that started this. Facebook is untouched and keeps
-    // its Latin title, which sits below the image.
-    twitter: { card: 'summary_large_image' },
+    // X prints this title in a dark box over the picture, so it appears twice:
+    // once in the headline drawn on the card, once here. The newsroom was shown
+    // both and asked for the Latin title in that box — X will always print
+    // something there, so the choice is Latin or Thaana, never neither.
+    twitter: { card: 'summary_large_image', title: textTitle },
   };
 }
 
