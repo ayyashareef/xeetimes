@@ -19,12 +19,6 @@ const LOGOS: { id: string; label: string; hint: string }[] = [
   { id: 'white-mark', label: 'White mark', hint: 'no name' },
 ];
 
-const SIZES: { id: string; label: string }[] = [
-  { id: 'small', label: 'Small' },
-  { id: 'medium', label: 'Medium' },
-  { id: 'large', label: 'Large' },
-  { id: 'cover', label: 'Cover (hide a face)' },
-];
 const OPACITIES = [100, 85, 70, 50];
 
 const POSITIONS: { id: string; label: string }[] = [
@@ -44,9 +38,11 @@ export default function UploadSourceDialog({ open, onChoose, onCancel }: {
 }) {
   const [logo, setLogo] = useState('red-word-white');
   const [pos, setPos] = useState('bottom-left');
-  // Small by default: the newsroom signs a photo, it does not label it, and a
-  // mark that has to be un-noticed is the one people leave on.
-  const [size, setSize] = useState('small');
+  // Fixed at small — the newsroom signs a photo, it does not label it, and a
+  // mark meant to go un-noticed is the one people leave on. A one-option
+  // dropdown is just a thing to mis-click. Still SENT with the
+  // upload so the server is never left guessing at its own default.
+  const size = 'small';
   const [opacity, setOpacity] = useState(100);
   if (!open) return null;
 
@@ -97,12 +93,6 @@ export default function UploadSourceDialog({ open, onChoose, onCancel }: {
             <label style={{ display: 'block', fontSize: 12, fontWeight: 700, letterSpacing: '.04em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 8 }}>Position</label>
             <select value={pos} onChange={(e) => setPos(e.target.value)} style={selectStyle}>
               {POSITIONS.map((p) => <option key={p.id} value={p.id}>{p.label}</option>)}
-            </select>
-          </div>
-          <div>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 700, letterSpacing: '.04em', textTransform: 'uppercase', color: '#6b7280', marginBottom: 8 }}>Size</label>
-            <select value={size} onChange={(e) => setSize(e.target.value)} style={selectStyle}>
-              {SIZES.map((x) => <option key={x.id} value={x.id}>{x.label}</option>)}
             </select>
           </div>
           <div>
