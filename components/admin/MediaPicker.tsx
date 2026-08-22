@@ -162,12 +162,19 @@ export default function MediaPicker({ open, onClose, onSelect, onSelectMultiple,
 
         {/* Toolbar */}
         <div className="flex items-center gap-3 p-4 border-b border-gray-100">
-          {/* Folder nav */}
-          <div className="flex items-center gap-1 text-sm">
+          {/* Folder nav.
+              flex-1 + min-w-0 + overflow-x-auto is what keeps Upload on screen.
+              This row grows a chip every time staff upload into a new category
+              folder; at 13 folders it needed ~1250px inside an 896px dialog, so
+              it pushed the search box and the Upload button off the right edge —
+              which is why the button was there one week and gone the next.
+              min-w-0 is the load-bearing half: without it a flex child refuses
+              to shrink below its content and scrolls the whole toolbar instead. */}
+          <div className="flex items-center gap-1 text-sm flex-1 min-w-0 overflow-x-auto">
             <button
               onClick={() => setCurrentFolder('')}
               className={cn(
-                'px-2 py-1 rounded transition',
+                'px-2 py-1 rounded transition shrink-0',
                 !currentFolder ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100'
               )}
             >
@@ -178,7 +185,7 @@ export default function MediaPicker({ open, onClose, onSelect, onSelectMultiple,
                 key={f}
                 onClick={() => setCurrentFolder(f)}
                 className={cn(
-                  'px-2 py-1 rounded transition flex items-center gap-1',
+                  'px-2 py-1 rounded transition flex items-center gap-1 shrink-0 whitespace-nowrap',
                   currentFolder === f ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100'
                 )}
               >
@@ -188,10 +195,8 @@ export default function MediaPicker({ open, onClose, onSelect, onSelectMultiple,
             ))}
           </div>
 
-          <div className="flex-1" />
-
           {/* Search */}
-          <div className="relative">
+          <div className="relative shrink-0">
             <Search className="absolute start-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
@@ -205,7 +210,7 @@ export default function MediaPicker({ open, onClose, onSelect, onSelectMultiple,
 
           {/* Upload button (asks XeeTimes-owned vs other on click) */}
           <label className={cn(
-            'flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white rounded-lg text-sm font-medium cursor-pointer hover:bg-primary-700 transition',
+            'flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white rounded-lg text-sm font-medium cursor-pointer hover:bg-primary-700 transition shrink-0 whitespace-nowrap',
             uploading && 'opacity-50 pointer-events-none'
           )}>
             {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
